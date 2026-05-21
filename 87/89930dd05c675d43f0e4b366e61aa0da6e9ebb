@@ -1,0 +1,16 @@
+.pre-commit-config.yaml
+  h_e38f44ce52ca59 1-18
+.gitignore
+  h_e38f44ce52ca59 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "8789930dd05c675d43f0e4b366e61aa0da6e9ebb",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
