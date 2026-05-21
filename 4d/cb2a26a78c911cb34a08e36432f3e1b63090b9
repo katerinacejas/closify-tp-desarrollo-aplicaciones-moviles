@@ -1,0 +1,14 @@
+.gitignore
+  h_e38f44ce52ca59 1-15,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "4dcb2a26a78c911cb34a08e36432f3e1b63090b9",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
