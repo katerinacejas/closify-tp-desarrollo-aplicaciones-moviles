@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Placeholder para pantalla 1: "Tu estilo, organizado"
+    Reemplazar con el PNG exportado desde Figma: on_boarding_parte_1
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Fondo circular suave -->
+    <path
+        android:fillColor="#F4ECFF"
+        android:pathData="M140,10 A130,130 0 1,1 139.9,10 Z" />
+
+    <!-- Cuerpo del teléfono -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#B9A7F7"
+        android:strokeWidth="3"
+        android:pathData="M105,70 L175,70 Q182,70 182,77 L182,210 Q182,217 175,217 L105,217 Q98,217 98,210 L98,77 Q98,70 105,70 Z" />
+
+    <!-- Pantalla del teléfono -->
+    <path
+        android:fillColor="#F4ECFF"
+        android:pathData="M108,85 L172,85 L172,200 L108,200 Z" />
+
+    <!-- Prenda 1: remera (cuadrado rosa) -->
+    <path
+        android:fillColor="#F8BBD0"
+        android:pathData="M115,100 L152,100 L152,130 L115,130 Z" />
+
+    <!-- Prenda 2: pantalón (cuadrado lila) -->
+    <path
+        android:fillColor="#B9A7F7"
+        android:pathData="M115,138 L152,138 L152,168 L115,168 Z" />
+
+    <!-- Prenda 3: bolsa (acento lavanda) -->
+    <path
+        android:fillColor="#D8B4FE"
+        android:pathData="M115,176 L135,176 L135,193 L115,193 Z" />
+
+    <!-- Prenda 4: zapatos (gris claro) -->
+    <path
+        android:fillColor="#B9A7F7"
+        android:strokeColor="#7C3AED"
+        android:strokeWidth="1"
+        android:pathData="M140,176 L160,176 L160,193 L140,193 Z" />
+
+    <!-- Perchero externo: palo vertical -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M195,80 L199,80 L199,210 L195,210 Z" />
+
+    <!-- Perchero: base -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M185,207 L209,207 L209,213 L185,213 Z" />
+
+    <!-- Perchero: barra horizontal -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M185,110 L209,110 L209,114 L185,114 Z" />
+
+    <!-- Perchero: gancho curvo -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#7C3AED"
+        android:strokeWidth="3"
+        android:pathData="M197,80 A8,8 0 0,1 197,64" />
+
+</vector>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Placeholder para pantalla 3: "Inspirate con tus amigos"
+    Reemplazar con el PNG exportado desde Figma: on_boarding_parte_3
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Fondo circular lavanda -->
+    <path
+        android:fillColor="#EDE9FE"
+        android:pathData="M140,10 A130,130 0 1,1 139.9,10 Z" />
+
+    <!-- Teléfono principal (feed social) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#B9A7F7"
+        android:strokeWidth="3"
+        android:pathData="M90,55 L190,55 Q198,55 198,63 L198,225 Q198,233 190,233 L90,233 Q82,233 82,225 L82,63 Q82,55 90,55 Z" />
+
+    <!-- Pantalla del teléfono -->
+    <path
+        android:fillColor="#FFF7FB"
+        android:pathData="M88,72 L192,72 L192,220 L88,220 Z" />
+
+    <!-- Post 1: avatar + contenido -->
+    <path android:fillColor="#D8B4FE" android:pathData="M94,80 L106,80 A6,6 0 1,1 94,80 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M114,82 L180,82 L180,88 L114,88 Z" />
+    <path android:fillColor="#B9A7F7" android:pathData="M94,98 L186,98 L186,130 L94,130 Z" />
+
+    <!-- Post 2: avatar + contenido -->
+    <path android:fillColor="#F8BBD0" android:pathData="M94,140 L106,140 A6,6 0 1,1 94,140 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M114,142 L180,142 L180,148 L114,148 Z" />
+    <path android:fillColor="#F8BBD0" android:pathData="M94,158 L186,158 L186,190 L94,190 Z" />
+
+    <!-- Post 3: avatar + contenido parcial -->
+    <path android:fillColor="#B9A7F7" android:pathData="M94,200 L106,200 A6,6 0 1,1 94,200 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M114,202 L180,202 L180,208 L114,208 Z" />
+
+    <!-- Avatares flotantes (amigos) -->
+    <!-- Avatar 1 arriba derecha -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M205,80 A18,18 0 1,1 204.9,80 Z" />
+    <!-- Avatar 2 arriba -->
+    <path
+        android:fillColor="#F8BBD0"
+        android:pathData="M218,55 A14,14 0 1,1 217.9,55 Z" />
+    <!-- Avatar 3 derecha -->
+    <path
+        android:fillColor="#D8B4FE"
+        android:pathData="M212,115 A16,16 0 1,1 211.9,115 Z" />
+
+</vector>

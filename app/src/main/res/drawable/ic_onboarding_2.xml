@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Placeholder para pantalla 2: "Outfits para cada momento"
+    Reemplazar con el PNG exportado desde Figma: on_boarding_parte_2
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Fondo circular rosa suave -->
+    <path
+        android:fillColor="#FFF0F5"
+        android:pathData="M140,10 A130,130 0 1,1 139.9,10 Z" />
+
+    <!-- Calendario: fondo -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#F8BBD0"
+        android:strokeWidth="3"
+        android:pathData="M70,80 L210,80 Q216,80 216,86 L216,210 Q216,216 210,216 L70,216 Q64,216 64,210 L64,86 Q64,80 70,80 Z" />
+
+    <!-- Calendario: encabezado -->
+    <path
+        android:fillColor="#F8BBD0"
+        android:pathData="M64,86 Q64,80 70,80 L210,80 Q216,80 216,86 L216,105 L64,105 Z" />
+
+    <!-- Calendario: ganchos -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M100,70 L104,70 L104,92 L100,92 Z" />
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M176,70 L180,70 L180,92 L176,92 Z" />
+
+    <!-- Grid de días: fila 1 -->
+    <path android:fillColor="#D8B4FE" android:pathData="M75,115 L90,115 L90,130 L75,130 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M95,115 L110,115 L110,130 L95,130 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M115,115 L130,115 L130,130 L115,130 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M135,115 L150,115 L150,130 L135,130 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M155,115 L170,115 L170,130 L155,130 Z" />
+    <path android:fillColor="#F8BBD0" android:pathData="M175,115 L190,115 L190,130 L175,130 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M195,115 L205,115 L205,130 L195,130 Z" />
+
+    <!-- Grid de días: fila 2 -->
+    <path android:fillColor="#F4ECFF" android:pathData="M75,135 L90,135 L90,150 L75,150 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M95,135 L110,135 L110,150 L95,150 Z" />
+    <path android:fillColor="#B9A7F7" android:pathData="M115,135 L130,135 L130,150 L115,150 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M135,135 L150,135 L150,150 L135,150 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M155,135 L170,135 L170,150 L155,150 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M175,135 L190,135 L190,150 L175,150 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M195,135 L205,135 L205,150 L195,150 Z" />
+
+    <!-- Grid de días: fila 3 -->
+    <path android:fillColor="#F4ECFF" android:pathData="M75,155 L90,155 L90,170 L75,170 Z" />
+    <path android:fillColor="#F8BBD0" android:pathData="M95,155 L110,155 L110,170 L95,170 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M115,155 L130,155 L130,170 L115,170 Z" />
+    <path android:fillColor="#7C3AED" android:pathData="M135,155 L150,155 L150,170 L135,170 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M155,155 L170,155 L170,170 L155,170 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M175,155 L190,155 L190,170 L175,170 Z" />
+    <path android:fillColor="#F4ECFF" android:pathData="M195,155 L205,155 L205,170 L195,170 Z" />
+
+    <!-- Outfit destacado debajo del calendario -->
+    <path
+        android:fillColor="#B9A7F7"
+        android:pathData="M95,180 L130,180 L130,205 L95,205 Z" />
+    <path
+        android:fillColor="#F8BBD0"
+        android:pathData="M135,180 L185,180 L185,205 L135,205 Z" />
+
+</vector>
