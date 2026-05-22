@@ -1,0 +1,47 @@
+app/src/main/java/com/closify/myapplication/ui/theme/Theme.kt
+  s_e5c58b19a73b37::t_9bafe50491316f 10-26,28-44,48,52,56,59
+app/src/main/java/com/closify/myapplication/MainActivity.kt
+  s_e5c58b19a73b37::t_e1e0cb09fc4359 7-8,15-20
+app/src/main/res/drawable/ic_onboarding_1.xml
+  s_e5c58b19a73b37::t_bcd5e37682c023 1-73
+app/src/main/res/values/arrays.xml
+  h_e38f44ce52ca59 1-4
+app/build.gradle.kts
+  s_e5c58b19a73b37::t_699e4c758064b3 51
+  h_e38f44ce52ca59 52
+app/src/main/java/com/closify/myapplication/ui/theme/Color.kt
+  s_e5c58b19a73b37::t_df9a30205a6bcc 5-19
+app/src/main/res/drawable/ic_onboarding_3.xml
+  s_e5c58b19a73b37::t_264f15985abe87 1-57
+app/src/main/java/com/closify/myapplication/ui/theme/Type.kt
+  s_e5c58b19a73b37::t_96a28539765b4c 7-8,10,12-44,46-54,56-57,60-76,78,80,82,84
+app/src/main/res/drawable/ic_onboarding_2.xml
+  s_e5c58b19a73b37::t_9a19a2fe49d96a 1-72
+app/src/main/java/com/closify/myapplication/ui/onboarding/OnboardingScreen.kt
+  s_e5c58b19a73b37::t_8cc457272d3304 24,72-123,126-128
+  s_e5c58b19a73b37::t_94994c1161a835 1-23,25-71,124-125,129-213
+gradle/libs.versions.toml
+  s_e5c58b19a73b37::t_4bb915d19a7a40 28
+  h_e38f44ce52ca59 11,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "fdcb33bfd2fbabd388833dd9a65295eb54cc68e5",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_e5c58b19a73b37": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da2e92b7-216a-4358-89a3-b478d55867d3",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
