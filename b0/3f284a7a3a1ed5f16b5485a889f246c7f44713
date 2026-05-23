@@ -1,0 +1,24 @@
+.gitignore
+  s_13f9eaa2e43871::t_7cd36e1b833194 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b03f284a7a3a1ed5f16b5485a889f246c7f44713",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_13f9eaa2e43871": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ca8ac0a2-9702-4a35-a827-983286b0c2b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
