@@ -1,0 +1,24 @@
+app/src/main/java/com/closify/myapplication/ui/theme/Type.kt
+  s_13f9eaa2e43871::t_5b9577e0c886fc 5,11,14-17,20-21,23,26-29,32,35-38,41,44-47,50,53-56,59,62-65,68,71-74,77,80-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "31520a95109d5e9ef739ae18533cb5426c12ad21",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_13f9eaa2e43871": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ca8ac0a2-9702-4a35-a827-983286b0c2b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
