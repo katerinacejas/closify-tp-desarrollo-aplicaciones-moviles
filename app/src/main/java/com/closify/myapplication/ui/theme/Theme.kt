@@ -51,8 +51,7 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary          = DarkBackgroundColor,  // #17111F
 
     background          = DarkBackgroundColor,  // #17111F — fondo dark
-    onBackground        = DarkTextColor,        // #F8F1FF
-
+    onBackground        = DarkTextColor,        // #F8F1F
     surface             = DarkSurfaceColor,     // #241A2E — cards dark
     onSurface           = DarkTextColor,        // #F8F1FF
     surfaceVariant      = DarkSurfaceColor,     // #241A2E
