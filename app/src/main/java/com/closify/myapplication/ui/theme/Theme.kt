@@ -1,58 +1,77 @@
 package com.closify.myapplication.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+// ── Esquema de colores claro ──────────────────────────────────────────────────
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary             = PrimaryDark,          // #7C3AED — botón principal
+    onPrimary           = SurfaceColor,         // #FFFFFF — texto sobre botón principal
+    primaryContainer    = LilaPrimary,          // #B9A7F7 — chips/filtros seleccionados
+    onPrimaryContainer  = TextPrimary,          // #2E2438
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary           = RosaSecondary,        // #F8BBD0 — botón secundario
+    onSecondary         = TextPrimary,          // #2E2438
+    secondaryContainer  = RosaSecondary,
+    onSecondaryContainer = TextPrimary,
+
+    tertiary            = LavandaAccent,        // #D8B4FE — accent / chips
+    onTertiary          = TextPrimary,          // #2E2438
+
+    background          = BackgroundColor,      // #FFF7FB — fondo general
+    onBackground        = TextPrimary,          // #2E2438
+
+    surface             = SurfaceColor,         // #FFFFFF — cards
+    onSurface           = TextPrimary,          // #2E2438
+    surfaceVariant      = SurfaceVariantColor,  // #F4ECFF — cards suaves / secciones
+    onSurfaceVariant    = TextSecondary,        // #7B6B8F
+
+    error               = ErrorColor,           // #E57373
+    onError             = SurfaceColor,         // #FFFFFF
 )
 
+// ── Esquema de colores oscuro ─────────────────────────────────────────────────
+
+private val DarkColorScheme = darkColorScheme(
+    primary             = LilaPrimary,          // #B9A7F7 — botones principales dark
+    onPrimary           = DarkBackgroundColor,  // #17111F
+    primaryContainer    = PrimaryDark,          // #7C3AED
+    onPrimaryContainer  = DarkTextColor,        // #F8F1FF
+
+    secondary           = RosaSecondary,        // #F8BBD0
+    onSecondary         = DarkBackgroundColor,  // #17111F
+    secondaryContainer  = RosaSecondary,
+    onSecondaryContainer = DarkBackgroundColor,
+
+    tertiary            = LavandaAccent,        // #D8B4FE
+    onTertiary          = DarkBackgroundColor,  // #17111F
+
+    background          = DarkBackgroundColor,  // #17111F — fondo dark
+    onBackground        = DarkTextColor,        // #F8F1FF
+
+    surface             = DarkSurfaceColor,     // #241A2E — cards dark
+    onSurface           = DarkTextColor,        // #F8F1FF
+    surfaceVariant      = DarkSurfaceColor,     // #241A2E
+    onSurfaceVariant    = DarkTextColor,        // #F8F1FF
+
+    error               = ErrorColor,           // #E57373
+    onError             = SurfaceColor,         // #FFFFFF
+)
+
+// ── Tema principal de la app ──────────────────────────────────────────────────
+
 @Composable
-fun MyApplicationTheme(
+fun ClosifyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+        typography  = ClosifyTypography,
+        content     = content
     )
 }
