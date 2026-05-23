@@ -19,12 +19,7 @@ signing.properties
 release.properties
 
 # ── Android Studio / IntelliJ ─────────────────────────────────────────────────
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
 
 # ── Kotlin ────────────────────────────────────────────────────────────────────
 .kotlin/
