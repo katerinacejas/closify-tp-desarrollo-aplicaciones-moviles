@@ -1,0 +1,38 @@
+app/src/main/java/com/closify/myapplication/ui/screens/Onboarding.kt
+  h_e38f44ce52ca59 1,28,41,47,49,172-179
+  s_13f9eaa2e43871::t_641128b983ff46 126-127
+  s_13f9eaa2e43871::t_35f4a3bced16b7 137
+app/src/main/java/com/closify/myapplication/MainActivity.kt
+  s_13f9eaa2e43871::t_aa8d7e6231d77e 7
+app/src/main/java/com/closify/myapplication/ui/viewModel/Onboarding.kt
+  s_13f9eaa2e43871::t_f0b3cce8e0514d 1-33,46-49
+  s_13f9eaa2e43871::t_5afa43fd4abbda 34-36
+  s_13f9eaa2e43871::t_a8d7b8f9a6fe2f 37-45
+app/src/main/AndroidManifest.xml
+  s_13f9eaa2e43871::t_b433ae7954fcec 5-6
+app/build.gradle.kts
+  s_13f9eaa2e43871::t_32ac3dbd991a54 53
+gradle/libs.versions.toml
+  s_13f9eaa2e43871::t_52f123ea210838 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "c29d798dfa5dfa654182ed7afe65736db82d1480",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_13f9eaa2e43871": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ca8ac0a2-9702-4a35-a827-983286b0c2b7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
