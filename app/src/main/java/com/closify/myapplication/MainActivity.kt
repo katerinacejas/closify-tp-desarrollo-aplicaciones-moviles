@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.closify.myapplication.ui.screens.onboarding.OnboardingScreen
+import com.closify.myapplication.ui.screens.OnboardingScreen
 import com.closify.myapplication.ui.theme.ClosifyTheme
 
 class MainActivity : ComponentActivity() {

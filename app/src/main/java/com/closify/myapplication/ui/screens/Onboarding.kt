@@ -1,7 +1,5 @@
-package com.closify.myapplication.ui.screens.onboarding
+package com.closify.myapplication.ui.screens
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,39 +38,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyLogo
+import com.closify.myapplication.ui.viewModel.OnboardingViewModel
 import com.closify.myapplication.ui.theme.ClosifyTheme
-
-private data class OnboardingPage(
-    @DrawableRes val imageRes: Int,
-    @StringRes val titleRes: Int,
-    @StringRes val descriptionRes: Int
-)
-
-private val pages = listOf(
-    OnboardingPage(
-        imageRes        = R.drawable.onboarding_1,
-        titleRes        = R.string.onboarding_1_title,
-        descriptionRes  = R.string.onboarding_1_description
-    ),
-    OnboardingPage(
-        imageRes        = R.drawable.onboarding_2,
-        titleRes        = R.string.onboarding_2_title,
-        descriptionRes  = R.string.onboarding_2_description
-    ),
-    OnboardingPage(
-        imageRes        = R.drawable.onboarding_3,
-        titleRes        = R.string.onboarding_3_title,
-        descriptionRes  = R.string.onboarding_3_description
-    )
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen(
-    onFinish: () -> Unit = {}
+    viewModel: OnboardingViewModel = viewModel()
 ) {
+    val pages = viewModel.pages
     val pagerState = rememberPagerState(pageCount = { pages.size })
-    val isLastPage = pagerState.currentPage == pages.lastIndex
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -147,13 +123,8 @@ fun OnboardingScreen(
 
             Button(
                 onClick = {
-                    if (isLastPage) {
-                        // TODO: navegar a la pantalla principal (pendiente de implementar)
-                        onFinish()
-                    } else {
-                        scope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
+                    viewModel.onButtonClick(pagerState.currentPage) { nextPage ->
+                        scope.launch { pagerState.animateScrollToPage(nextPage) }
                     }
                 },
                 modifier = Modifier
@@ -163,7 +134,7 @@ fun OnboardingScreen(
                 shape = RoundedCornerShape(14.dp)
             ) {
                 Text(
-                    text = stringResource(if (isLastPage) R.string.btn_start else R.string.btn_continue),
+                    text = stringResource(viewModel.buttonLabelRes(pagerState.currentPage)),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
@@ -196,5 +167,13 @@ private fun PageIndicator(
                     )
             )
         }
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun OnboardingScreenPreview() {
+    ClosifyTheme {
+        OnboardingScreen()
     }
 }
