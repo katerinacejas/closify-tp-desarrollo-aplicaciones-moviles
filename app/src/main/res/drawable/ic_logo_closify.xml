@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- El "C" estilizado -->
+    <path
+        android:pathData="M80,20 C88,28 92,40 92,50 C92,73.2 73.2,92 50,92 C26.8,92 8,73.2 8,50 C8,26.8 26.8,8 50,8 C60,8 70,12 78,18"
+        android:strokeWidth="4"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startColor="#F472B6"
+                android:endColor="#7C3AED"
+                android:startX="8"
+                android:startY="50"
+                android:endX="92"
+                android:endY="50"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- La percha (hanger) interna -->
+    <path
+        android:pathData="M50,30 C47,30 45,32 45,35 C45,37 46,38.5 47.5,39.3 L47.5,43 C38,44 31,52 31,61 L31,63 C31,64.5 32,66 33.5,66 C35,66 36,64.5 36,63 L36,61 C36,54 42,48 50,48 C58,48 64,54 64,61 L64,63 C64,64.5 65,66 66.5,66 C68,66 69,64.5 69,63 L69,61 C69,52 62,44 52.5,43 L52.5,39.3 C54,38.5 55,37 55,35 C55,32 53,30 50,30 Z"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startColor="#F472B6"
+                android:endColor="#7C3AED"
+                android:startX="31"
+                android:startY="48"
+                android:endX="69"
+                android:endY="48"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+</vector>
