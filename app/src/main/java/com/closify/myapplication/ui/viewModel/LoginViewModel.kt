@@ -3,8 +3,7 @@ package com.closify.myapplication.ui.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.closify.myapplication.AppContainer
-import com.closify.myapplication.domain.repository.UserRepository
+import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +29,7 @@ sealed interface LoginEvent {
 }
 
 class LoginViewModel(
-    private val userRepository: UserRepository = AppContainer.userRepository
+    private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())

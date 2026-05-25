@@ -1,16 +1,18 @@
 package com.closify.myapplication.data.repository
 
-import com.closify.myapplication.domain.repository.UserRepository
 import kotlinx.coroutines.delay
 
-// Modelo interno del repositorio — no se expone fuera de esta capa
 private data class UserRecord(
     val email: String,
     val password: String,
     val username: String
 )
 
-class FakeUserRepository : UserRepository {
+class UserRepository {
+
+    companion object {
+        val instance = UserRepository()
+    }
 
     // Usuarios precargados para poder hacer login sin registrarse
     // TODO: reemplazar por Firebase Auth
@@ -20,7 +22,7 @@ class FakeUserRepository : UserRepository {
         UserRecord("juan@gmail.com",   "Juan123!",   "juan")
     )
 
-    override suspend fun login(email: String, password: String): Result<Unit> {
+    suspend fun login(email: String, password: String): Result<Unit> {
         delay(1000)
         return if (users.any { it.email == email && it.password == password }) {
             Result.success(Unit)
@@ -29,7 +31,7 @@ class FakeUserRepository : UserRepository {
         }
     }
 
-    override suspend fun register(
+    suspend fun register(
         email: String,
         password: String,
         username: String
@@ -39,7 +41,7 @@ class FakeUserRepository : UserRepository {
         return Result.success(Unit)
     }
 
-    override suspend fun isUsernameAvailable(username: String): Boolean {
+    suspend fun isUsernameAvailable(username: String): Boolean {
         delay(300)
         return users.none { it.username.lowercase() == username.lowercase() }
     }
