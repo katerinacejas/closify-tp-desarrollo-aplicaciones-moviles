@@ -1,0 +1,82 @@
+app/src/main/java/com/closify/myapplication/ui/components/ClosifyButton.kt
+  s_318ed6835f40e2::t_c11e1984348c32 1-70
+app/src/main/java/com/closify/myapplication/ui/screens/Onboarding.kt
+  s_318ed6835f40e2::t_b312d3edb28516 47
+  s_318ed6835f40e2::t_676c01808a555b 130
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_318ed6835f40e2::t_867d4e7d99829a 1-43
+app/src/main/res/drawable/ic_visibility.xml
+  s_318ed6835f40e2::t_75b9715dc85bcb 1-9
+app/src/main/java/com/closify/myapplication/ui/viewModel/MainViewModel.kt
+  s_318ed6835f40e2::t_7ec615d76404d0 1-20
+gradle/libs.versions.toml
+  s_318ed6835f40e2::t_894811d78dd3dd 14-15
+  s_318ed6835f40e2::t_7c8e857703bcda 35-36
+app/src/main/java/com/closify/myapplication/ui/screens/RegisterScreen.kt
+  h_e38f44ce52ca59 41
+  s_318ed6835f40e2::t_16f4bafcfb2547 1-40,42-519
+app/build.gradle.kts
+  s_318ed6835f40e2::t_f294f87da6bc57 53-54
+app/src/main/java/com/closify/myapplication/ui/components/ClosifyTextField.kt
+  s_318ed6835f40e2::t_03618bb27641a9 1-155
+app/src/main/java/com/closify/myapplication/navigation/AuthNavGraph.kt
+  s_318ed6835f40e2::t_70169a685e9658 1-54
+app/src/main/res/drawable/ic_visibility_off.xml
+  s_318ed6835f40e2::t_415cbb1f34d2a9 1-9
+app/src/main/java/com/closify/myapplication/domain/repository/UserRepository.kt
+  s_318ed6835f40e2::t_5e79555869f098 1-7
+app/src/main/java/com/closify/myapplication/MainActivity.kt
+  s_318ed6835f40e2::t_9e3c546579876d 7-11,13,21-30
+app/src/main/java/com/closify/myapplication/data/repository/FakeUserRepository.kt
+  s_318ed6835f40e2::t_533700976ddba5 1-46
+app/src/main/java/com/closify/myapplication/ui/viewModel/LoginViewModel.kt
+  s_318ed6835f40e2::t_9c021d6e8ec534 45
+  s_318ed6835f40e2::t_ef430bd9a3fd8c 1-5,8-28,30-31,35-44,46-72,81-84
+  s_318ed6835f40e2::t_f54bd6427210be 29
+  s_318ed6835f40e2::t_6f9ac3588b7e89 6-7,32-34,73-80
+app/src/main/res/drawable/ic_back.xml
+  s_318ed6835f40e2::t_80329259967eb5 1-9
+app/src/main/java/com/closify/myapplication/AppContainer.kt
+  s_318ed6835f40e2::t_3220ccaf46d9e7 1-15
+app/src/main/java/com/closify/myapplication/ui/screens/LoginScreen.kt
+  s_318ed6835f40e2::t_41ba29901e45d1 74-77
+  s_318ed6835f40e2::t_ba0c5483b01db5 1-2,5-28,30-73,78-177,179,184-198
+  s_318ed6835f40e2::t_e087e225a5025d 3-4,178,180-183
+  h_e38f44ce52ca59 29
+app/src/main/java/com/closify/myapplication/ui/viewModel/RegisterViewModel.kt
+  s_318ed6835f40e2::t_65fe44f72a7006 1-4,7-67,71-81,90-93,139-176,186-200,202-210
+  s_318ed6835f40e2::t_5123e4dfa7fe53 5-6,68-70,82-89,94-138,177-185,201
+ARQUITECTURA.md
+  s_318ed6835f40e2::t_c7217bdd19dcfc 1-27,29,65-67,69-75,79-80,84-87,90,93-99,102-107,110-121,125-126,128-130,134-135,138-141,143-145,147-149,151-152,156,158-161,164-172,174-175,177-184,205-206,208-218,265,267-285,287-291,293-295,297-300,302-304,306-313,315-331,333-355,357,359-375,377-379,381-383,385-386,398-399,401,403-404,413-424,426,428,449-451,453-455,457-458,462-465,467,474,476-482,484,521,523,525-529,531-542,544-546,548-552,555-563,565-570,572,574,585-588
+  s_318ed6835f40e2::t_412dbcbc1ac7f5 28,30-64,68,76-78,81-83,88-89,91-92,100-101,108-109,122-124,127,131-133,136-137,142,146,150,157,162-163,173,176,207,264,266,286,292,296,301,305,314,332,356,358,376,380,384,387-397,400,402,405-407,409-412,425,427,429-448,452,456,459-461,466,468-473,475,520,522,524,530,543,547,553-554,564,571,573,575-584
+  s_318ed6835f40e2::t_ad89ba9581f9a9 153-155
+  s_318ed6835f40e2::t_68217d94729d61 219-263
+  s_318ed6835f40e2::t_2bd5f2ea4451cb 483
+  s_318ed6835f40e2::t_fe29ff76df39fa 516-517
+  s_318ed6835f40e2::t_def86f312ef16f 185-204
+  s_318ed6835f40e2::t_16d74f92dfc311 408
+  s_318ed6835f40e2::t_b7aa3d9734a218 485-515,518-519
+app/src/main/java/com/closify/myapplication/navigation/Screen.kt
+  s_318ed6835f40e2::t_c48218a7fbb901 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "6c3dd841bc9618d31f35df4142ea4dcc0f0d9521",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
