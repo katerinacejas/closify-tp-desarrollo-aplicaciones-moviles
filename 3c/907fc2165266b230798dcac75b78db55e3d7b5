@@ -1,0 +1,68 @@
+app/src/main/java/com/closify/myapplication/ui/screens/register/components/RegisterTopBar.kt
+  s_318ed6835f40e2::t_7072ad713ccc76 3-4,21
+app/src/main/res/drawable/home.xml
+  h_e38f44ce52ca59 1-44
+app/src/main/res/drawable/camara.xml
+  h_e38f44ce52ca59 1-49
+gradle/libs.versions.toml
+  s_318ed6835f40e2::t_afeaea2ad904d1 39
+app/src/main/java/com/closify/myapplication/ui/components/ClosifyTextField.kt
+  s_318ed6835f40e2::t_a664e3e7c5dcc2 20-22
+  s_318ed6835f40e2::t_f78d61bf365cef 75-76
+app/src/main/res/drawable/calendario.xml
+  h_e38f44ce52ca59 1-65
+app/src/main/java/com/closify/myapplication/ui/screens/outfitresult/OutfitResultScreen.kt
+  s_318ed6835f40e2::t_70bac72040ea58 4-5,39
+app/src/main/java/com/closify/myapplication/domain/usecase/GenerateOutfitsUseCase.kt
+  s_318ed6835f40e2::t_567626d71632db 64
+app/build.gradle.kts
+  s_318ed6835f40e2::t_01ce631d5f6a8c 56
+app/src/main/res/drawable/perfil.xml
+  h_e38f44ce52ca59 1-31
+app/src/main/java/com/closify/myapplication/ui/screens/outfitresult/components/OutfitCard.kt
+  s_318ed6835f40e2::t_6258ec2f12711d 7
+  s_318ed6835f40e2::t_832d27951b1e1b 12-14,76-81
+  s_318ed6835f40e2::t_9d909c996101b6 56-58
+app/src/main/java/com/closify/myapplication/ui/components/BottomNavBar.kt
+  s_318ed6835f40e2::t_fcba66ac895273 1-2,8,10-14,16-18,21-23,25-32,39,42-47,53,89,91-93
+  s_318ed6835f40e2::t_f5f4ba4ad7345a 3,6,15,20,24,33-38,40-41,48-52,54-63,83-88,90
+  s_318ed6835f40e2::t_c64526e606eb75 9
+  s_318ed6835f40e2::t_a598a3a42ce430 19
+  s_318ed6835f40e2::t_4973c05ce26326 64-82
+  s_318ed6835f40e2::t_a1de8e0551db82 4-5,7
+app/src/main/java/com/closify/myapplication/navigation/Screen.kt
+  s_318ed6835f40e2::t_b323c8a4ba0071 13-19
+app/src/main/java/com/closify/myapplication/data/repository/GarmentRepository.kt
+  s_318ed6835f40e2::t_39ae853820550a 13-30,47,54,61,68,75,84,91,105,112,128,135,151,158,167,174
+  s_318ed6835f40e2::t_4f364a36d98ece 99
+  s_318ed6835f40e2::t_5c16cb9374d60c 31-33
+  s_318ed6835f40e2::t_7366a4966b9b93 122,129,136,143
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_318ed6835f40e2::t_2d21412ff45f56 31-37
+  s_318ed6835f40e2::t_cc09a0178e38a2 3-8,10-12,16,18,26-27,29-30,38,42-54,56-67,71-82
+app/src/main/res/drawable/guardarropa.xml
+  h_e38f44ce52ca59 1-43
+app/src/main/res/drawable/amigos.xml
+  h_e38f44ce52ca59 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "3c907fc2165266b230798dcac75b78db55e3d7b5",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
