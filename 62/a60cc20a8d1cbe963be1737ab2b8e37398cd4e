@@ -1,0 +1,46 @@
+app/src/main/java/com/closify/myapplication/domain/model/GarmentCategory.kt
+  s_318ed6835f40e2::t_b821a2291cbe07 7-8
+app/src/main/java/com/closify/myapplication/ui/screens/outfitresult/components/OutfitCard.kt
+  s_318ed6835f40e2::t_11b4055939cb99 9
+  s_318ed6835f40e2::t_53705890e2d434 27,30
+  s_318ed6835f40e2::t_19c86c73eb05a8 80
+  s_318ed6835f40e2::t_1a18ed41b794a1 41-51,73,75-79,81-85,87-96
+  s_318ed6835f40e2::t_a79d2f49540ab7 58,61-64
+app/src/main/java/com/closify/myapplication/data/repository/GarmentRepository.kt
+  s_318ed6835f40e2::t_adfb786428dbcb 15-22,25-26,29-30,32-41
+  s_318ed6835f40e2::t_dd423b2d832a12 69,74-78,83-86,92-95,103-106,112-115,121-125,130-133,139-143,150-154,201,221
+  s_318ed6835f40e2::t_25770df0e9e6bd 181,192,212
+  s_318ed6835f40e2::t_08af986dda0a54 190-191,199-200,210-211,219-220
+  s_318ed6835f40e2::t_8fde87955f2476 31,163
+app/src/main/java/com/closify/myapplication/ui/screens/outfitresult/OutfitResultContent.kt
+  s_318ed6835f40e2::t_181f19eea21ed3 12
+  s_318ed6835f40e2::t_b53b64fd74e9c1 64-70
+app/src/main/java/com/closify/myapplication/domain/usecase/GenerateOutfitsUseCase.kt
+  s_318ed6835f40e2::t_08af986dda0a54 29-30
+  s_318ed6835f40e2::t_d5d352d115d411 35-38,42-45,51,54-57
+  s_318ed6835f40e2::t_06d1a34defa8c9 62
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_318ed6835f40e2::t_4f2929c4b57bd0 34-43
+  s_318ed6835f40e2::t_363725bf01f587 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "62a60cc20a8d1cbe963be1737ab2b8e37398cd4e",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
