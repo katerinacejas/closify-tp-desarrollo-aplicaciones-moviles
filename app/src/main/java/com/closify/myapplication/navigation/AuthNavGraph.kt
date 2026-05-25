@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.screens.LoginScreen
 import com.closify.myapplication.ui.screens.OnboardingScreen
-import com.closify.myapplication.ui.screens.RegisterScreen
+import com.closify.myapplication.ui.screens.register.RegisterScreen
 
 @Composable
 fun AuthNavGraph(
