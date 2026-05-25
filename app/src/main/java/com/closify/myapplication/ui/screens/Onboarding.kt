@@ -44,6 +44,7 @@ import com.closify.myapplication.ui.theme.ClosifyTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen(
+    onFinish: () -> Unit = {},
     viewModel: OnboardingViewModel = viewModel()
 ) {
     val pages = viewModel.pages
@@ -126,6 +127,7 @@ fun OnboardingScreen(
                     viewModel.onButtonClick(pagerState.currentPage) { nextPage ->
                         scope.launch { pagerState.animateScrollToPage(nextPage) }
                     }
+                    if (pagerState.currentPage == viewModel.pages.lastIndex) onFinish()
                 },
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
