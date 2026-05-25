@@ -61,6 +61,6 @@ class GenerateOutfitsUseCase(
             }
         }
 
-        return outfits.take(10) // máximo 10 outfits por generación
+        return outfits.take(5) // máximo 5 outfits por generación
     }
 }

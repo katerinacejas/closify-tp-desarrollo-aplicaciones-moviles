@@ -10,4 +10,11 @@ sealed class Screen(val route: String) {
     // — App —
     data object Home         : Screen("home")
     data object OutfitResult : Screen("outfit_result")
+
+    // — Bottom Nav (placeholders) —
+    data object Wardrobe  : Screen("wardrobe")
+    data object Friends   : Screen("friends")
+    data object Camera    : Screen("camera")
+    data object Calendar  : Screen("calendar")
+    data object Profile   : Screen("profile")
 }
