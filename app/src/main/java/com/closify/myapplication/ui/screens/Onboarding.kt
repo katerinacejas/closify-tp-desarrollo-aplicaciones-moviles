@@ -36,10 +36,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyLogo
-import com.closify.myapplication.ui.viewModel.OnboardingViewModel
 import com.closify.myapplication.ui.theme.ClosifyTheme
+import com.closify.myapplication.ui.viewmodel.OnboardingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
