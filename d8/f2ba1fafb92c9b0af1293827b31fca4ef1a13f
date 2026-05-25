@@ -1,0 +1,88 @@
+app/src/main/java/com/closify/myapplication/data/repository/WeatherRepository.kt
+  s_318ed6835f40e2::t_f985e371601486 1-18
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/SectionCard.kt
+  s_318ed6835f40e2::t_9e9793223844a1 1-38
+app/src/main/java/com/closify/myapplication/ui/components/SelectableChip.kt
+  s_318ed6835f40e2::t_f7fea372ae55d1 1-26,29-30,41-49,51-82
+  s_318ed6835f40e2::t_b49abca7296288 50
+  s_318ed6835f40e2::t_4a711340aaa0ef 27-28,31-40
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_318ed6835f40e2::t_3e4218bc1675d7 8,20-24
+app/src/main/res/drawable/ic_garment_top.xml
+  s_318ed6835f40e2::t_7ba92146ea198b 1-9
+app/src/main/java/com/closify/myapplication/domain/model/Occasion.kt
+  s_318ed6835f40e2::t_47f0ceb53dd84d 1-11
+app/src/main/java/com/closify/myapplication/domain/model/Outfit.kt
+  s_318ed6835f40e2::t_ad26208bdecbd4 1-6
+app/src/main/java/com/closify/myapplication/domain/usecase/GenerateOutfitsUseCase.kt
+  s_318ed6835f40e2::t_ece9680c310f01 1-66
+app/src/main/java/com/closify/myapplication/ui/screens/home/HomeContent.kt
+  s_318ed6835f40e2::t_02b33214abaa8d 27-28,49,51,53,55-71,73,75-81,83-90,95-98,100,102-105,108
+  s_318ed6835f40e2::t_ee2e2cb59a84dc 43-48
+  s_318ed6835f40e2::t_3f9d8d95351b59 19
+  s_318ed6835f40e2::t_d774e763b83976 1-18,20-26,29-33,35-42,50,52,54,72,74,82,91-94,99,101,106-107,109-116,118-126
+  s_318ed6835f40e2::t_3ec9156d6cd306 117
+  s_318ed6835f40e2::t_21da1afc1ee8d8 34
+app/build.gradle.kts
+  s_318ed6835f40e2::t_9a2eeb88f52620 55
+app/src/main/java/com/closify/myapplication/domain/model/WeatherCondition.kt
+  s_318ed6835f40e2::t_867826a51c88c7 1-9
+app/src/main/java/com/closify/myapplication/ui/screens/home/HomeScreen.kt
+  s_318ed6835f40e2::t_e59f624d8be76f 1-2,6-8,10-31,47
+  s_318ed6835f40e2::t_6e486a8c4c9f6b 3-5,9,32-46
+app/src/main/res/drawable/ic_garment_bottom.xml
+  s_318ed6835f40e2::t_9153f01ccad2d1 1-9
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/OccasionSection.kt
+  s_318ed6835f40e2::t_0e2bae6e963340 1-44
+app/src/main/res/drawable/ic_garment_footwear.xml
+  s_318ed6835f40e2::t_185b7d2d67b1a7 1-9
+app/src/main/java/com/closify/myapplication/data/repository/UserRepository.kt
+  s_318ed6835f40e2::t_04c02df0e073d2 25-27,30-32
+app/src/main/java/com/closify/myapplication/domain/model/Garment.kt
+  s_318ed6835f40e2::t_812e5973f09bb9 1-7,9-11
+  s_318ed6835f40e2::t_37b52c65cb8911 8
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/AutoManualToggle.kt
+  s_318ed6835f40e2::t_97ea6c2f8ea5a7 1-62
+app/src/main/java/com/closify/myapplication/domain/model/GarmentColor.kt
+  s_318ed6835f40e2::t_9a7f6f6a23bbc1 1-12
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/WeatherSection.kt
+  s_318ed6835f40e2::t_73cccffa0e0ebb 1-66
+gradle/libs.versions.toml
+  s_318ed6835f40e2::t_27a4ab34ef729d 38
+  s_318ed6835f40e2::t_cc15ef158321ca 15
+app/src/main/java/com/closify/myapplication/ui/viewModel/HomeViewModel.kt
+  s_318ed6835f40e2::t_384e991b3d1107 5
+  s_318ed6835f40e2::t_099cfaeb2169fd 44-46
+  s_318ed6835f40e2::t_5a7d7ccf1803ac 20
+  s_318ed6835f40e2::t_ea0275a4e246bb 1-4,6-19,21-43,47-110
+app/src/main/java/com/closify/myapplication/domain/model/GarmentCategory.kt
+  s_318ed6835f40e2::t_4afab02a357ac3 1-9
+app/src/main/res/drawable/ic_garment_dress.xml
+  s_318ed6835f40e2::t_bf131423d61746 1-9
+app/src/main/java/com/closify/myapplication/data/repository/GarmentRepository.kt
+  s_318ed6835f40e2::t_67e8ada499cf11 13-21,35,42,49,56,63,72,79,86,93,100,109,116,123,130,139,146,155,162
+  s_318ed6835f40e2::t_6c560af1779938 1-12,22-34,36-41,43-48,50-55,57-62,64-71,73-78,80-85,87-92,94-99,101-108,110-115,117-122,124-129,131-138,140-145,147-154,156-161,163-167
+app/src/main/res/drawable/ic_garment_outerwear.xml
+  s_318ed6835f40e2::t_2382f1a9f95bff 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "d8f2ba1fafb92c9b0af1293827b31fca4ef1a13f",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
