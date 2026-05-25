@@ -22,9 +22,14 @@ class UserRepository {
         UserRecord("juan@gmail.com",   "Juan123!",   "juan")
     )
 
+    var currentUsername: String = ""
+        private set
+
     suspend fun login(email: String, password: String): Result<Unit> {
         delay(1000)
-        return if (users.any { it.email == email && it.password == password }) {
+        val user = users.find { it.email == email && it.password == password }
+        return if (user != null) {
+            currentUsername = user.username
             Result.success(Unit)
         } else {
             Result.failure(Exception("Credenciales incorrectas."))
