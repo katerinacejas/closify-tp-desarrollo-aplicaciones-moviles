@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,8 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.ui.theme.LavandaAccent
 
@@ -35,22 +38,30 @@ fun OutfitCard(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Box {
+    Box(modifier = modifier.fillMaxWidth()) {
+
+        // Card sin el botón adentro
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp), // espacio para que el botón pueda sobresalir arriba
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
+                val context = LocalContext.current
                 outfit.garments.forEach { garment ->
                     AsyncImage(
-                        model = garment.imageUrl,
+                        model = ImageRequest.Builder(context)
+                            .data(garment.imageUrl)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = garment.name,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
@@ -59,29 +70,30 @@ fun OutfitCard(
                     )
                 }
             }
+        }
 
-            IconButton(
-                onClick = onToggleFavorite,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        if (isFavorite) MaterialTheme.colorScheme.primary
-                        else LavandaAccent
-                    )
-            ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Favorite
-                                  else Icons.Filled.FavoriteBorder,
-                    contentDescription = if (isFavorite) "Quitar de favoritos"
-                                         else "Agregar a favoritos",
-                    tint = if (isFavorite) Color.White
-                           else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
+        // Botón superpuesto en el borde superior derecho de la card
+        IconButton(
+            onClick = onToggleFavorite,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = (-4).dp, y = 0.dp)
+                .size(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    if (isFavorite) MaterialTheme.colorScheme.primary
+                    else LavandaAccent
                 )
-            }
+        ) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite
+                              else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite) "Quitar de favoritos"
+                                     else "Agregar a favoritos",
+                tint = if (isFavorite) Color.White
+                       else MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

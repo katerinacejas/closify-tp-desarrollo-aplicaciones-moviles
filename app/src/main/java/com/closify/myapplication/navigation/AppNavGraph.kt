@@ -24,17 +24,23 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
+    val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
 
     Scaffold(
         bottomBar = {
             BottomNavBar(
                 currentRoute = currentRoute,
                 onItemSelected = { screen ->
-                    navController.navigate(screen.route) {
-                        popUpTo(Screen.Home.route) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
+                    // Si estamos en OutfitResult primero volvemos atrás
+                    if (currentRoute == Screen.OutfitResult.route) {
+                        navController.popBackStack()
+                    }
+                    if (screen.route != Screen.Home.route || currentRoute != Screen.Home.route) {
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Home.route) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 }
             )
