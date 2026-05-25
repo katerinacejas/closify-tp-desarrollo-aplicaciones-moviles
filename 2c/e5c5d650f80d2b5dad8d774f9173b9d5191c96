@@ -1,0 +1,19 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/Home.kt
+  s_318ed6835f40e2::t_1c36502c7892e2 1-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "2ce5c5d650f80d2b5dad8d774f9173b9d5191c96",
+  "prompts": {},
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
