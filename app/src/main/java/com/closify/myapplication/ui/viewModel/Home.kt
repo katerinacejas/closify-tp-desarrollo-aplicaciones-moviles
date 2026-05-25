@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository
 import com.closify.myapplication.domain.model.Occasion
@@ -102,6 +103,9 @@ class HomeViewModel(
         val occasion = state.selectedOccasion ?: return
 
         val outfits = generateOutfitsUseCase(weather, occasion)
+
+        // Guarda en Repository para que OutfitResultViewModel los lea
+        OutfitRepository.instance.currentOutfits = outfits
 
         viewModelScope.launch {
             _navigationEffect.send(HomeNavigationEffect.NavigateToOutfitResult(outfits))

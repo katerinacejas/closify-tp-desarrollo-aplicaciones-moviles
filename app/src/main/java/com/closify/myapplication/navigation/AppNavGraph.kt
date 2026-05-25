@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.screens.home.HomeScreen
+import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 
 @Composable
 fun AppNavGraph(
@@ -18,9 +19,15 @@ fun AppNavGraph(
 
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigateToOutfitResult = { outfits ->
-                    // TODO: navegar a OutfitResultScreen (próximo PR)
+                onNavigateToOutfitResult = {
+                    navController.navigate(Screen.OutfitResult.route)
                 }
+            )
+        }
+
+        composable(Screen.OutfitResult.route) {
+            OutfitResultScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }
