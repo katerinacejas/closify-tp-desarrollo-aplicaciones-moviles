@@ -27,5 +27,8 @@ release.properties
 # ── macOS ─────────────────────────────────────────────────────────────────────
 .DS_Store
 
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
+
 # ── Pre-commit (configuración local, no versionar) ────────────────────────────
 .pre-commit-config.yaml

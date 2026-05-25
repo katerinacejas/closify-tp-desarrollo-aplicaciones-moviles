@@ -4,8 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.closify.myapplication.ui.screens.OnboardingScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
+import com.closify.myapplication.navigation.AppNavGraph
+import com.closify.myapplication.navigation.AuthNavGraph
 import com.closify.myapplication.ui.theme.ClosifyTheme
+import com.closify.myapplication.ui.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,7 +18,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ClosifyTheme {
-                OnboardingScreen()
+                val mainViewModel: MainViewModel = viewModel()
+                val isLoggedIn by mainViewModel.isLoggedIn.collectAsStateWithLifecycle()
+
+                if (isLoggedIn) {
+                    AppNavGraph()
+                } else {
+                    AuthNavGraph(
+                        onLoginSuccess = { mainViewModel.onLoginSuccess() }
+                    )
+                }
             }
         }
     }

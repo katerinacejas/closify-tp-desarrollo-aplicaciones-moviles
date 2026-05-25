@@ -36,14 +36,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyLogo
-import com.closify.myapplication.ui.viewModel.OnboardingViewModel
 import com.closify.myapplication.ui.theme.ClosifyTheme
+import com.closify.myapplication.ui.viewmodel.OnboardingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen(
+    onFinish: () -> Unit = {},
     viewModel: OnboardingViewModel = viewModel()
 ) {
     val pages = viewModel.pages
@@ -126,6 +126,7 @@ fun OnboardingScreen(
                     viewModel.onButtonClick(pagerState.currentPage) { nextPage ->
                         scope.launch { pagerState.animateScrollToPage(nextPage) }
                     }
+                    if (pagerState.currentPage == viewModel.pages.lastIndex) onFinish()
                 },
                 modifier = Modifier
                     .padding(horizontal = 24.dp)

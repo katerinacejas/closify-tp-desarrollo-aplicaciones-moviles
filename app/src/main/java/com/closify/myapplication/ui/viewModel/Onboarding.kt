@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.viewModel
+package com.closify.myapplication.ui.viewmodel
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
