@@ -125,9 +125,10 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "¡Bienvenido de nuevo!",
+            text = "¡Bienvenido!",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
