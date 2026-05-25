@@ -1,0 +1,38 @@
+app/src/main/java/com/closify/myapplication/ui/screens/Onboarding.kt
+  h_e38f44ce52ca59 41
+app/src/main/java/com/closify/myapplication/ui/screens/register/components/RegisterTopBar.kt
+  s_318ed6835f40e2::t_2e94087006b602 1-31
+app/src/main/java/com/closify/myapplication/ui/screens/register/components/DateInputField.kt
+  s_318ed6835f40e2::t_787d4bfbf35915 1-111
+app/src/main/java/com/closify/myapplication/ui/screens/register/RegisterScreen.kt
+  s_318ed6835f40e2::t_9d5185aa96c5cd 1-97
+app/src/main/java/com/closify/myapplication/ui/screens/register/components/RegisterStep1Content.kt
+  s_318ed6835f40e2::t_9ec8665715b394 1-150
+app/src/main/java/com/closify/myapplication/ui/viewModel/Onboarding.kt
+  s_318ed6835f40e2::t_f7949651a75088 1
+app/src/main/java/com/closify/myapplication/navigation/AuthNavGraph.kt
+  s_318ed6835f40e2::t_eac0a8bf4b4dff 10
+app/src/main/java/com/closify/myapplication/ui/screens/register/components/RegisterStep2Content.kt
+  s_318ed6835f40e2::t_be4a7e0126602f 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "2e963b9b03e4e8941325fb99f8d070d645ec6533",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
