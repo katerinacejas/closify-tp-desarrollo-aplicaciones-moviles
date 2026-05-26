@@ -29,16 +29,19 @@ fun SelectableChip(
 ) {
     val shape = RoundedCornerShape(50.dp)
     val backgroundColor = when {
-        selected && enabled -> LavandaAccent
-        else -> MaterialTheme.colorScheme.surface
+        selected && enabled  -> LavandaAccent
+        selected && !enabled -> LavandaAccent.copy(alpha = 0.5f)  // seleccionado pero deshabilitado
+        else                 -> MaterialTheme.colorScheme.surface
     }
     val textColor = when {
-        selected && enabled -> MaterialTheme.colorScheme.primary
-        !enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-        else -> MaterialTheme.colorScheme.onBackground
+        selected             -> MaterialTheme.colorScheme.primary.copy(alpha = if (enabled) 1f else 0.6f)
+        !enabled             -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+        else                 -> MaterialTheme.colorScheme.onBackground
     }
-    val borderColor = if (selected && enabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                      else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+    val borderColor = when {
+        selected             -> MaterialTheme.colorScheme.primary.copy(alpha = if (enabled) 0.3f else 0.2f)
+        else                 -> MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+    }
 
     Surface(
         color = backgroundColor,
