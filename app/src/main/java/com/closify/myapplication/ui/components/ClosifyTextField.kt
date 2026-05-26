@@ -17,13 +17,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.closify.myapplication.R
 import com.closify.myapplication.ui.theme.ClosifyTheme
 
 @Composable
@@ -71,10 +72,8 @@ fun ClosifyTextField(
                     isPassword -> {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
-                                painter = painterResource(
-                                    if (passwordVisible) R.drawable.ic_visibility
-                                    else R.drawable.ic_visibility_off
-                                ),
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility
+                                              else Icons.Filled.VisibilityOff,
                                 contentDescription = if (passwordVisible) "Ocultar contraseña"
                                                      else "Mostrar contraseña",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant

@@ -1,6 +1,7 @@
 package com.closify.myapplication.ui.screens.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -21,15 +22,21 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AutoManualToggle(
     isAuto: Boolean,
-    onToggle: (Boolean) -> Unit
+    onToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(50.dp)
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surface),
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = shape
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         listOf(true to "AUTOMÁTICO", false to "MANUAL").forEach { (value, label) ->
@@ -46,6 +53,7 @@ fun AutoManualToggle(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .weight(1f)
+                    .padding(4.dp)
                     .clip(shape)
                     .background(
                         if (selected) MaterialTheme.colorScheme.surface

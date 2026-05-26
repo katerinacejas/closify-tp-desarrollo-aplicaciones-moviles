@@ -26,41 +26,39 @@ class GenerateOutfitsUseCase(
         val tops       = filtered.filter { it.category == GarmentCategory.TOP }
         val bottoms    = filtered.filter { it.category == GarmentCategory.BOTTOM }
         val footwear   = filtered.filter { it.category == GarmentCategory.FOOTWEAR }
-        val outerwear  = filtered.filter { it.category == GarmentCategory.OUTERWEAR }
-        val dresses    = filtered.filter { it.category == GarmentCategory.DRESS }
+        val outerwear  = filtered.filter { it.category == GarmentCategory.OUTWEAR }
+        val dresses    = filtered.filter { it.category == GarmentCategory.FULL_BODY }
 
         val outfits = mutableListOf<Outfit>()
         var idCounter = 1
 
-        // Combinación: TOP + BOTTOM + FOOTWEAR (+ OUTERWEAR opcional si hace frío)
+        val needsOuterwear = weather == WeatherCondition.COLD || weather == WeatherCondition.WINDY
+        val outwearOptions = if (needsOuterwear && outerwear.isNotEmpty()) outerwear else listOf(null)
+
+        // Combinación: TOP + BOTTOM + FOOTWEAR (+ OUTWEAR si hace frío, iterando todos)
         for (top in tops) {
             for (bottom in bottoms) {
                 for (shoe in footwear) {
-                    val garments = mutableListOf(top, bottom, shoe)
-
-                    // Agrega abrigo si el clima es frío o ventoso
-                    if (weather == WeatherCondition.COLD || weather == WeatherCondition.WINDY) {
-                        outerwear.firstOrNull()?.let { garments.add(it) }
+                    for (outer in outwearOptions) {
+                        val garments = mutableListOf(top, bottom, shoe)
+                        outer?.let { garments.add(it) }
+                        outfits.add(Outfit(id = "outfit_${idCounter++}", garments = garments))
                     }
+                }
+            }
+        }
 
+        // Combinación: FULL_BODY + FOOTWEAR (+ OUTWEAR si hace frío, iterando todos)
+        for (dress in dresses) {
+            for (shoe in footwear) {
+                for (outer in outwearOptions) {
+                    val garments = mutableListOf(dress, shoe)
+                    outer?.let { garments.add(it) }
                     outfits.add(Outfit(id = "outfit_${idCounter++}", garments = garments))
                 }
             }
         }
 
-        // Combinación: DRESS + FOOTWEAR (+ OUTERWEAR opcional)
-        for (dress in dresses) {
-            for (shoe in footwear) {
-                val garments = mutableListOf(dress, shoe)
-
-                if (weather == WeatherCondition.COLD || weather == WeatherCondition.WINDY) {
-                    outerwear.firstOrNull()?.let { garments.add(it) }
-                }
-
-                outfits.add(Outfit(id = "outfit_${idCounter++}", garments = garments))
-            }
-        }
-
-        return outfits.take(10) // máximo 10 outfits por generación
+        return outfits.shuffled().take(5) // mezcla para evitar combinaciones repetitivas
     }
 }
