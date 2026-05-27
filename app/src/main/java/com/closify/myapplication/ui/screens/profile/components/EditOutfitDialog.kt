@@ -100,7 +100,7 @@ fun EditOutfitDialog(
                 )
             ) {
                 Text(
-                    text = "Eliminar favorito",
+                    text = "Eliminar",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
