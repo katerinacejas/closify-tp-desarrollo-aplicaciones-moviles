@@ -19,10 +19,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ClosifyTheme {
-                // Para testeo de Settings y sus sub-pantallas conectadas:
-                SettingsScreen()
-
-                /* Flujo real (comentado para testeo):
                 val mainViewModel: MainViewModel = viewModel()
                 val isLoggedIn by mainViewModel.isLoggedIn.collectAsStateWithLifecycle()
 
@@ -33,7 +29,6 @@ class MainActivity : ComponentActivity() {
                         onLoginSuccess = { mainViewModel.onLoginSuccess() }
                     )
                 }
-                */
             }
         }
     }
