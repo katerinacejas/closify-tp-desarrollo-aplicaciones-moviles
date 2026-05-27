@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
+import com.closify.myapplication.ui.screens.profile.ProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -70,7 +71,13 @@ fun AppNavGraph(
             composable(Screen.Friends.route)   { PlaceholderScreen("Amigos") }
             composable(Screen.Camera.route)    { PlaceholderScreen("Cámara") }
             composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
-            composable(Screen.Profile.route)   { PlaceholderScreen("Perfil") }
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onSettingsClick = {
+                        /* TODO: Implementar navegación a configuración */
+                    }
+                )
+            }
         }
     }
 }

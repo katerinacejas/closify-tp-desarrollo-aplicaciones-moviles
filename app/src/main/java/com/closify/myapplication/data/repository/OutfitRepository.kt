@@ -1,6 +1,9 @@
 package com.closify.myapplication.data.repository
 
 import com.closify.myapplication.domain.model.Outfit
+import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.OutfitPostType
+import com.closify.myapplication.domain.model.SuggestedOutfit
 
 class OutfitRepository {
 
@@ -37,4 +40,17 @@ class OutfitRepository {
 
     fun isFavorite(outfitId: String): Boolean =
         _favoriteOutfits.any { it.id == outfitId }
+
+    fun getSuggestedOutfits(): List<SuggestedOutfit> =
+        MockClosifyData.suggestedOutfits
+
+    fun getFavoritePosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
+        MockClosifyData.outfitPosts.filter {
+            it.author.id == userId && it.type == OutfitPostType.FAVORITE
+        }
+
+    fun getPlannedPosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
+        MockClosifyData.outfitPosts.filter {
+            it.author.id == userId && it.type == OutfitPostType.PLANNED
+        }
 }
