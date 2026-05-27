@@ -27,6 +27,7 @@ import com.closify.myapplication.ui.theme.RosaSecondary
 @Composable
 fun ProfileOutfitCard(
     outfit: OutfitPost,
+    isLikedByCurrentUser: Boolean,
     onLikeClick: () -> Unit,
     onLikesTextClick: () -> Unit,
     onCommentsClick: () -> Unit,
@@ -45,11 +46,13 @@ fun ProfileOutfitCard(
                 .padding(20.dp)
                 .fillMaxWidth()
         ) {
-            Text(
-                text = outfit.title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            if (!outfit.title.isNullOrBlank()) {
+                Text(
+                    text = outfit.title,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             Text(
                 text = outfit.dateLabel,
                 style = MaterialTheme.typography.bodySmall,
@@ -62,13 +65,13 @@ fun ProfileOutfitCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                outfit.garmentImageNames.forEach { resName ->
+                outfit.outfit.garments.forEach { garment ->
                     val context = LocalContext.current
-                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+                    val resId = context.resources.getIdentifier(garment.imageUrl, "drawable", context.packageName)
                     if (resId != 0) {
                         Image(
                             painter = painterResource(id = resId),
-                            contentDescription = null,
+                            contentDescription = garment.name,
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f),
@@ -91,14 +94,14 @@ fun ProfileOutfitCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onLikeClick, modifier = Modifier.size(28.dp)) {
                         Icon(
-                            imageVector = if (outfit.isLiked) {
+                            imageVector = if (isLikedByCurrentUser) {
                                 Icons.Rounded.Favorite
                             } else {
                                 Icons.Rounded.FavoriteBorder
                             },
                             contentDescription = "Me gusta",
                             modifier = Modifier.size(22.dp),
-                            tint = if (outfit.isLiked) {
+                            tint = if (isLikedByCurrentUser) {
                                 RosaSecondary
                             } else {
                                 MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
@@ -155,6 +158,6 @@ fun ProfileOutfitCard(
 
 private val OutfitPost.dateLabel: String
     get() = when (type) {
-        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $eventDate"
-        OutfitPostType.PLANNED -> "Planificado para el dia: $eventDate"
+        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $createdAt"
+        OutfitPostType.PLANNED -> "Planificado para el dia: ${plannedDate ?: createdAt}"
     }

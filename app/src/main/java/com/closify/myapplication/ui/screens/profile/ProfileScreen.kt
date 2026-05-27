@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.closify.myapplication.ui.viewModel.ProfileViewModel
+import com.closify.myapplication.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
@@ -24,7 +24,8 @@ fun ProfileScreen(
             uiState = uiState,
             onSettingsClick = onSettingsClick,
             onLikeClick = viewModel::onLikeClick,
-            onCommentClick = viewModel::onCommentClick,
+            onUpdatePostTitle = viewModel::onUpdatePostTitle,
+            onDeletePost = viewModel::onDeletePost,
             modifier = Modifier.padding(innerPadding)
         )
     }

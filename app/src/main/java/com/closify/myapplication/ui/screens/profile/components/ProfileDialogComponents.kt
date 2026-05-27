@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,16 +47,34 @@ internal fun ProfileDialogScaffold(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     contentTopSpacing: Dp = 14.dp,
+    heightFraction: Float? = 0.74f,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Surface(
-            modifier = modifier
+        val surfaceModifier = if (heightFraction != null) {
+            modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.74f)
+                .fillMaxHeight(heightFraction)
+        } else {
+            modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        }
+        val contentModifier = if (heightFraction != null) {
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        }
+
+        Surface(
+            modifier = surfaceModifier
                 .padding(horizontal = 20.dp),
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.surface,
@@ -65,8 +83,7 @@ internal fun ProfileDialogScaffold(
             border = androidx.compose.foundation.BorderStroke(1.dp, RosaSecondary)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = contentModifier
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {

@@ -26,7 +26,7 @@ class GenerateOutfitsUseCase(
         val tops       = filtered.filter { it.category == GarmentCategory.TOP }
         val bottoms    = filtered.filter { it.category == GarmentCategory.BOTTOM }
         val footwear   = filtered.filter { it.category == GarmentCategory.FOOTWEAR }
-        val outerwear  = filtered.filter { it.category == GarmentCategory.OUTWEAR }
+        val outerwear  = filtered.filter { it.category == GarmentCategory.OUTERWEAR }
         val dresses    = filtered.filter { it.category == GarmentCategory.FULL_BODY }
 
         val outfits = mutableListOf<Outfit>()
@@ -35,7 +35,7 @@ class GenerateOutfitsUseCase(
         val needsOuterwear = weather == WeatherCondition.COLD || weather == WeatherCondition.WINDY
         val outwearOptions = if (needsOuterwear && outerwear.isNotEmpty()) outerwear else listOf(null)
 
-        // Combinación: TOP + BOTTOM + FOOTWEAR (+ OUTWEAR si hace frío, iterando todos)
+        // Combinacion: TOP + BOTTOM + FOOTWEAR (+ OUTERWEAR si hace frio, iterando todos)
         for (top in tops) {
             for (bottom in bottoms) {
                 for (shoe in footwear) {
@@ -48,7 +48,7 @@ class GenerateOutfitsUseCase(
             }
         }
 
-        // Combinación: FULL_BODY + FOOTWEAR (+ OUTWEAR si hace frío, iterando todos)
+        // Combinacion: FULL_BODY + FOOTWEAR (+ OUTERWEAR si hace frio, iterando todos)
         for (dress in dresses) {
             for (shoe in footwear) {
                 for (outer in outwearOptions) {

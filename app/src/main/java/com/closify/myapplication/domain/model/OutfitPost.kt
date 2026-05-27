@@ -2,13 +2,14 @@ package com.closify.myapplication.domain.model
 
 data class OutfitPost(
     val id: String,
-    val title: String,
+    val author: UserSummary,
+    val outfit: Outfit,
+    val title: String?,
     val type: OutfitPostType,
-    val eventDate: String,
-    val isLiked: Boolean = false,
+    val createdAt: String,
+    val plannedDate: String? = null,
     val likedBy: List<Like> = emptyList(),
-    val comments: List<Comment> = emptyList(),
-    val garmentImageNames: List<String>
+    val comments: List<Comment> = emptyList()
 ) {
     val likesCount: Int
         get() = likedBy.size

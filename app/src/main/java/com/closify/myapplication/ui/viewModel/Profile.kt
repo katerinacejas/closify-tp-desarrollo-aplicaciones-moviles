@@ -1,18 +1,19 @@
-package com.closify.myapplication.ui.viewModel
+package com.closify.myapplication.ui.viewmodel
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.ProfileRepository
-import com.closify.myapplication.domain.model.Comment
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 data class ProfileUiState(
+    val userId: String = "",
     val name: String = "",
     val username: String = "",
     val bio: String = "",
@@ -41,21 +42,25 @@ class ProfileViewModel(
 
     private fun loadProfile() {
         val profile = profileRepository.getProfile()
+        val friends = profileRepository.getFriends()
+        val posts = profileRepository.getPosts()
+        val garments = profileRepository.getWardrobeGarments()
 
         _uiState.value = ProfileUiState(
+            userId = profile.id,
             name = profile.name,
             username = profile.username,
             bio = profile.bio,
             birthDate = profile.birthDate,
-            friendsCount = profile.friendsCount,
-            garmentsCount = profile.garmentsCount,
-            wardrobeUsagePercentage = profile.wardrobeUsagePercentage,
-            favoriteOutfitsCount = profile.favoriteOutfitsCount,
-            plannedOutfitsCount = profile.plannedOutfitsCount,
+            friendsCount = friends.size,
+            garmentsCount = garments.size,
+            wardrobeUsagePercentage = profileRepository.getWardrobeUsagePercentage(),
+            favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
+            plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
             bannerImageResId = profile.bannerImageResId,
             profileImageResId = profile.profileImageResId,
-            friends = profileRepository.getFriends(),
-            posts = profileRepository.getPosts()
+            friends = friends,
+            posts = posts
         )
     }
 
@@ -65,7 +70,6 @@ class ProfileViewModel(
         _uiState.value = currentState.copy(
             posts = currentState.posts.map { post ->
                 if (post.id == postId) {
-                    val nextLiked = !post.isLiked
                     val myLike = Like(
                         id = "me",
                         user = UserSummary(
@@ -76,12 +80,12 @@ class ProfileViewModel(
                         ),
                         createdAt = "25 de mayo de 2026"
                     )
+                    val nextLiked = post.likedBy.none { it.user.id == myLike.user.id }
                     post.copy(
-                        isLiked = nextLiked,
                         likedBy = if (nextLiked) {
                             listOf(myLike) + post.likedBy
                         } else {
-                            post.likedBy.filterNot { it.id == myLike.id }
+                            post.likedBy.filterNot { it.user.id == myLike.user.id }
                         }
                     )
                 } else {
@@ -91,28 +95,35 @@ class ProfileViewModel(
         )
     }
 
-    fun onCommentClick(postId: String) {
+    fun onUpdatePostTitle(postId: String, title: String) {
         val currentState = _uiState.value
 
         _uiState.value = currentState.copy(
             posts = currentState.posts.map { post ->
                 if (post.id == postId) {
-                    val myComment = Comment(
-                        id = "me_comment_${post.commentsCount + 1}",
-                        user = UserSummary(
-                            id = "user_1",
-                            name = currentState.name,
-                            username = currentState.username,
-                            profileImageResId = currentState.profileImageResId ?: R.drawable.avatar_default
-                        ),
-                        text = "Me encanta este outfit <3",
-                        createdAt = "25 de mayo de 2026"
-                    )
-
-                    post.copy(comments = post.comments + myComment)
+                    post.copy(title = title.take(100).ifBlank { null })
                 } else {
                     post
                 }
+            }
+        )
+    }
+
+    fun onDeletePost(postId: String) {
+        val currentState = _uiState.value
+        val deletedPost = currentState.posts.firstOrNull { it.id == postId } ?: return
+
+        _uiState.value = currentState.copy(
+            posts = currentState.posts.filterNot { it.id == postId },
+            favoriteOutfitsCount = if (deletedPost.type == OutfitPostType.FAVORITE) {
+                (currentState.favoriteOutfitsCount - 1).coerceAtLeast(0)
+            } else {
+                currentState.favoriteOutfitsCount
+            },
+            plannedOutfitsCount = if (deletedPost.type == OutfitPostType.PLANNED) {
+                (currentState.plannedOutfitsCount - 1).coerceAtLeast(0)
+            } else {
+                currentState.plannedOutfitsCount
             }
         )
     }

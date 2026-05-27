@@ -187,7 +187,7 @@ class GarmentRepository {
         Garment(
             id = "o1",
             name = "Campera jean",
-            category = GarmentCategory.OUTWEAR,
+            category = GarmentCategory.OUTERWEAR,
             color = GarmentColor.BLUE,
             imageUrl = CAMPERA_JEAN,
             suitableWeather = setOf(WeatherCondition.MILD, WeatherCondition.WINDY, WeatherCondition.ANY),
@@ -196,7 +196,7 @@ class GarmentRepository {
         Garment(
             id = "o2",
             name = "Abrigo negro",
-            category = GarmentCategory.OUTWEAR,
+            category = GarmentCategory.OUTERWEAR,
             color = GarmentColor.BLACK,
             imageUrl = ABRIGO_NEGRO,
             suitableWeather = setOf(WeatherCondition.COLD, WeatherCondition.WINDY, WeatherCondition.ANY),
