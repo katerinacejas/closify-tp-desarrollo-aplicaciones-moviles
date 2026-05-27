@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import com.closify.myapplication.R
 
 data class OnboardingPage(
-    @DrawableRes val imageRes: Int,
-    @StringRes val titleRes: Int,
-    @StringRes val descriptionRes: Int
+    @param:DrawableRes val imageRes: Int,
+    @param:StringRes val titleRes: Int,
+    @param:StringRes val descriptionRes: Int
 )
 
 class OnboardingViewModel : ViewModel() {
