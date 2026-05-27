@@ -1,6 +1,8 @@
 package com.closify.myapplication.ui.screens.profile.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,6 +12,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -17,14 +20,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.ui.theme.RosaSecondary
-import com.closify.myapplication.ui.viewModel.ProfileOutfit
 
 @Composable
 fun ProfileOutfitCard(
-    outfit: ProfileOutfit,
+    outfit: OutfitPost,
     onLikeClick: () -> Unit,
+    onLikesTextClick: () -> Unit,
     onCommentsClick: () -> Unit,
+    onCommentsTextClick: () -> Unit,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -45,7 +51,7 @@ fun ProfileOutfitCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = outfit.date,
+                text = outfit.dateLabel,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -56,7 +62,7 @@ fun ProfileOutfitCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                outfit.garments.forEach { resName ->
+                outfit.garmentImageNames.forEach { resName ->
                     val context = LocalContext.current
                     val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
                     if (resId != 0) {
@@ -101,9 +107,14 @@ fun ProfileOutfitCard(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${outfit.likes} me gustas",
+                        text = "${outfit.likesCount} me gustas",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = onLikesTextClick
+                        )
                     )
                     
                     Spacer(modifier = Modifier.width(16.dp))
@@ -118,9 +129,14 @@ fun ProfileOutfitCard(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${outfit.comments} comentarios",
+                        text = "${outfit.commentsCount} comentarios",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = onCommentsTextClick
+                        )
                     )
                 }
 
@@ -136,3 +152,9 @@ fun ProfileOutfitCard(
         }
     }
 }
+
+private val OutfitPost.dateLabel: String
+    get() = when (type) {
+        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $eventDate"
+        OutfitPostType.PLANNED -> "Planificado para el dia: $eventDate"
+    }

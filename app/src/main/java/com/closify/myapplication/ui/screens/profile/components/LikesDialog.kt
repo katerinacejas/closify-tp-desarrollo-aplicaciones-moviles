@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,8 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,15 +32,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.unit.dp
-import com.closify.myapplication.domain.model.UserSummary
+import com.closify.myapplication.domain.model.Like
+import com.closify.myapplication.ui.theme.LavandaAccent
 import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
-fun FriendsDialog(
-    friends: List<UserSummary>,
+fun LikesDialog(
+    likes: List<Like>,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,7 +63,7 @@ fun FriendsDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -79,20 +81,25 @@ fun FriendsDialog(
                     }
 
                     Text(
-                        text = "Mis amigos",
+                        text = "Me gustas",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(friends) { friend ->
-                        FriendRow(friend = friend)
+                if (likes.isEmpty()) {
+                    EmptyLikesContent(modifier = Modifier.weight(1f))
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(likes) { like ->
+                            LikeRow(like = like)
+                        }
                     }
                 }
             }
@@ -101,18 +108,18 @@ fun FriendsDialog(
 }
 
 @Composable
-private fun FriendRow(
-    friend: UserSummary,
+private fun LikeRow(
+    like: Like,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(50.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = friend.profileImageResId),
+            painter = painterResource(id = like.user.profileImageResId),
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)
@@ -124,34 +131,47 @@ private fun FriendRow(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 12.dp, end = 8.dp)
+                .padding(start = 12.dp)
         ) {
             Text(
-                text = friend.name,
+                text = like.user.name,
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = friend.username,
+                text = "Dio me gusta el ${like.createdAt}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
 
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = ButtonDefaults.ContentPadding,
-            modifier = Modifier.height(34.dp)
-        ) {
-            Text(
-                text = "Eliminar",
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-            )
-        }
+@Composable
+private fun EmptyLikesContent(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 92.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.FavoriteBorder,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = LavandaAccent
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Aun no tenes ningun me gusta en este outfit",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+        )
     }
 }

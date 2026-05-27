@@ -14,10 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
+import com.closify.myapplication.domain.model.Comment
+import com.closify.myapplication.domain.model.Like
+import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.OutfitPostType
+import com.closify.myapplication.domain.model.UserSummary
 import com.closify.myapplication.ui.screens.profile.components.*
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.viewModel.ProfileFriend
-import com.closify.myapplication.ui.viewModel.ProfileOutfit
 import com.closify.myapplication.ui.viewModel.ProfileUiState
 
 @Composable
@@ -25,15 +28,33 @@ fun ProfileContent(
     uiState: ProfileUiState,
     onSettingsClick: () -> Unit,
     onLikeClick: (String) -> Unit,
+    onCommentClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showFriendsDialog by remember { mutableStateOf(false) }
+    var selectedLikesOutfitId by remember { mutableStateOf<String?>(null) }
+    var selectedCommentsOutfitId by remember { mutableStateOf<String?>(null) }
+    val selectedLikesOutfit = uiState.posts.firstOrNull { it.id == selectedLikesOutfitId }
+    val selectedCommentsOutfit = uiState.posts.firstOrNull { it.id == selectedCommentsOutfitId }
 
     if (showFriendsDialog) {
         FriendsDialog(
             friends = uiState.friends,
-            profileImageResId = uiState.profileImageResId,
             onDismiss = { showFriendsDialog = false }
+        )
+    }
+
+    if (selectedLikesOutfit != null) {
+        LikesDialog(
+            likes = selectedLikesOutfit.likedBy,
+            onDismiss = { selectedLikesOutfitId = null }
+        )
+    }
+
+    if (selectedCommentsOutfit != null) {
+        CommentsDialog(
+            comments = selectedCommentsOutfit.comments,
+            onDismiss = { selectedCommentsOutfitId = null }
         )
     }
 
@@ -78,11 +99,13 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(10.dp))
         }
 
-        items(uiState.outfits) { outfit ->
+        items(uiState.posts) { outfit ->
             ProfileOutfitCard(
                 outfit = outfit,
                 onLikeClick = { onLikeClick(outfit.id) },
-                onCommentsClick = {},
+                onLikesTextClick = { selectedLikesOutfitId = outfit.id },
+                onCommentsClick = { onCommentClick(outfit.id) },
+                onCommentsTextClick = { selectedCommentsOutfitId = outfit.id },
                 onEditClick = {},
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
@@ -108,34 +131,53 @@ private fun ProfileContentPreview() {
                 bannerImageResId = R.drawable.banner_default,
                 profileImageResId = R.drawable.avatar_default,
                 friends = listOf(
-                    ProfileFriend("1", "Ayelen Martinez", "@aye_martinez"),
-                    ProfileFriend("2", "Milagros Fava", "@miliifava"),
-                    ProfileFriend("3", "Ailen Garcia", "@ailu_garcia"),
-                    ProfileFriend("4", "Ayelen Balmaceda", "@ayee_balmaceda_1"),
-                    ProfileFriend("5", "Camila Martinez", "@camii_martinez")
+                    UserSummary("1", "Ayelen Martinez", "@aye_martinez", R.drawable.avatar_default),
+                    UserSummary("2", "Milagros Fava", "@miliifava", R.drawable.avatar_default),
+                    UserSummary("3", "Ailen Garcia", "@ailu_garcia", R.drawable.avatar_default),
+                    UserSummary("4", "Ayelen Balmaceda", "@ayee_balmaceda_1", R.drawable.avatar_default),
+                    UserSummary("5", "Camila Martinez", "@camii_martinez", R.drawable.avatar_default)
                 ),
-                outfits = listOf(
-                    ProfileOutfit(
+                posts = listOf(
+                    OutfitPost(
                         id = "1",
                         title = "Mi outfit para mi cumpleanos! <3",
-                        date = "Anadido a favoritos el: 25 de mayo de 2026",
-                        likes = 3,
-                        comments = 2,
+                        type = OutfitPostType.FAVORITE,
+                        eventDate = "25 de mayo de 2026",
                         isLiked = true,
-                        garments = listOf("blusa_1", "jean_1", "zapatillas_blancas")
+                        likedBy = listOf(
+                            Like("1", UserSummary("3", "Ailen Garcia", "@ailu_garcia", R.drawable.avatar_default), "25 de mayo de 2026"),
+                            Like("2", UserSummary("2", "Milagros Fava", "@miliifava", R.drawable.avatar_default), "25 de mayo de 2026"),
+                            Like("3", UserSummary("1", "Ayelen Martinez", "@aye_martinez", R.drawable.avatar_default), "25 de mayo de 2026")
+                        ),
+                        comments = listOf(
+                            Comment(
+                                id = "1",
+                                user = UserSummary("6", "Andrea Gonzalez", "@andrea_gonzalez", R.drawable.avatar_default),
+                                text = "Ay que lindo outfit amigaaa! Me encanta <3",
+                                createdAt = "25 de mayo de 2026"
+                            ),
+                            Comment(
+                                id = "2",
+                                user = UserSummary("7", "Agustina Marrapodia", "@agustina_marrapodia", R.drawable.avatar_default),
+                                text = "Amigaaaa, te queda hermoso, tenes que prestarme esa blusa :)",
+                                createdAt = "25 de mayo de 2026"
+                            )
+                        ),
+                        garmentImageNames = listOf("blusa_1", "jean_1", "zapatillas_blancas")
                     ),
-                    ProfileOutfit(
+                    OutfitPost(
                         id = "2",
                         title = "El outfit que me voy a poner en el cumple de mi novio <3",
-                        date = "Planificado para el dia: 25 de diciembre de 2026",
-                        likes = 5,
-                        comments = 1,
-                        garments = listOf("vestido_floral", "botas_negras")
+                        type = OutfitPostType.PLANNED,
+                        eventDate = "25 de diciembre de 2026",
+                        comments = emptyList(),
+                        garmentImageNames = listOf("vestido_floral", "botas_negras")
                     )
                 )
             ),
             onSettingsClick = {},
-            onLikeClick = {}
+            onLikeClick = {},
+            onCommentClick = {}
         )
     }
 }

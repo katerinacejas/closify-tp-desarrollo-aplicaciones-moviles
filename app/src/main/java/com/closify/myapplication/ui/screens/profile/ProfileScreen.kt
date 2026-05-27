@@ -24,6 +24,7 @@ fun ProfileScreen(
             uiState = uiState,
             onSettingsClick = onSettingsClick,
             onLikeClick = viewModel::onLikeClick,
+            onCommentClick = viewModel::onCommentClick,
             modifier = Modifier.padding(innerPadding)
         )
     }

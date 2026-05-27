@@ -13,6 +13,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private data class ProfileStatItem(
+    val value: String,
+    val label: String
+)
+
 @Composable
 fun ProfileStats(
     garmentsCount: Int,
@@ -21,32 +26,26 @@ fun ProfileStats(
     plannedOutfits: Int,
     modifier: Modifier = Modifier
 ) {
+    val stats = listOf(
+        ProfileStatItem(garmentsCount.toString(), "prendas"),
+        ProfileStatItem("$wardrobeUsage%", "guardarropa en uso"),
+        ProfileStatItem(favoriteOutfits.toString(), "outfit fav"),
+        ProfileStatItem(plannedOutfits.toString(), "outfits planificados")
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        StatCard(
-            value = garmentsCount.toString(),
-            label = "prendas",
-            modifier = Modifier.weight(1f)
-        )
-        StatCard(
-            value = "$wardrobeUsage%",
-            label = "guardarropa en uso",
-            modifier = Modifier.weight(1f)
-        )
-        StatCard(
-            value = favoriteOutfits.toString(),
-            label = "outfit fav",
-            modifier = Modifier.weight(1f)
-        )
-        StatCard(
-            value = plannedOutfits.toString(),
-            label = "outfits planificados",
-            modifier = Modifier.weight(1f)
-        )
+        stats.forEach { stat ->
+            StatCard(
+                value = stat.value,
+                label = stat.label,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
