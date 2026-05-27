@@ -1,0 +1,50 @@
+package com.closify.myapplication.ui.screens.camera
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.ui.viewmodel.CameraEvent
+import com.closify.myapplication.ui.viewmodel.CameraMode
+import com.closify.myapplication.ui.viewmodel.CameraViewModel
+
+@Composable
+fun CameraScreen(
+    onNavigateToClassify: (String) -> Unit,
+    viewModel: CameraViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Launcher para seleccionar imagen de la galería
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { onNavigateToClassify(it.toString()) }
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        CameraContent(
+            selectedMode = uiState.selectedMode,
+            onEvent = viewModel::onEvent,
+            onCardClick = {
+                when (uiState.selectedMode) {
+                    CameraMode.GALLERY -> galleryLauncher.launch(
+                        PickVisualMediaRequest(PickVisualMedia.ImageOnly)
+                    )
+                    CameraMode.CAMERA  -> { /* TODO: implementar cámara */ }
+                }
+            },
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}

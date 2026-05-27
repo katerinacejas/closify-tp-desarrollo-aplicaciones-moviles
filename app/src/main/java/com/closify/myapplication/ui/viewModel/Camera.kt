@@ -1,0 +1,29 @@
+package com.closify.myapplication.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+enum class CameraMode { GALLERY, CAMERA }
+
+data class CameraUiState(
+    val selectedMode: CameraMode = CameraMode.GALLERY
+)
+
+sealed interface CameraEvent {
+    data class SelectMode(val mode: CameraMode) : CameraEvent
+}
+
+class CameraViewModel : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CameraUiState())
+    val uiState: StateFlow<CameraUiState> = _uiState.asStateFlow()
+
+    fun onEvent(event: CameraEvent) {
+        when (event) {
+            is CameraEvent.SelectMode -> _uiState.update { it.copy(selectedMode = event.mode) }
+        }
+    }
+}

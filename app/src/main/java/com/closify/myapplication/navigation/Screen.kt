@@ -11,6 +11,11 @@ sealed class Screen(val route: String) {
     data object Home         : Screen("home")
     data object OutfitResult : Screen("outfit_result")
 
+    data object ClassifyGarment : Screen("classify_garment/{imageUri}") {
+        fun createRoute(imageUri: String): String =
+            "classify_garment/${android.net.Uri.encode(imageUri)}"
+    }
+
     // — Bottom Nav (placeholders) —
     data object Wardrobe  : Screen("wardrobe")
     data object Friends   : Screen("friends")

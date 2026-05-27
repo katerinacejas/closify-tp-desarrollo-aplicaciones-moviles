@@ -16,6 +16,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.closify.myapplication.ui.screens.camera.CameraScreen
+import com.closify.myapplication.ui.screens.camera.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 
@@ -68,7 +72,24 @@ fun AppNavGraph(
             // — Placeholders —
             composable(Screen.Wardrobe.route)  { PlaceholderScreen("Guardarropa") }
             composable(Screen.Friends.route)   { PlaceholderScreen("Amigos") }
-            composable(Screen.Camera.route)    { PlaceholderScreen("Cámara") }
+            composable(Screen.Camera.route) {
+                CameraScreen(
+                    onNavigateToClassify = { uri ->
+                        navController.navigate(Screen.ClassifyGarment.createRoute(uri))
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.ClassifyGarment.route,
+                arguments = listOf(navArgument("imageUri") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
+                ClassifyGarmentScreen(
+                    imageUri = imageUri,
+                    onBack = { navController.popBackStack() }
+                )
+            }
             composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
             composable(Screen.Profile.route)   { PlaceholderScreen("Perfil") }
         }
