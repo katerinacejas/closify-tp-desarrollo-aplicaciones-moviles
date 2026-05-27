@@ -1,0 +1,50 @@
+app/src/main/java/com/closify/myapplication/ui/screens/camera/ClassifyGarmentScreen.kt
+  s_318ed6835f40e2::t_4464e5c3427269 1-67
+app/src/main/java/com/closify/myapplication/ui/screens/camera/CameraScreen.kt
+  s_318ed6835f40e2::t_157555c996a115 3,5,16,21,26-32,39-41,43-46
+  s_318ed6835f40e2::t_b185ea0e80c1e7 4
+  s_318ed6835f40e2::t_15b394bb9c0a77 1-2,7-15,17-20,22-25,33-38,47-50
+  s_318ed6835f40e2::t_e06c78a1e95964 6
+  s_318ed6835f40e2::t_dcdfdb0c08e8cb 42
+app/src/main/java/com/closify/myapplication/navigation/Screen.kt
+  s_318ed6835f40e2::t_7aff4191201acf 14-18
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_318ed6835f40e2::t_34b8ba3ec670fd 21
+  s_318ed6835f40e2::t_00c066172f4fb2 19-20,22
+  s_318ed6835f40e2::t_c173026d8d609b 75-92
+app/src/main/java/com/closify/myapplication/ui/screens/camera/CameraContent.kt
+  s_318ed6835f40e2::t_174c79c5ee9ea5 14-15
+  s_318ed6835f40e2::t_ffaa5a2752b5f2 1-2,4-13,16-42,44-88,90,94-103,105,107-180
+  s_318ed6835f40e2::t_1ad029f983d467 3
+  s_318ed6835f40e2::t_08c2a330d91380 89,91-93
+  s_318ed6835f40e2::t_e800f323170a2e 104,106
+app/src/main/java/com/closify/myapplication/ui/viewModel/Camera.kt
+  s_318ed6835f40e2::t_d701df2db6aaf3 1-29
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  s_318ed6835f40e2::t_99dac7566d440d 1-56
+app/src/main/java/com/closify/myapplication/ui/screens/camera/ClassifyGarmentContent.kt
+  s_318ed6835f40e2::t_f87bce15cded7d 1-211
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/AutoManualToggle.kt
+  s_318ed6835f40e2::t_acd333bece13b4 26-28,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "48ba998852fa091484208c52fe5752e932976422",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_318ed6835f40e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9db6d2a1-40b9-458f-b828-6ccdfc0d79c4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
