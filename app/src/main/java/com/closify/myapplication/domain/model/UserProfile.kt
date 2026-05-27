@@ -1,27 +1,26 @@
 package com.closify.myapplication.domain.model
 
-// Perfil publico. Los contadores se calculan desde listas en la capa de estado/UI.
+import androidx.annotation.DrawableRes
+
 data class UserProfile(
-    val user: User
+    val id: String,
+    val fullName: String,
+    val username: String,
+    val birthDate: String,
+    val bio: String,
+    @param:DrawableRes val avatarImageResId: Int,
+    @param:DrawableRes val bannerImageResId: Int
 ) {
-    val id: String
-        get() = user.id
-
     val name: String
-        get() = user.fullName
-
-    val username: String
-        get() = user.username
-
-    val bio: String
-        get() = user.bio
-
-    val birthDate: String
-        get() = user.birthDate
-
-    val bannerImageResId: Int
-        get() = user.bannerImageResId
+        get() = fullName
 
     val profileImageResId: Int
-        get() = user.avatarImageResId
+        get() = avatarImageResId
+
+    fun toSummary(): UserSummary = UserSummary(
+        id = id,
+        fullName = fullName,
+        username = username,
+        profileImageResId = avatarImageResId
+    )
 }

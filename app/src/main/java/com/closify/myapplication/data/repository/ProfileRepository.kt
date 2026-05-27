@@ -15,7 +15,7 @@ class ProfileRepository(
     }
 
     fun getProfile(userId: String = MockClosifyData.CURRENT_USER_ID): UserProfile =
-        UserProfile(user = requireNotNull(MockClosifyData.userById(userId)))
+        requireNotNull(MockClosifyData.userById(userId)).profile
 
     fun getFriends(userId: String = MockClosifyData.CURRENT_USER_ID): List<UserSummary> =
         socialRepository.getFriends(userId)

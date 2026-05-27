@@ -2,6 +2,7 @@ package com.closify.myapplication.data.repository
 
 import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.User
+import com.closify.myapplication.domain.model.UserProfile
 import kotlinx.coroutines.delay
 
 private data class UserRecord(
@@ -20,26 +21,32 @@ class UserRepository {
         UserRecord(
             user = User(
                 id = "auth_maria",
-                fullName = "Maria",
-                username = "maria",
                 email = "maria@gmail.com",
-                birthDate = "",
-                bio = "",
-                avatarImageResId = R.drawable.avatar_default,
-                bannerImageResId = R.drawable.banner_default
+                profile = UserProfile(
+                    id = "auth_maria",
+                    fullName = "Maria",
+                    username = "maria",
+                    birthDate = "",
+                    bio = "",
+                    avatarImageResId = R.drawable.avatar_default,
+                    bannerImageResId = R.drawable.banner_default
+                )
             ),
             password = "Maria123!"
         ),
         UserRecord(
             user = User(
                 id = "auth_juan",
-                fullName = "Juan",
-                username = "juan",
                 email = "juan@gmail.com",
-                birthDate = "",
-                bio = "",
-                avatarImageResId = R.drawable.avatar_default,
-                bannerImageResId = R.drawable.banner_default
+                profile = UserProfile(
+                    id = "auth_juan",
+                    fullName = "Juan",
+                    username = "juan",
+                    birthDate = "",
+                    bio = "",
+                    avatarImageResId = R.drawable.avatar_default,
+                    bannerImageResId = R.drawable.banner_default
+                )
             ),
             password = "Juan123!"
         )
@@ -77,13 +84,16 @@ class UserRepository {
         delay(1000)
         val user = User(
             id = "auth_${users.size + 1}",
-            fullName = username,
-            username = username,
             email = email,
-            birthDate = "",
-            bio = "",
-            avatarImageResId = R.drawable.avatar_default,
-            bannerImageResId = R.drawable.banner_default
+            profile = UserProfile(
+                id = "auth_${users.size + 1}",
+                fullName = username,
+                username = username,
+                birthDate = "",
+                bio = "",
+                avatarImageResId = R.drawable.avatar_default,
+                bannerImageResId = R.drawable.banner_default
+            )
         )
         users.add(UserRecord(user = user, password = password))
         currentUserId = user.id

@@ -16,6 +16,7 @@ import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.SuggestedOutfit
 import com.closify.myapplication.domain.model.User
+import com.closify.myapplication.domain.model.UserProfile
 import com.closify.myapplication.domain.model.UserSummary
 import com.closify.myapplication.domain.model.WeatherCondition
 
@@ -25,13 +26,16 @@ internal object MockClosifyData {
 
     val currentUser = User(
         id = CURRENT_USER_ID,
-        fullName = "Katerina Cejas",
-        username = "@kate_cejas_1999",
         email = "kate@closify.com",
-        birthDate = "3 de septiembre de 1999",
-        bio = "hola soy kate, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
-        avatarImageResId = R.drawable.avatar_default,
-        bannerImageResId = R.drawable.banner_default,
+        profile = UserProfile(
+            id = CURRENT_USER_ID,
+            fullName = "Katerina Cejas",
+            username = "@kate_cejas_1999",
+            birthDate = "3 de septiembre de 1999",
+            bio = "hola soy kate, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        ),
         createdAt = "1 de mayo de 2026"
     )
 
@@ -227,12 +231,16 @@ internal object MockClosifyData {
 
     private fun user(id: String, fullName: String, username: String): User = User(
         id = id,
-        fullName = fullName,
-        username = username,
-        birthDate = "",
-        bio = "",
-        avatarImageResId = R.drawable.avatar_default,
-        bannerImageResId = R.drawable.banner_default,
+        email = "$id@closify.com",
+        profile = UserProfile(
+            id = id,
+            fullName = fullName,
+            username = username,
+            birthDate = "",
+            bio = "",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        ),
         createdAt = "1 de mayo de 2026"
     )
 
