@@ -74,7 +74,7 @@ class ProfileViewModel(
                         id = "me",
                         user = UserSummary(
                             id = "user_1",
-                            name = currentState.name,
+                            fullName = currentState.name,
                             username = currentState.username,
                             profileImageResId = currentState.profileImageResId ?: R.drawable.avatar_default
                         ),

@@ -67,7 +67,8 @@ fun ProfileOutfitCard(
             ) {
                 outfit.outfit.garments.forEach { garment ->
                     val context = LocalContext.current
-                    val resId = context.resources.getIdentifier(garment.imageUrl, "drawable", context.packageName)
+                    val resName = garment.imageUrl.substringAfterLast("/")
+                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
                     if (resId != 0) {
                         Image(
                             painter = painterResource(id = resId),

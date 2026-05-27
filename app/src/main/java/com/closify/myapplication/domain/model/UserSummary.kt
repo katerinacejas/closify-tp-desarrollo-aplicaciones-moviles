@@ -6,7 +6,10 @@ import androidx.annotation.DrawableRes
 // El id permite navegar al perfil completo sin cargar toda la entidad User.
 data class UserSummary(
     val id: String,
-    val name: String,
+    val fullName: String,
     val username: String,
     @param:DrawableRes val profileImageResId: Int
-)
+) {
+    val name: String
+        get() = fullName
+}
