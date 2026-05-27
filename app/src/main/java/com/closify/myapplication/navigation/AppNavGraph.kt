@@ -22,6 +22,7 @@ import com.closify.myapplication.ui.screens.camera.CameraScreen
 import com.closify.myapplication.ui.screens.camera.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
+import com.closify.myapplication.ui.screens.profile.ProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -91,7 +92,13 @@ fun AppNavGraph(
                 )
             }
             composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
-            composable(Screen.Profile.route)   { PlaceholderScreen("Perfil") }
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onSettingsClick = {
+                        /* TODO: Implementar navegación a configuración */
+                    }
+                )
+            }
         }
     }
 }

@@ -63,7 +63,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedWeather = weather,
-                isGenerateEnabled = weather != null && it.selectedOccasion != null
+                isGenerateEnabled = it.selectedOccasion != null
             )
         }
     }
@@ -72,7 +72,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedOccasion = occasion,
-                isGenerateEnabled = it.selectedWeather != null && occasion != null
+                isGenerateEnabled = it.selectedWeather != null
             )
         }
     }
