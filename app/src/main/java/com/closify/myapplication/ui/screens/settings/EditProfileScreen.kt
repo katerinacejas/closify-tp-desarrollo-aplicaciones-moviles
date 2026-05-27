@@ -64,35 +64,35 @@ fun EditProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 20.dp), // Reducido de 24 a 20
             horizontalAlignment = Alignment.Start
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp)) // Reducido de 16 a 8
 
             Text(
                 text = "Editar Perfil",
-                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold, fontSize = 26.sp),
+                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp), // Fuente un pelín más chica
                 color = Color(0xFF333333),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Reducido de 32 a 16
 
             // 1. Título Nombre y caja
             Text(text = "Nombre", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp)) // Reducido de 8 a 4
             ClosifyTextField(
                 value = name,
                 onValueChange = { name = it },
                 placeholder = "Tu nombre"
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp)) // Reducido de 24 a 12
 
             // 2. Título Usuario y caja con @
             Text(text = "Usuario", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = if (username.startsWith("@")) username else "@$username",
                 onValueChange = { 
@@ -102,18 +102,18 @@ fun EditProfileScreen(
                 placeholder = "@usuario"
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 3. Título Algo sobre ti... (caja grande con contador)
             Text(text = "Algo sobre ti..", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Box {
                 ClosifyTextField(
                     value = bio,
                     onValueChange = { if (it.length <= 140) bio = it },
                     placeholder = "Contanos algo sobre vos...",
-                    minLines = 4,
-                    maxLines = 4,
+                    minLines = 3, // Reducido de 4 a 3 para ahorrar espacio
+                    maxLines = 3,
                     singleLine = false
                 )
                 Text(
@@ -126,11 +126,11 @@ fun EditProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 4. Título Fecha de nacimiento y caja con calendario
             Text(text = "Fecha de nacimiento", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             
             val dateFormatter = remember { DateTimeFormatter.ofPattern("dd / MM / yyyy") }
             val birthdateText = birthdate?.format(dateFormatter) ?: "dd / mm / aaaa"
@@ -143,7 +143,7 @@ fun EditProfileScreen(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    modifier = Modifier.padding(12.dp).fillMaxWidth(), // Padding interno de 16 a 12
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -152,7 +152,7 @@ fun EditProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Reducido de 24 a 16
 
             // Botón Guardar Cambios
             ClosifyButton(
@@ -160,7 +160,7 @@ fun EditProfileScreen(
                 onClick = { onBack() }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         // Calendario Material 3

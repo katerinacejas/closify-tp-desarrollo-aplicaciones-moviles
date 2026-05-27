@@ -1,13 +1,14 @@
 package com.closify.myapplication.ui.screens.settings
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,28 +25,79 @@ import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.theme.LilaPrimary
 import com.closify.myapplication.ui.viewmodel.SettingsViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Definimos los posibles estados de la pantalla
+enum class SettingsSubScreen {
+    MENU,
+    EDIT_PROFILE,
+    SECURITY
+}
+
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
-    onNavigateToEditProfile: () -> Unit = {},
-    onBack: () -> Unit = {}
+    onBackToHome: () -> Unit = {}
 ) {
     val isDarkMode by viewModel.isDarkMode.collectAsState()
-    val fontScale by viewModel.fontScale.collectAsState()
     val language by viewModel.language.collectAsState()
 
-    // Función auxiliar para escalar el tamaño de fuente
-    fun getScaledSize(baseSize: Int): androidx.compose.ui.unit.TextUnit {
-        val multiplier = when (fontScale) {
-            0f -> 0.8f
-            1f -> 1.0f
-            2f -> 1.2f
-            3f -> 1.4f
-            else -> 1.0f
+    SettingsScreenContent(
+        isDarkMode = isDarkMode,
+        language = language,
+        onDarkModeChange = viewModel::toggleDarkMode,
+        onLanguageChange = viewModel::updateLanguage,
+        onBackToHome = onBackToHome
+    )
+}
+
+@Composable
+fun SettingsScreenContent(
+    isDarkMode: Boolean,
+    language: String,
+    onDarkModeChange: (Boolean) -> Unit,
+    onLanguageChange: (String) -> Unit,
+    onBackToHome: () -> Unit
+) {
+    // Estado para manejar la navegación interna sin tocar el AppNavGraph
+    var currentSubScreen by remember { mutableStateOf(SettingsSubScreen.MENU) }
+
+    Crossfade(targetState = currentSubScreen, label = "SettingsNav") { screen ->
+        when (screen) {
+            SettingsSubScreen.MENU -> {
+                SettingsMenu(
+                    isDarkMode = isDarkMode,
+                    language = language,
+                    onDarkModeChange = onDarkModeChange,
+                    onLanguageChange = onLanguageChange,
+                    onNavigateToEditProfile = { currentSubScreen = SettingsSubScreen.EDIT_PROFILE },
+                    onNavigateToSecurity = { currentSubScreen = SettingsSubScreen.SECURITY },
+                    onBack = onBackToHome
+                )
+            }
+            SettingsSubScreen.EDIT_PROFILE -> {
+                EditProfileScreen(
+                    onBack = { currentSubScreen = SettingsSubScreen.MENU }
+                )
+            }
+            SettingsSubScreen.SECURITY -> {
+                SecurityScreen(
+                    onBack = { currentSubScreen = SettingsSubScreen.MENU }
+                )
+            }
         }
-        return (baseSize * multiplier).sp
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsMenu(
+    isDarkMode: Boolean,
+    language: String,
+    onDarkModeChange: (Boolean) -> Unit,
+    onLanguageChange: (String) -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToSecurity: () -> Unit,
+    onBack: () -> Unit
+) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -58,19 +110,11 @@ fun SettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
-                        )
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                actions = {
-                    // Espaciador para centrar el logo ya que navigationIcon ocupa espacio
-                    Spacer(modifier = Modifier.size(48.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+                actions = { Spacer(modifier = Modifier.size(48.dp)) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     ) { innerPadding ->
@@ -88,43 +132,33 @@ fun SettingsScreen(
                 text = "Configuración",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = getScaledSize(26)
+                    fontSize = 26.sp
                 ),
                 color = Color(0xFF333333)
             )
 
-            Spacer(modifier = Modifier.height(24.dp)) // Reducido de 32 a 24
+            Spacer(modifier = Modifier.height(24.dp))
 
             GeneralSettingsCard(
                 isDarkMode = isDarkMode,
-                onDarkModeChange = { viewModel.toggleDarkMode(it) },
-                fontScale = fontScale,
-                onFontScaleChange = { viewModel.updateFontScale(it) },
+                onDarkModeChange = onDarkModeChange,
                 language = language,
-                onLanguageChange = { viewModel.updateLanguage(it) },
-                getScaledSize = ::getScaledSize
+                onLanguageChange = onLanguageChange
             )
 
-            Spacer(modifier = Modifier.height(20.dp)) // Reducido de 32 a 20 para subir los botones
+            Spacer(modifier = Modifier.height(20.dp))
 
             SettingsActionButton(
                 text = "Editar Perfil", 
                 onClick = onNavigateToEditProfile,
-                fontSize = getScaledSize(18)
+                fontSize = 18.sp
             )
-            Spacer(modifier = Modifier.height(12.dp)) // Reducido de 16 a 12
+            Spacer(modifier = Modifier.height(12.dp))
             SettingsActionButton(
                 text = "Seguridad", 
-                onClick = { },
-                fontSize = getScaledSize(18)
+                onClick = onNavigateToSecurity,
+                fontSize = 18.sp
             )
-            Spacer(modifier = Modifier.height(12.dp)) // Reducido de 16 a 12
-            SettingsActionButton(
-                text = "Notificaciones", 
-                onClick = { },
-                fontSize = getScaledSize(18)
-            )
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -134,11 +168,8 @@ fun SettingsScreen(
 fun GeneralSettingsCard(
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit,
-    fontScale: Float,
-    onFontScaleChange: (Float) -> Unit,
     language: String,
-    onLanguageChange: (String) -> Unit,
-    getScaledSize: (Int) -> androidx.compose.ui.unit.TextUnit
+    onLanguageChange: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -155,7 +186,7 @@ fun GeneralSettingsCard(
                 text = "GENERAL",
                 style = MaterialTheme.typography.labelLarge.copy(
                     letterSpacing = 1.sp,
-                    fontSize = getScaledSize(12)
+                    fontSize = 12.sp
                 ),
                 color = Color.Gray,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -163,7 +194,6 @@ fun GeneralSettingsCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Modo Oscuro
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -171,7 +201,7 @@ fun GeneralSettingsCard(
             ) {
                 Text(
                     text = "Modo Oscuro", 
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = getScaledSize(16))
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
                 Switch(
                     checked = isDarkMode,
@@ -185,44 +215,9 @@ fun GeneralSettingsCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Tamaño de fuente
-            Text(
-                text = "Tamaño de fuente", 
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = getScaledSize(16))
-            )
-            Slider(
-                value = fontScale,
-                onValueChange = onFontScaleChange,
-                valueRange = 0f..3f,
-                steps = 2,
-                colors = SliderDefaults.colors(
-                    thumbColor = LilaPrimary,
-                    activeTrackColor = LilaPrimary.copy(alpha = 0.3f),
-                    inactiveTrackColor = LilaPrimary.copy(alpha = 0.1f)
-                )
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Pequeño", 
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = getScaledSize(12)), 
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Grande", 
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = getScaledSize(12)), 
-                    color = Color.Gray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Idioma
             Text(
                 text = "Idioma", 
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = getScaledSize(16))
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
             )
             Spacer(modifier = Modifier.height(12.dp))
             LanguageSelector(selectedLanguage = language, onLanguageSelected = onLanguageChange)
@@ -277,7 +272,7 @@ fun SettingsActionButton(
                 color = Color(0xFF444444)
             )
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 tint = LilaPrimary,
                 modifier = Modifier.size(28.dp)
@@ -286,10 +281,16 @@ fun SettingsActionButton(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
     ClosifyTheme {
-        SettingsScreen()
+        SettingsScreenContent(
+            isDarkMode = false,
+            language = "ESPAÑOL",
+            onDarkModeChange = {},
+            onLanguageChange = {},
+            onBackToHome = {}
+        )
     }
 }
