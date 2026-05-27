@@ -18,8 +18,6 @@ import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
-import com.closify.myapplication.ui.screens.settings.EditProfileScreen
-import com.closify.myapplication.ui.screens.settings.SettingsScreen
 
 @Composable
 fun AppNavGraph(
@@ -33,6 +31,7 @@ fun AppNavGraph(
             BottomNavBar(
                 currentRoute = currentRoute,
                 onItemSelected = { screen ->
+                    // Si estamos en OutfitResult primero volvemos atrás
                     if (currentRoute == Screen.OutfitResult.route) {
                         navController.popBackStack()
                     }
@@ -60,45 +59,24 @@ fun AppNavGraph(
                 )
             }
 
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    onNavigateToEditProfile = {
-                        navController.navigate(Screen.EditProfile.route)
-                    },
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(Screen.EditProfile.route) {
-                EditProfileScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
             composable(Screen.OutfitResult.route) {
                 OutfitResultScreen(
                     onBack = { navController.popBackStack() }
                 )
             }
 
+            // — Placeholders —
             composable(Screen.Wardrobe.route)  { PlaceholderScreen("Guardarropa") }
             composable(Screen.Friends.route)   { PlaceholderScreen("Amigos") }
             composable(Screen.Camera.route)    { PlaceholderScreen("Cámara") }
             composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
-            composable(Screen.Profile.route)   { 
-                SettingsScreen(
-                    onNavigateToEditProfile = {
-                        navController.navigate(Screen.EditProfile.route)
-                    },
-                    onBack = { navController.navigate(Screen.Home.route) }
-                )
-            }
+            composable(Screen.Profile.route)   { PlaceholderScreen("Perfil") }
         }
     }
 }
 
 @Composable
-fun PlaceholderScreen(name: String) {
+private fun PlaceholderScreen(name: String) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
