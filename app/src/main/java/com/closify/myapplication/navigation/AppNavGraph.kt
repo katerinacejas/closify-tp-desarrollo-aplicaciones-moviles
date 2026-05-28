@@ -26,12 +26,15 @@ import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
 import com.closify.myapplication.ui.viewmodel.CameraViewModel
+import com.closify.myapplication.ui.screens.settings.SettingsScreen
 
 private const val CAMERA_FLOW_ROUTE = "camera_flow"
 
+
 @Composable
 fun AppNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onLogout: () -> Unit = {}
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
@@ -115,7 +118,18 @@ fun AppNavGraph(
 
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    onSettingsClick = { /* TODO */ }
+                    onSettingsClick = {
+                        navController.navigate(Screen.Settings.route)
+                    }
+                )
+            }
+
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onLogout = onLogout,
+                    onBackToHome = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
