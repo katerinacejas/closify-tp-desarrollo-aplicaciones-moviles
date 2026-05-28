@@ -56,8 +56,8 @@ import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.screens.wardrobe.components.WardrobeHeader
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.viewModel.WardrobeEvent
-import com.closify.myapplication.ui.viewModel.WardrobeViewModel
+import com.closify.myapplication.ui.viewmodel.WardrobeEvent
+import com.closify.myapplication.ui.viewmodel.WardrobeViewModel
 
 @Composable
 fun GarmentDetailScreen(

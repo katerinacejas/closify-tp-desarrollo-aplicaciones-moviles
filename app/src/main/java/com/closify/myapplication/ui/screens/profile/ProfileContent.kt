@@ -2,10 +2,12 @@ package com.closify.myapplication.ui.screens.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,8 +28,12 @@ fun ProfileContent(
     onLikeClick: (String) -> Unit,
     onUpdatePostTitle: (String, String) -> Unit,
     onDeletePost: (String) -> Unit,
+    onOpenUserProfile: (String) -> Unit,
+    onToggleFriend: (String) -> Unit,
+    targetPostId: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val listState = rememberLazyListState()
     var showFriendsDialog by remember { mutableStateOf(false) }
     var selectedLikesOutfitId by remember { mutableStateOf<String?>(null) }
     var selectedCommentsOutfitId by remember { mutableStateOf<String?>(null) }
@@ -38,9 +44,21 @@ fun ProfileContent(
     val selectedEditOutfit = uiState.posts.firstOrNull { it.id == selectedEditOutfitId }
     val selectedDeleteOutfit = uiState.posts.firstOrNull { it.id == selectedDeleteOutfitId }
 
+    LaunchedEffect(targetPostId, uiState.posts) {
+        val postIndex = uiState.posts.indexOfFirst { it.id == targetPostId }
+        if (postIndex >= 0) {
+            listState.animateScrollToItem(index = 4 + postIndex)
+        }
+    }
+
     if (showFriendsDialog) {
         FriendsDialog(
             friends = uiState.friends,
+            onFriendClick = { userId ->
+                showFriendsDialog = false
+                onOpenUserProfile(userId)
+            },
+            onToggleFriend = onToggleFriend,
             onDismiss = { showFriendsDialog = false }
         )
     }
@@ -48,6 +66,10 @@ fun ProfileContent(
     if (selectedLikesOutfit != null) {
         LikesDialog(
             likes = selectedLikesOutfit.likedBy,
+            onUserClick = { userId ->
+                selectedLikesOutfitId = null
+                onOpenUserProfile(userId)
+            },
             onDismiss = { selectedLikesOutfitId = null }
         )
     }
@@ -55,6 +77,10 @@ fun ProfileContent(
     if (selectedCommentsOutfit != null) {
         CommentsDialog(
             comments = selectedCommentsOutfit.comments,
+            onUserClick = { userId ->
+                selectedCommentsOutfitId = null
+                onOpenUserProfile(userId)
+            },
             onDismiss = { selectedCommentsOutfitId = null }
         )
     }
@@ -87,6 +113,7 @@ fun ProfileContent(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        state = listState,
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {
@@ -154,10 +181,10 @@ private fun ProfileContentPreview() {
         ProfileContent(
             uiState = ProfileUiState(
                 userId = profile.id,
-                name = "Katerina Cejas",
-                username = "@kate_cejas_1999",
-                bio = "hola soy kate, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
-                birthDate = "3 de septiembre de 1999",
+                name = profile.name,
+                username = profile.username,
+                bio = profile.bio,
+                birthDate = profile.birthDate,
                 friendsCount = friends.size,
                 garmentsCount = garments.size,
                 wardrobeUsagePercentage = repository.getWardrobeUsagePercentage(),
@@ -171,7 +198,9 @@ private fun ProfileContentPreview() {
             onSettingsClick = {},
             onLikeClick = {},
             onUpdatePostTitle = { _, _ -> },
-            onDeletePost = {}
+            onDeletePost = {},
+            onOpenUserProfile = {},
+            onToggleFriend = {}
         )
     }
 }

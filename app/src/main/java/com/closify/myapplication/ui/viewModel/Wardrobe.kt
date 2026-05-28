@@ -1,7 +1,8 @@
-package com.closify.myapplication.ui.viewModel
+package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.closify.myapplication.data.repository.WardrobeRepository
+import com.closify.myapplication.data.repository.GarmentRepository
+import com.closify.myapplication.data.repository.MockClosifyData
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -34,7 +35,7 @@ sealed interface WardrobeEvent {
 }
 
 class WardrobeViewModel(
-    private val garmentRepository: WardrobeRepository = WardrobeRepository.instance
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WardrobeUiState())
@@ -45,7 +46,7 @@ class WardrobeViewModel(
     }
 
     private fun loadGarments() {
-        val garments = garmentRepository.getAllGarments()
+        val garments = garmentRepository.getAllByUserId()
         
         // Conteo por Categoría
         val catCounts = garments.groupBy { it.category }
@@ -54,13 +55,13 @@ class WardrobeViewModel(
         // Conteo por Clima
         val weathCounts = mutableMapOf<WeatherCondition, Int>()
         WeatherCondition.entries.forEach { condition ->
-            weathCounts[condition] = garmentRepository.getGarmentsByWeather(condition).size
+            weathCounts[condition] = garmentRepository.getByWeather(condition).size
         }
 
         // Conteo por Ocasión
         val occCounts = mutableMapOf<Occasion, Int>()
         Occasion.entries.forEach { occasion ->
-            occCounts[occasion] = garmentRepository.getGarmentsByOccasion(occasion).size
+            occCounts[occasion] = garmentRepository.getByOccasion(occasion).size
         }
         
         _uiState.update { it.copy(
@@ -70,7 +71,6 @@ class WardrobeViewModel(
             allGarments = garments
         ) }
 
-        // Si estamos en la pestaña TODO y hay una búsqueda activa, aplicamos el filtro
         if (_uiState.value.selectedFilter == WardrobeFilter.ALL) {
             filterGarments()
         }
@@ -95,26 +95,28 @@ class WardrobeViewModel(
     }
 
     fun loadGarmentsByCategory(category: GarmentCategory) {
-        val filtered = garmentRepository.getGarmentsByCategory(category)
+        val filtered = garmentRepository.getByCategory(category)
         _uiState.update { it.copy(filteredGarments = filtered) }
     }
 
     fun loadGarmentsByWeather(condition: WeatherCondition) {
-        val filtered = garmentRepository.getGarmentsByWeather(condition)
+        val filtered = garmentRepository.getByWeather(condition)
         _uiState.update { it.copy(filteredGarments = filtered) }
     }
 
     fun loadGarmentsByOccasion(occasion: Occasion) {
-        val filtered = garmentRepository.getGarmentsByOccasion(occasion)
+        val filtered = garmentRepository.getByOccasion(occasion)
         _uiState.update { it.copy(filteredGarments = filtered) }
     }
 
     fun getGarmentById(id: String) {
-        val garment = garmentRepository.getAllGarments().find { it.id == id }
+        val garment = garmentRepository.getAllByUserId().find { it.id == id }
         _uiState.update { it.copy(selectedGarment = garment) }
     }
 
     private fun deleteGarment(id: String) {
+        MockClosifyData.garments.removeIf { it.id == id }
+        
         _uiState.update { state ->
             val updatedFiltered = state.filteredGarments.filter { it.id != id }
             state.copy(
@@ -127,11 +129,11 @@ class WardrobeViewModel(
 
     private fun filterGarments() {
         val query = _uiState.value.searchQuery
-        val allGarments = garmentRepository.getAllGarments()
+        val allGarments = garmentRepository.getAllByUserId()
         val filtered = if (query.isEmpty()) {
             allGarments
         } else {
-            garmentRepository.getGarmentsByName(query)
+            allGarments.filter { it.name.contains(query, ignoreCase = true) }
         }
         _uiState.update { it.copy(filteredGarments = filtered) }
     }

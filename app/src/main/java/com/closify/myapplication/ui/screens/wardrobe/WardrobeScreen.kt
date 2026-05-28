@@ -53,13 +53,13 @@ import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.SelectableChip
+import com.closify.myapplication.ui.screens.wardrobe.components.GarmentGrid
 import com.closify.myapplication.ui.screens.wardrobe.components.WardrobeHeader
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.viewModel.WardrobeEvent
-import com.closify.myapplication.ui.viewModel.WardrobeFilter
-import com.closify.myapplication.ui.viewModel.WardrobeUiState
-import com.closify.myapplication.ui.viewModel.WardrobeViewModel
-
+import com.closify.myapplication.ui.viewmodel.WardrobeEvent
+import com.closify.myapplication.ui.viewmodel.WardrobeFilter
+import com.closify.myapplication.ui.viewmodel.WardrobeUiState
+import com.closify.myapplication.ui.viewmodel.WardrobeViewModel
 
 @Composable
 fun WardrobeScreen(
@@ -402,9 +402,4 @@ private fun WardrobeScreenPreview() {
             onGarmentClick = {}
         )
     }
-}
-
-@Composable
-fun WardrobeUiState(categoryCounts: Map<GarmentCategory, Int>) {
-    TODO("Not yet implemented")
 }

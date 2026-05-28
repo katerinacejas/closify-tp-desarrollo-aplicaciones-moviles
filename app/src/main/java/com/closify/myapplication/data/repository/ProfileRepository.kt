@@ -6,6 +6,7 @@ import com.closify.myapplication.domain.model.UserProfile
 import com.closify.myapplication.domain.model.UserSummary
 
 class ProfileRepository(
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val wardrobeRepository: WardrobeRepository = WardrobeRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance
 ) {
@@ -21,13 +22,11 @@ class ProfileRepository(
         socialRepository.getFriends(userId)
 
     fun getWardrobeGarments(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
-        wardrobeRepository.getAllGarments(userId)
+        garmentRepository.getAllByUserId(userId)
 
     fun getWardrobeUsagePercentage(userId: String = MockClosifyData.CURRENT_USER_ID): Int =
         wardrobeRepository.calculateWardrobeUsagePercentage(getPosts(userId))
 
     fun getPosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
-        MockClosifyData.outfitPosts
-            .filter { it.author.id == userId }
-            .sortedByDescending { it.createdAt }
+        socialRepository.getPostsByUser(userId)
 }

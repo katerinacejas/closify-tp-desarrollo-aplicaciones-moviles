@@ -4,17 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Air
@@ -33,8 +28,6 @@ import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Work
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,25 +38,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.ui.screens.wardrobe.components.GarmentGrid
 import com.closify.myapplication.ui.screens.wardrobe.components.WardrobeHeader
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.viewModel.WardrobeEvent
-import com.closify.myapplication.ui.viewModel.WardrobeUiState
-import com.closify.myapplication.ui.viewModel.WardrobeViewModel
+import com.closify.myapplication.ui.viewmodel.WardrobeEvent
+import com.closify.myapplication.ui.viewmodel.WardrobeUiState
+import com.closify.myapplication.ui.viewmodel.WardrobeViewModel
 
 @Composable
 fun WardrobeDetailScreen(
@@ -188,55 +177,6 @@ fun FilterTitle(category: GarmentCategory?, weather: WeatherCondition?, occasion
     }
 }
 
-@Composable
-fun GarmentGrid(
-    garments: List<Garment>,
-    onGarmentClick: (Garment) -> Unit
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(garments) { garment ->
-            GarmentItem(
-                garment = garment,
-                onClick = { onGarmentClick(garment) }
-            )
-        }
-    }
-}
-
-@Composable
-fun GarmentItem(
-    garment: Garment,
-    onClick: () -> Unit
-) {
-    val context = LocalContext.current
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(0.8f)
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(garment.imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = garment.name,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-        )
-    }
-}
-
 @Preview(showSystemUi = true)
 @Composable
 private fun WardrobeDetailPreview() {
@@ -250,7 +190,7 @@ private fun WardrobeDetailPreview() {
             category = GarmentCategory.TOP,
             weather = null,
             occasion = null,
-            uiState = WardrobeUiState(filteredGarments = sampleGarments + sampleGarments + sampleGarments),
+            uiState = WardrobeUiState(allGarments = sampleGarments, filteredGarments = sampleGarments),
             onBack = {},
             onGarmentClick = {},
             onEvent = {}

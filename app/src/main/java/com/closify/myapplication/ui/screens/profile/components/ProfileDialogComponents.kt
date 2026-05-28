@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.screens.profile.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -154,6 +155,7 @@ internal fun ProfileDialogUserRow(
     supportingText: String,
     modifier: Modifier = Modifier,
     rowHeight: Dp? = 50.dp,
+    onUserClick: (() -> Unit)? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
     bodyContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
@@ -170,7 +172,8 @@ internal fun ProfileDialogUserRow(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .border(1.dp, RosaSecondary, CircleShape),
+                    .border(1.dp, RosaSecondary, CircleShape)
+                    .then(if (onUserClick != null) Modifier.clickable(onClick = onUserClick) else Modifier),
                 contentScale = ContentScale.Crop
             )
 
@@ -178,6 +181,7 @@ internal fun ProfileDialogUserRow(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 12.dp, end = 8.dp)
+                    .then(if (onUserClick != null) Modifier.clickable(onClick = onUserClick) else Modifier)
             ) {
                 Text(
                     text = user.name,
