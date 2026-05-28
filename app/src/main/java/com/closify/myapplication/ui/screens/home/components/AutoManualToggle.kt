@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 fun AutoManualToggle(
     isAuto: Boolean,
     onToggle: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    labelAuto: String = "AUTOMÁTICO",
+    labelManual: String = "MANUAL"
 ) {
     val shape = RoundedCornerShape(50.dp)
 
@@ -39,7 +41,7 @@ fun AutoManualToggle(
             .background(MaterialTheme.colorScheme.surfaceVariant),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        listOf(true to "AUTOMÁTICO", false to "MANUAL").forEach { (value, label) ->
+        listOf(true to labelAuto, false to labelManual).forEach { (value, label) ->
             val selected = isAuto == value
             val interactionSource = remember { MutableInteractionSource() }
 

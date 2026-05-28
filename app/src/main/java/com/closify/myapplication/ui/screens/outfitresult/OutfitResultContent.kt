@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.ui.components.ClosifyButton
+import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
 import com.closify.myapplication.ui.screens.outfitresult.components.OutfitCard
-import com.closify.myapplication.ui.screens.outfitresult.components.SavedFavoritesDialog
 
 @Composable
 fun OutfitResultContent(
@@ -92,6 +92,10 @@ fun OutfitResultContent(
     }
 
     if (showSavedDialog) {
-        SavedFavoritesDialog(onDismiss = onDismissDialog)
+        ClosifyConfirmationDialog(
+            title = "¡Outfits guardados!",
+            subtitle = "Podés verlos en tu perfil",
+            onDismiss = onDismissDialog
+        )
     }
 }
