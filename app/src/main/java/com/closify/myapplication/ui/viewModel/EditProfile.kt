@@ -1,43 +1,46 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.closify.myapplication.domain.model.User
+import com.closify.myapplication.R
+import com.closify.myapplication.domain.model.UserProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.time.LocalDate
 
 class EditProfileViewModel : ViewModel() {
-    // Mock de usuario inicial
-    private val _user = MutableStateFlow(
-        User(
+    
+    // Usamos UserProfile directamente para evitar el conflicto con User
+    private val _profile = MutableStateFlow(
+        UserProfile(
             id = "1",
-            name = "Katerina",
+            fullName = "Katerina",
             username = "katerina_closify",
             bio = "Amante de la moda y el orden.",
-            birthdate = LocalDate.of(2000, 5, 15)
+            birthDate = "15/05/2000",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
         )
     )
-    val user: StateFlow<User> = _user.asStateFlow()
+    val profile: StateFlow<UserProfile> = _profile.asStateFlow()
 
-    private val _name = MutableStateFlow(_user.value.name)
-    val name: StateFlow<String> = _name.asStateFlow()
+    // Estados para los campos editables, usando los nombres de UserProfile
+    private val _fullName = MutableStateFlow(_profile.value.fullName)
+    val fullName: StateFlow<String> = _fullName.asStateFlow()
 
-    private val _username = MutableStateFlow(_user.value.username)
+    private val _username = MutableStateFlow(_profile.value.username)
     val username: StateFlow<String> = _username.asStateFlow()
 
-    private val _bio = MutableStateFlow(_user.value.bio)
+    private val _bio = MutableStateFlow(_profile.value.bio)
     val bio: StateFlow<String> = _bio.asStateFlow()
 
-    private val _birthdate = MutableStateFlow(_user.value.birthdate)
-    val birthdate: StateFlow<LocalDate?> = _birthdate.asStateFlow()
+    private val _birthDate = MutableStateFlow(_profile.value.birthDate)
+    val birthDate: StateFlow<String> = _birthDate.asStateFlow()
 
     fun onNameChange(newName: String) {
-        _name.value = newName
+        _fullName.value = newName
     }
 
     fun onUsernameChange(newUsername: String) {
-        // Aseguramos que empiece con @ o lo manejamos en la UI
         _username.value = newUsername
     }
 
@@ -47,17 +50,16 @@ class EditProfileViewModel : ViewModel() {
         }
     }
 
-    fun onBirthdateChange(newDate: LocalDate) {
-        _birthdate.value = newDate
+    fun onBirthDateChange(newDate: String) {
+        _birthDate.value = newDate
     }
 
     fun saveChanges() {
-        // Aquí impactaría en el repositorio/base de datos
-        _user.value = _user.value.copy(
-            name = _name.value,
+        _profile.value = _profile.value.copy(
+            fullName = _fullName.value,
             username = _username.value,
             bio = _bio.value,
-            birthdate = _birthdate.value
+            birthDate = _birthDate.value
         )
     }
 }
