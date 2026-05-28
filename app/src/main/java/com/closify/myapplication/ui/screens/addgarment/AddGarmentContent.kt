@@ -90,11 +90,12 @@ fun AddGarmentContent(
         DashedCard(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(220.dp)
                 .clickable { onCardClick() }
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center

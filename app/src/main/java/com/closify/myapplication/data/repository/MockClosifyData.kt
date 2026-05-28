@@ -539,6 +539,18 @@ internal object MockClosifyData {
     fun findAuthUser(email: String, password: String): User? =
         authUsers.firstOrNull { it.user.email == email && it.password == password }?.user
 
+    fun isCurrentPassword(userId: String, password: String): Boolean =
+        authUsers.any { it.user.id == userId && it.password == password }
+
+    fun updateAuthUserPassword(userId: String, newPassword: String): Boolean {
+        val index = authUsers.indexOfFirst { it.user.id == userId }
+        if (index == -1) return false
+
+        val currentAuthUser = authUsers[index]
+        authUsers[index] = currentAuthUser.copy(password = newPassword)
+        return true
+    }
+
     fun isUsernameAvailable(username: String): Boolean {
         val normalizedUsername = username.trim().let { value ->
             if (value.startsWith("@")) value else "@$value"
