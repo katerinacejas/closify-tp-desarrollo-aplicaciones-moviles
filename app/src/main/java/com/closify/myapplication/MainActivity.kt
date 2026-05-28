@@ -23,7 +23,9 @@ class MainActivity : ComponentActivity() {
                 val isLoggedIn by mainViewModel.isLoggedIn.collectAsStateWithLifecycle()
 
                 if (isLoggedIn) {
-                    AppNavGraph()
+                    AppNavGraph(
+                        onLogout = { mainViewModel.onLogout() }
+                    )
                 } else {
                     AuthNavGraph(
                         onLoginSuccess = { mainViewModel.onLoginSuccess() }

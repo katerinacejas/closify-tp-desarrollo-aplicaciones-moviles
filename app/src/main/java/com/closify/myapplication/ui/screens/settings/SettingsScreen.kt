@@ -35,6 +35,7 @@ enum class SettingsSubScreen {
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
+    onLogout: () -> Unit = {},
     onBackToHome: () -> Unit = {}
 ) {
     val isDarkMode by viewModel.isDarkMode.collectAsState()
@@ -45,6 +46,7 @@ fun SettingsScreen(
         language = language,
         onDarkModeChange = viewModel::toggleDarkMode,
         onLanguageChange = viewModel::updateLanguage,
+        onLogout = onLogout,
         onBackToHome = onBackToHome
     )
 }
@@ -55,6 +57,7 @@ fun SettingsScreenContent(
     language: String,
     onDarkModeChange: (Boolean) -> Unit,
     onLanguageChange: (String) -> Unit,
+    onLogout: () -> Unit,
     onBackToHome: () -> Unit
 ) {
     // Estado para manejar la navegación interna sin tocar el AppNavGraph
@@ -70,6 +73,7 @@ fun SettingsScreenContent(
                     onLanguageChange = onLanguageChange,
                     onNavigateToEditProfile = { currentSubScreen = SettingsSubScreen.EDIT_PROFILE },
                     onNavigateToSecurity = { currentSubScreen = SettingsSubScreen.SECURITY },
+                    onLogout = onLogout,
                     onBack = onBackToHome
                 )
             }
@@ -96,6 +100,7 @@ private fun SettingsMenu(
     onLanguageChange: (String) -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToSecurity: () -> Unit,
+    onLogout: () -> Unit,
     onBack: () -> Unit
 ) {
 
@@ -159,6 +164,29 @@ private fun SettingsMenu(
                 onClick = onNavigateToSecurity,
                 fontSize = 18.sp
             )
+            
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Button(
+                onClick = onLogout,
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = "Cerrar sesión",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    ),
+                    color = Color.White
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -290,6 +318,7 @@ fun SettingsScreenPreview() {
             language = "ESPAÑOL",
             onDarkModeChange = {},
             onLanguageChange = {},
+            onLogout = {},
             onBackToHome = {}
         )
     }

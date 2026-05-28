@@ -19,10 +19,12 @@ import com.closify.myapplication.ui.components.BottomNavBar
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
+import com.closify.myapplication.ui.screens.settings.SettingsScreen
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onLogout: () -> Unit = {}
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
@@ -74,7 +76,16 @@ fun AppNavGraph(
             composable(Screen.Profile.route) {
                 ProfileScreen(
                     onSettingsClick = {
-                        /* TODO: Implementar navegación a configuración */
+                        navController.navigate(Screen.Settings.route)
+                    }
+                )
+            }
+
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onLogout = onLogout,
+                    onBackToHome = {
+                        navController.popBackStack()
                     }
                 )
             }
