@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.closify.myapplication.navigation.AppNavGraph
 import com.closify.myapplication.navigation.AuthNavGraph
+import com.closify.myapplication.navigation.Screen
 import com.closify.myapplication.ui.screens.settings.SettingsScreen
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.MainViewModel
@@ -28,7 +29,9 @@ class MainActivity : ComponentActivity() {
                     )
                 } else {
                     AuthNavGraph(
-                        onLoginSuccess = { mainViewModel.onLoginSuccess() }
+                        onLoginSuccess = { mainViewModel.onLoginSuccess() },
+                        startDestination = if (mainViewModel.hasLoggedOutOnce) Screen.Login.route
+                                           else Screen.Onboarding.route
                     )
                 }
             }

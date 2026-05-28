@@ -10,11 +10,15 @@ class MainViewModel : ViewModel() {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
+    var hasLoggedOutOnce = false
+        private set
+
     fun onLoginSuccess() {
         _isLoggedIn.value = true
     }
 
     fun onLogout() {
+        hasLoggedOutOnce = true
         _isLoggedIn.value = false
     }
 }
