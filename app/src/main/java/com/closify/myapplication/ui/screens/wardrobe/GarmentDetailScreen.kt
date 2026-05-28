@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import com.closify.myapplication.ui.screens.wardrobe.components.DeleteGarmentDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -119,7 +118,7 @@ fun GarmentDetailContent(
     ) {
         Card(
             shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -142,6 +141,7 @@ fun GarmentDetailContent(
                         text = "Prenda",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f).padding(end = 48.dp) // Offset for centered title
                     )
@@ -151,10 +151,10 @@ fun GarmentDetailContent(
 
                 Card(
                     shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier
                         .size(200.dp)
-                        .border(1.dp, Color(0xFFF8BBD0), RoundedCornerShape(32.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(32.dp))
                 ) {
                     val context = LocalContext.current
                     AsyncImage(
@@ -175,6 +175,7 @@ fun GarmentDetailContent(
                 Text(
                     text = garment.name,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

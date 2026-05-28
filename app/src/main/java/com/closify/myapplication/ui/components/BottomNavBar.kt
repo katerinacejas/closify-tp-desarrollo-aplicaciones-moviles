@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -19,8 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
 import com.closify.myapplication.navigation.Screen
-import com.closify.myapplication.ui.theme.LavandaAccent
-import com.closify.myapplication.ui.theme.SurfaceVariantColor
 
 data class BottomNavItem(
     val screen: Screen,
@@ -45,7 +44,7 @@ fun BottomNavBar(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        color = SurfaceVariantColor,
+        color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 6.dp,
         shadowElevation = 8.dp
     ) {
@@ -78,7 +77,7 @@ fun BottomNavBar(
                         }
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = LavandaAccent.copy(alpha = 0.7f),
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
                         selectedIconColor = Color.Unspecified,
                         unselectedIconColor = Color.Unspecified
                     )

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.screens.home.components.AutoManualToggle
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.LavandaAccent
 import com.closify.myapplication.ui.viewmodel.CameraEvent
 import com.closify.myapplication.ui.viewmodel.CameraMode
 
@@ -139,10 +138,10 @@ fun AddGarmentContent(
 private fun DashedCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 16.dp,
-    dashColor: Color = LavandaAccent,
+    dashColor: Color? = null,
     content: @Composable () -> Unit
 ) {
-    val borderColor = dashColor
+    val borderColor = dashColor ?: MaterialTheme.colorScheme.outlineVariant
     Card(
         modifier = modifier.drawBehind {
             val strokeWidth = 2.dp.toPx()

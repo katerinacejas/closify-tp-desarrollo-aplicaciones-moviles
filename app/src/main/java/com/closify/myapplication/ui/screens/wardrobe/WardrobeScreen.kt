@@ -253,7 +253,7 @@ fun ShelfList(
                 icon = getCategoryIcon(category),
                 label = label,
                 count = categoryCounts[category] ?: 0,
-                color = Color(0xFFB9A7F7),
+                color = MaterialTheme.colorScheme.primaryContainer,
                 onClick = { onCategoryClick(category) }
             )
         }
@@ -279,7 +279,11 @@ fun WeatherShelfList(
                 icon = getWeatherIcon(condition),
                 label = label,
                 count = weatherCounts[condition] ?: 0,
-                color = if (condition == WeatherCondition.ANY) Color(0xFF7C3AED) else Color(0xFFB9A7F7),
+                color = if (condition == WeatherCondition.ANY) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                },
                 onClick = { onWeatherClick(condition) }
             )
         }
@@ -307,7 +311,11 @@ fun OccasionShelfList(
                 icon = getOccasionIcon(occasion),
                 label = label,
                 count = occasionCounts[occasion] ?: 0,
-                color = if (occasion == Occasion.ANY) Color(0xFF7C3AED) else Color(0xFFB9A7F7),
+                color = if (occasion == Occasion.ANY) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                },
                 onClick = { onOccasionClick(occasion) }
             )
         }
@@ -324,7 +332,7 @@ fun ShelfCard(
 ) {
     Card(
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth()
@@ -344,6 +352,7 @@ fun ShelfCard(
                 text = label,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
             Text(

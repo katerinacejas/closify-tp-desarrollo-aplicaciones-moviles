@@ -39,8 +39,6 @@ import com.closify.myapplication.ui.components.SocialCommentsDialog
 import com.closify.myapplication.ui.components.SocialLikesDialog
 import com.closify.myapplication.ui.screens.profile.components.ProfileHeader
 import com.closify.myapplication.ui.screens.profile.components.ProfileStats
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.PublicProfileUiState
 
 @Composable
@@ -133,8 +131,8 @@ fun PublicProfileContent(
                         enabled = !uiState.hasPendingOutgoingRequest,
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryDark,
-                            disabledContainerColor = PrimaryDark.copy(alpha = 0.35f),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
                             disabledContentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         contentPadding = PaddingValues(horizontal = 14.dp),
@@ -266,21 +264,27 @@ private fun IncomingFriendRequestCard(
                     Button(
                         onClick = { onRejectIncomingFriendRequest(request.id) },
                         shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = RosaSecondary),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
+                        ),
                         contentPadding = PaddingValues(horizontal = 14.dp),
                         modifier = Modifier.height(34.dp)
                     ) {
                         Text(
                             text = "Rechazar",
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSecondary
                         )
                     }
 
                     Button(
                         onClick = { onAcceptIncomingFriendRequest(request.id) },
                         shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         modifier = Modifier.height(34.dp)
                     ) {

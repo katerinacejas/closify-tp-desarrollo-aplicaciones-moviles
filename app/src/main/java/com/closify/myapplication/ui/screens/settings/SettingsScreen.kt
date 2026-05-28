@@ -13,16 +13,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.LilaPrimary
 import com.closify.myapplication.ui.viewmodel.SettingsViewModel
 
 // Definimos los posibles estados de la pantalla
@@ -38,8 +37,8 @@ fun SettingsScreen(
     onLogout: () -> Unit = {},
     onBackToHome: () -> Unit = {}
 ) {
-    val isDarkMode by viewModel.isDarkMode.collectAsState()
-    val language by viewModel.language.collectAsState()
+    val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
+    val language by viewModel.language.collectAsStateWithLifecycle()
 
     SettingsScreenContent(
         isDarkMode = isDarkMode,
@@ -129,7 +128,7 @@ private fun SettingsMenu(
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp
                 ),
-                color = Color(0xFF333333)
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -173,7 +172,7 @@ private fun SettingsMenu(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     ),
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -192,7 +191,7 @@ fun GeneralSettingsCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -206,7 +205,7 @@ fun GeneralSettingsCard(
                     letterSpacing = 1.sp,
                     fontSize = 12.sp
                 ),
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
@@ -219,14 +218,17 @@ fun GeneralSettingsCard(
             ) {
                 Text(
                     text = "Modo Oscuro", 
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Switch(
                     checked = isDarkMode,
                     onCheckedChange = onDarkModeChange,
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = LilaPrimary
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.surface,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 )
             }
@@ -235,7 +237,8 @@ fun GeneralSettingsCard(
 
             Text(
                 text = "Idioma", 
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(12.dp))
             LanguageSelector(selectedLanguage = language, onLanguageSelected = onLanguageChange)
@@ -271,7 +274,7 @@ fun SettingsActionButton(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -287,12 +290,12 @@ fun SettingsActionButton(
                     fontWeight = FontWeight.Medium,
                     fontSize = fontSize
                 ),
-                color = Color(0xFF444444)
+                color = MaterialTheme.colorScheme.onSurface
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = LilaPrimary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(28.dp)
             )
         }

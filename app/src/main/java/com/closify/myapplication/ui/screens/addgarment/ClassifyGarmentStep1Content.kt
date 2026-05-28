@@ -29,7 +29,6 @@ import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.screens.addgarment.components.ClassifyGarmentHeader
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentEvent
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentUiState
 
@@ -143,8 +142,8 @@ fun ClassifyGarmentStep1Content(
                 onClick = onCancel,
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = RosaSecondary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
                 ),
                 modifier = Modifier
                     .weight(1f)

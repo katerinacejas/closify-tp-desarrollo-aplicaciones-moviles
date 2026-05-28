@@ -60,9 +60,6 @@ import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.NotificationType
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.LavandaAccent
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.NotificationUiItem
 import com.closify.myapplication.ui.viewmodel.NotificationsUiState
 
@@ -219,7 +216,7 @@ private fun NotificationsSearchField(
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        modifier = modifier.border(width = 1.dp, color = RosaSecondary, shape = shape),
+        modifier = modifier.border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape),
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier
@@ -308,7 +305,7 @@ private fun NotificationRow(
             modifier = Modifier
                 .size(52.dp)
                 .clip(CircleShape)
-                .border(1.dp, RosaSecondary, CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                 .clickable { onOpenUserProfile(notification.sender.id) },
             contentScale = ContentScale.Crop
         )
@@ -436,8 +433,9 @@ private fun FriendRequestActions(
             enabled = isPending,
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = RosaSecondary,
-                disabledContainerColor = RosaSecondary.copy(alpha = 0.45f),
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
+                disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.45f),
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             contentPadding = PaddingValues(horizontal = 12.dp),
@@ -454,11 +452,12 @@ private fun FriendRequestActions(
             enabled = isPending,
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryDark,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 disabledContainerColor = if (status == FriendRequestStatus.ACCEPTED) {
-                    LavandaAccent
+                    MaterialTheme.colorScheme.primaryContainer
                 } else {
-                    PrimaryDark.copy(alpha = 0.35f)
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                 },
                 disabledContentColor = MaterialTheme.colorScheme.onPrimary
             ),

@@ -30,8 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.ErrorColor
-import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
 fun FriendsTopBar(
@@ -80,7 +78,7 @@ fun FriendsTopBar(
                         Box(
                             modifier = Modifier
                                 .size(9.dp)
-                                .background(ErrorColor, CircleShape)
+                                .background(MaterialTheme.colorScheme.error, CircleShape)
                         )
                     }
                 }
@@ -107,7 +105,7 @@ private fun FriendsSearchField(
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         modifier = modifier
-            .border(width = 1.dp, color = RosaSecondary, shape = shape),
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape),
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier

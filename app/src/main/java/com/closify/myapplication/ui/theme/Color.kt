@@ -27,6 +27,19 @@ val WarningColor = Color(0xFFFFD6A5) // Avisos suaves
 val ErrorColor   = Color(0xFFE57373) // Errores
 
 // Dark mode
-val DarkBackgroundColor = Color(0xFF17111F) // Fondo modo oscuro
-val DarkSurfaceColor    = Color(0xFF241A2E) // Cards modo oscuro
-val DarkTextColor       = Color(0xFFF8F1FF) // Texto modo oscuro
+val DarkBackgroundColor = Color(0xFF17111F) // Fondo principal
+val DarkSurfaceColor = Color(0xFF241A2E) // Cards / contenedores
+val DarkSurfaceVariantColor = Color(0xFF30233D) // Cards suaves / secciones
+val DarkOutlineColor = Color(0xFF4A3A5F) // Bordes sutiles
+
+val DarkTextPrimary = Color(0xFFF8F1FF) // Texto principal
+val DarkTextSecondary = Color(0xFFC9B8DD) // Texto secundario
+
+val DarkPrimary = Color(0xFFC7B8FF) // Lila principal en dark
+val DarkPrimaryStrong = Color(0xFF9B6DFF) // Botones principales / acciones
+val DarkSecondary = Color(0xFFFFB3D0) // Rosa pastel visible en dark
+val DarkAccent = Color(0xFFE2C4FF) // Lavanda acento
+
+val DarkSuccessColor = Color(0xFF9BE0D3)
+val DarkWarningColor = Color(0xFFFFD39A)
+val DarkErrorColor = Color(0xFFFF8A8A)

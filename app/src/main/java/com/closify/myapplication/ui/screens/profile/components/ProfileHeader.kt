@@ -46,8 +46,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
-import com.closify.myapplication.ui.theme.RosaSecondary
-import com.closify.myapplication.ui.theme.SurfaceColor
 
 @Composable
 fun ProfileHeader(
@@ -222,8 +220,8 @@ private fun ProfileAvatar(
         modifier = modifier
             .size(126.dp)
             .clip(CircleShape)
-            .background(SurfaceColor)
-            .border(1.dp, RosaSecondary, CircleShape),
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         if (profileImageResId != null) {
@@ -249,19 +247,21 @@ private fun ProfileAvatar(
 private fun ProfileAvatarPlaceholder(
     modifier: Modifier = Modifier
 ) {
+    val avatarColor = MaterialTheme.colorScheme.secondary
+
     Canvas(modifier = modifier) {
         val stroke = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round)
         val centerX = size.width / 2f
 
         drawCircle(
-            color = RosaSecondary,
+            color = avatarColor,
             radius = 16.dp.toPx(),
             center = Offset(centerX, 28.dp.toPx()),
             style = stroke
         )
 
         drawArc(
-            color = RosaSecondary,
+            color = avatarColor,
             startAngle = 202f,
             sweepAngle = 136f,
             useCenter = false,

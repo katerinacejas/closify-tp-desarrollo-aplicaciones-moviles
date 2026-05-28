@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.LavandaAccent
 
 @Composable
 fun SelectableChip(
@@ -29,12 +28,12 @@ fun SelectableChip(
 ) {
     val shape = RoundedCornerShape(50.dp)
     val backgroundColor = when {
-        selected && enabled  -> LavandaAccent
-        selected && !enabled -> LavandaAccent.copy(alpha = 0.5f)  // seleccionado pero deshabilitado
+        selected && enabled  -> MaterialTheme.colorScheme.primaryContainer
+        selected && !enabled -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         else                 -> MaterialTheme.colorScheme.surface
     }
     val textColor = when {
-        selected             -> MaterialTheme.colorScheme.primary.copy(alpha = if (enabled) 1f else 0.6f)
+        selected             -> MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = if (enabled) 1f else 0.6f)
         !enabled             -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
         else                 -> MaterialTheme.colorScheme.onBackground
     }

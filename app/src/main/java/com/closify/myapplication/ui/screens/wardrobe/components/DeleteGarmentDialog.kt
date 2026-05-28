@@ -30,7 +30,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.ui.screens.profile.components.ProfileDialogScaffold
-import com.closify.myapplication.ui.theme.RosaSecondary
 
 import androidx.compose.ui.tooling.preview.Preview
 import com.closify.myapplication.domain.model.GarmentCategory
@@ -57,10 +56,10 @@ fun DeleteGarmentDialog(
             // Imagen de la prenda
             Card(
                 shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier
                     .size(160.dp)
-                    .border(1.dp, RosaSecondary, RoundedCornerShape(32.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(32.dp))
             ) {
                 val context = LocalContext.current
                 AsyncImage(
@@ -108,8 +107,8 @@ fun DeleteGarmentDialog(
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = RosaSecondary,
-                        contentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     )
                 ) {
                     Text(
@@ -127,7 +126,7 @@ fun DeleteGarmentDialog(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Text(

@@ -47,8 +47,6 @@ import com.closify.myapplication.ui.screens.planner.components.PlannedOutfitDial
 import com.closify.myapplication.ui.screens.planner.components.WeatherInfoRow
 import com.closify.myapplication.ui.screens.planner.components.toSpanishTitle
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
 import com.closify.myapplication.ui.viewmodel.PlannerStep
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
@@ -242,7 +240,7 @@ private fun PlannerOutfitSelectionContent(
                     onCheckedChange = onToggleFullBody,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedTrackColor = PrimaryDark,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
                         uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                         uncheckedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -258,7 +256,7 @@ private fun PlannerOutfitSelectionContent(
             Button(
                 onClick = onContinueToPlanningReview,
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = MaterialTheme.colorScheme.onPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                 modifier = Modifier.width(156.dp).height(40.dp)
             ) {
                 Text(text = "Continuar", style = MaterialTheme.typography.labelLarge)
@@ -319,7 +317,7 @@ private fun PlannerReviewContent(
             Button(
                 onClick = onAddMoreGarments,
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = RosaSecondary, contentColor = MaterialTheme.colorScheme.onPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary, contentColor = MaterialTheme.colorScheme.onSecondary),
                 contentPadding = PaddingValues(horizontal = 8.dp),
                 modifier = Modifier.weight(1f).height(40.dp)
             ) {
@@ -328,7 +326,7 @@ private fun PlannerReviewContent(
             Button(
                 onClick = onSavePlanning,
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = MaterialTheme.colorScheme.onPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                 modifier = Modifier.weight(1f).height(40.dp)
             ) {
                 Text(text = "Guardar", style = MaterialTheme.typography.labelLarge)

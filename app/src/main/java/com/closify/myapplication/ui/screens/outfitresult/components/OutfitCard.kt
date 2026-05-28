@@ -22,14 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.closify.myapplication.domain.model.Outfit
-import com.closify.myapplication.ui.theme.LavandaAccent
 
 @Composable
 fun OutfitCard(
@@ -82,7 +80,7 @@ fun OutfitCard(
                 .clip(RoundedCornerShape(10.dp))
                 .background(
                     if (isFavorite) MaterialTheme.colorScheme.primary
-                    else LavandaAccent
+                    else MaterialTheme.colorScheme.primaryContainer
                 )
         ) {
             Icon(
@@ -90,7 +88,7 @@ fun OutfitCard(
                               else Icons.Filled.FavoriteBorder,
                 contentDescription = if (isFavorite) "Quitar de favoritos"
                                      else "Agregar a favoritos",
-                tint = if (isFavorite) Color.White
+                tint = if (isFavorite) MaterialTheme.colorScheme.onPrimary
                        else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(18.dp)
             )

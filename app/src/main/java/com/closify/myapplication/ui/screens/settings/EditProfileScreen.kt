@@ -15,21 +15,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -93,14 +88,14 @@ fun EditProfileScreen(
             Text(
                 text = "Editar Perfil",
                 style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                color = Color(0xFF333333),
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Nombre", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = "Nombre", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = uiState.fullName,
@@ -111,7 +106,7 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Usuario", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = "Usuario", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = uiState.username,
@@ -122,7 +117,7 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Algo sobre ti..", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = "Algo sobre ti..", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             Box {
                 ClosifyTextField(
@@ -136,7 +131,7 @@ fun EditProfileScreen(
                 Text(
                     text = "${uiState.bio.length}/140",
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (uiState.bioError == null) Color.Gray else MaterialTheme.colorScheme.error,
+                    color = if (uiState.bioError == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(bottom = 12.dp, end = 12.dp)
@@ -145,7 +140,7 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Fecha de nacimiento", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = "Fecha de nacimiento", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
 
             val dateFormatter = remember { DateTimeFormatter.ofPattern("dd / MM / yyyy") }
@@ -165,7 +160,14 @@ fun EditProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = birthdateText, color = if (birthdate == null) Color.LightGray else Color.Black)
+                    Text(
+                        text = birthdateText,
+                        color = if (birthdate == null) {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
+                    )
                     Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
             }

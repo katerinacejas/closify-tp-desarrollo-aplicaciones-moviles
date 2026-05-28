@@ -29,7 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
 fun ClosifyTopBar(
@@ -106,7 +105,7 @@ fun ClosifyTopBarSearchField(
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        modifier = modifier.border(width = 1.dp, color = RosaSecondary, shape = shape),
+        modifier = modifier.border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape),
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier
