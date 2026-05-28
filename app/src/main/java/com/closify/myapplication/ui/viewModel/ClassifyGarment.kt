@@ -2,27 +2,34 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.domain.model.GarmentCategory
+import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+enum class ClassifyStep { BASIC, OCCASION, SAVED }
+
 data class ClassifyGarmentUiState(
     val imageUri: String = "",
     val name: String = "",
     val selectedCategory: GarmentCategory? = null,
     val selectedWeathers: Set<WeatherCondition> = emptySet(),
+    val selectedOccasions: Set<Occasion> = emptySet(),
     val nameError: String? = null,
-    val categoryError: String? = null
+    val categoryError: String? = null,
+    val step: ClassifyStep = ClassifyStep.BASIC
 )
 
 sealed interface ClassifyGarmentEvent {
     data class NameChanged(val value: String) : ClassifyGarmentEvent
     data class SelectCategory(val category: GarmentCategory) : ClassifyGarmentEvent
     data class ToggleWeather(val weather: WeatherCondition) : ClassifyGarmentEvent
+    data class ToggleOccasion(val occasion: Occasion) : ClassifyGarmentEvent
     data object Continue : ClassifyGarmentEvent
-    data object Cancel : ClassifyGarmentEvent
+    data object Save : ClassifyGarmentEvent
+    data object Back : ClassifyGarmentEvent
 }
 
 class ClassifyGarmentViewModel(imageUri: String) : ViewModel() {
@@ -32,25 +39,45 @@ class ClassifyGarmentViewModel(imageUri: String) : ViewModel() {
 
     fun onEvent(event: ClassifyGarmentEvent) {
         when (event) {
-            is ClassifyGarmentEvent.NameChanged     -> _uiState.update { it.copy(name = event.value, nameError = null) }
-            is ClassifyGarmentEvent.SelectCategory  -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
-            is ClassifyGarmentEvent.ToggleWeather   -> toggleWeather(event.weather)
-            is ClassifyGarmentEvent.Continue        -> validate()
-            is ClassifyGarmentEvent.Cancel          -> { /* manejado en la Screen */ }
+            is ClassifyGarmentEvent.NameChanged    -> _uiState.update { it.copy(name = event.value, nameError = null) }
+            is ClassifyGarmentEvent.SelectCategory -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
+            is ClassifyGarmentEvent.ToggleWeather  -> toggleWeather(event.weather)
+            is ClassifyGarmentEvent.ToggleOccasion -> toggleOccasion(event.occasion)
+            is ClassifyGarmentEvent.Continue       -> validateAndAdvance()
+            is ClassifyGarmentEvent.Save           -> save()
+            is ClassifyGarmentEvent.Back           -> goBack()
         }
     }
 
     private fun toggleWeather(weather: WeatherCondition) {
         val current = _uiState.value.selectedWeathers
-        val updated = if (weather in current) current - weather else current + weather
-        _uiState.update { it.copy(selectedWeathers = updated) }
+        _uiState.update { it.copy(selectedWeathers = if (weather in current) current - weather else current + weather) }
     }
 
-    private fun validate() {
+    private fun toggleOccasion(occasion: Occasion) {
+        val current = _uiState.value.selectedOccasions
+        _uiState.update { it.copy(selectedOccasions = if (occasion in current) current - occasion else current + occasion) }
+    }
+
+    private fun validateAndAdvance() {
         val state = _uiState.value
         val nameError = if (state.name.trim().isEmpty()) "El nombre no puede estar vacío." else null
         val categoryError = if (state.selectedCategory == null) "Seleccioná un tipo de prenda." else null
-        _uiState.update { it.copy(nameError = nameError, categoryError = categoryError) }
-        // TODO: si válido → guardar prenda y navegar
+        val nextStep = if (nameError == null && categoryError == null) ClassifyStep.OCCASION else ClassifyStep.BASIC
+        _uiState.update { it.copy(nameError = nameError, categoryError = categoryError, step = nextStep) }
+    }
+
+    private fun goBack() {
+        _uiState.update {
+            when (it.step) {
+                ClassifyStep.OCCASION, ClassifyStep.SAVED -> it.copy(step = ClassifyStep.BASIC)
+                ClassifyStep.BASIC -> it
+            }
+        }
+    }
+
+    private fun save() {
+        // TODO: llamar al repositorio para guardar la prenda
+        _uiState.update { it.copy(step = ClassifyStep.SAVED) }
     }
 }

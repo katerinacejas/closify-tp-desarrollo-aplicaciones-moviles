@@ -88,7 +88,12 @@ fun AppNavGraph(
                 val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
                 ClassifyGarmentScreen(
                     imageUri = imageUri,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onSaved = {
+                        navController.navigate(Screen.Wardrobe.route) {
+                            popUpTo(Screen.Camera.route) { inclusive = true }
+                        }
+                    }
                 )
             }
             composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
