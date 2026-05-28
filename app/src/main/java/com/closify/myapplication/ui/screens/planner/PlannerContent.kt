@@ -700,7 +700,7 @@ private fun SavedPlanningDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(horizontal = 22.dp),
             contentAlignment = Alignment.Center
         ) {
