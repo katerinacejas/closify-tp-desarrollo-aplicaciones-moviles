@@ -39,12 +39,10 @@ fun OutfitCard(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-
-        // Card sin el botón adentro
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp), // espacio para que el botón pueda sobresalir arriba
+                .padding(top = 12.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -72,7 +70,6 @@ fun OutfitCard(
             }
         }
 
-        // Botón superpuesto en el borde superior derecho de la card
         IconButton(
             onClick = onToggleFavorite,
             modifier = Modifier
@@ -81,17 +78,13 @@ fun OutfitCard(
                 .size(36.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .background(
-                    if (isFavorite) MaterialTheme.colorScheme.primary
-                    else LavandaAccent
+                    if (isFavorite) MaterialTheme.colorScheme.primary else LavandaAccent
                 )
         ) {
             Icon(
-                imageVector = if (isFavorite) Icons.Filled.Favorite
-                              else Icons.Filled.FavoriteBorder,
-                contentDescription = if (isFavorite) "Quitar de favoritos"
-                                     else "Agregar a favoritos",
-                tint = if (isFavorite) Color.White
-                       else MaterialTheme.colorScheme.primary,
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                tint = if (isFavorite) Color.White else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(18.dp)
             )
         }

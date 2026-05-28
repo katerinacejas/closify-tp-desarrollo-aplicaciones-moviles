@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.screens.outfitresult
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,23 +19,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.ui.components.ClosifyButton
-import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
 import com.closify.myapplication.ui.screens.outfitresult.components.OutfitCard
 
 @Composable
 fun OutfitResultContent(
     outfits: List<Outfit>,
     favoriteIds: Set<String>,
-    showSavedDialog: Boolean,
     onToggleFavorite: (String) -> Unit,
-    onSaveFavorites: () -> Unit,
-    onDismissDialog: () -> Unit,
+    onContinue: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        // Header
+    Column(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,9 +42,7 @@ fun OutfitResultContent(
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = "Seleccioná los outfits que más te gusten para guardarlos en tu lista fav!",
                 style = MaterialTheme.typography.bodyMedium,
@@ -59,15 +51,9 @@ fun OutfitResultContent(
             )
         }
 
-        // Lista de outfits
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(
-                start = 24.dp,
-                end = 24.dp,
-                top = 16.dp,  // espacio para que el botón del primer card no se corte
-                bottom = 16.dp
-            ),
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(outfits) { outfit ->
@@ -80,22 +66,13 @@ fun OutfitResultContent(
             item { Spacer(modifier = Modifier.height(16.dp)) }
         }
 
-        // Botón guardar favoritos
         ClosifyButton(
-            text = "Guardar favoritos",
-            onClick = onSaveFavorites,
+            text = "Continuar",
+            onClick = onContinue,
             enabled = favoriteIds.isNotEmpty(),
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
-    }
-
-    if (showSavedDialog) {
-        ClosifyConfirmationDialog(
-            title = "¡Outfits guardados!",
-            subtitle = "Podés verlos en tu perfil",
-            onDismiss = onDismissDialog
-        )
     }
 }

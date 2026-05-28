@@ -86,7 +86,8 @@ internal object MockClosifyData {
 
     private val authUsers = mutableListOf(
         MockAuthUser(currentUser, "Maria123!"),
-        MockAuthUser(juanUser, "Juan123!")
+        MockAuthUser(juanUser, "Juan123!"),
+        MockAuthUser(user("user_2", "Ayelen Martinez", "@aye_martinez"), "Ayelen123!")
     )
 
     val users = mutableListOf(
@@ -456,9 +457,6 @@ internal object MockClosifyData {
         )
     )
 
-    val outfitPosts: List<OutfitPost>
-        get() = mutableOutfitPosts.toList()
-
     val suggestedOutfits = listOf(
         SuggestedOutfit(
             id = "suggested_1",
@@ -627,6 +625,24 @@ internal object MockClosifyData {
     fun outfit(outfitId: String): Outfit =
         requireNotNull(outfits.firstOrNull { it.id == outfitId }) { "Unknown mock outfit id: $outfitId" }
 
+    val outfitPosts: List<OutfitPost>
+        get() = mutableOutfitPosts.toList()
+
+    fun addOutfitPost(post: OutfitPost): OutfitPost {
+        mutableOutfitPosts.add(0, post)
+        return post
+    }
+
+    fun updateOutfitPost(post: OutfitPost): OutfitPost {
+        val index = mutableOutfitPosts.indexOfFirst { it.id == post.id }
+        if (index == -1) mutableOutfitPosts.add(0, post) else mutableOutfitPosts[index] = post
+        return post
+    }
+
+    fun deleteOutfitPost(postId: String) {
+        mutableOutfitPosts.removeAll { it.id == postId }
+    }
+
     fun friendIds(userId: String): Set<String> =
         friendIdsByUser[userId].orEmpty().toSet()
 
@@ -729,25 +745,6 @@ internal object MockClosifyData {
         mutableNotifications.replaceAll { notification ->
             if (notification.receiver.id == userId) notification.copy(read = true) else notification
         }
-    }
-
-    fun addOutfitPost(post: OutfitPost): OutfitPost {
-        mutableOutfitPosts.add(0, post)
-        return post
-    }
-
-    fun updateOutfitPost(post: OutfitPost): OutfitPost {
-        val index = mutableOutfitPosts.indexOfFirst { it.id == post.id }
-        if (index == -1) {
-            mutableOutfitPosts.add(0, post)
-        } else {
-            mutableOutfitPosts[index] = post
-        }
-        return post
-    }
-
-    fun deleteOutfitPost(postId: String) {
-        mutableOutfitPosts.removeAll { it.id == postId }
     }
 
     fun isFriend(userId: String, otherUserId: String): Boolean =

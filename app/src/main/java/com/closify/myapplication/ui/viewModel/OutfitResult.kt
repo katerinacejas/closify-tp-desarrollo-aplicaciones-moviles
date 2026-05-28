@@ -10,14 +10,12 @@ import kotlinx.coroutines.flow.update
 
 data class OutfitResultUiState(
     val outfits: List<Outfit> = emptyList(),
-    val favoriteIds: Set<String> = emptySet(),
-    val showSavedDialog: Boolean = false
+    val favoriteIds: Set<String> = emptySet()
 )
 
 sealed interface OutfitResultEvent {
     data class ToggleFavorite(val outfitId: String) : OutfitResultEvent
-    data object SaveFavorites : OutfitResultEvent
-    data object DismissDialog : OutfitResultEvent
+    data object Continue : OutfitResultEvent
 }
 
 class OutfitResultViewModel(
@@ -32,8 +30,7 @@ class OutfitResultViewModel(
     fun onEvent(event: OutfitResultEvent) {
         when (event) {
             is OutfitResultEvent.ToggleFavorite -> toggleFavorite(event.outfitId)
-            is OutfitResultEvent.SaveFavorites  -> saveFavorites()
-            is OutfitResultEvent.DismissDialog  -> _uiState.update { it.copy(showSavedDialog = false) }
+            is OutfitResultEvent.Continue       -> storePendingFavorites()
         }
     }
 
@@ -43,11 +40,8 @@ class OutfitResultViewModel(
         _uiState.update { it.copy(favoriteIds = updated) }
     }
 
-    private fun saveFavorites() {
-        val favorites = _uiState.value.outfits.filter {
-            it.id in _uiState.value.favoriteIds
-        }
-        outfitRepository.saveFavorites(favorites)
-        _uiState.update { it.copy(showSavedDialog = true) }
+    private fun storePendingFavorites() {
+        val state = _uiState.value
+        outfitRepository.pendingFavorites = state.outfits.filter { it.id in state.favoriteIds }
     }
 }

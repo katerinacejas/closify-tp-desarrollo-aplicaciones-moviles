@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository
@@ -17,13 +18,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+enum class HomeDialog { NO_GARMENTS, NO_COMBINATIONS }
+
 data class HomeUiState(
     val username: String = "",
     val selectedWeather: WeatherCondition? = null,
     val selectedOccasion: Occasion? = null,
     val isAutoWeather: Boolean = false,
     val isLoadingWeather: Boolean = false,
-    val isGenerateEnabled: Boolean = false
+    val isGenerateEnabled: Boolean = false,
+    val dialog: HomeDialog? = null
 )
 
 sealed interface HomeEvent {
@@ -31,6 +35,7 @@ sealed interface HomeEvent {
     data class SelectOccasion(val occasion: Occasion) : HomeEvent
     data class ToggleAutoWeather(val isAuto: Boolean) : HomeEvent
     data object GenerateOutfits : HomeEvent
+    data object DismissDialog : HomeEvent
 }
 
 sealed interface HomeNavigationEffect {
@@ -39,7 +44,8 @@ sealed interface HomeNavigationEffect {
 
 class HomeViewModel(
     private val generateOutfitsUseCase: GenerateOutfitsUseCase = GenerateOutfitsUseCase(),
-    private val weatherRepository: WeatherRepository = WeatherRepository.instance
+    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -55,7 +61,8 @@ class HomeViewModel(
             is HomeEvent.SelectWeather      -> selectWeather(event.weather)
             is HomeEvent.SelectOccasion     -> selectOccasion(event.occasion)
             is HomeEvent.ToggleAutoWeather  -> toggleAutoWeather(event.isAuto)
-            is HomeEvent.GenerateOutfits    -> generateOutfits()
+            is HomeEvent.GenerateOutfits -> generateOutfits()
+            is HomeEvent.DismissDialog   -> _uiState.update { it.copy(dialog = null) }
         }
     }
 
@@ -102,7 +109,17 @@ class HomeViewModel(
         val weather = state.selectedWeather ?: return
         val occasion = state.selectedOccasion ?: return
 
+        if (garmentRepository.getAllByUserId().isEmpty()) {
+            _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
+            return
+        }
+
         val outfits = generateOutfitsUseCase(weather, occasion)
+
+        if (outfits.isEmpty()) {
+            _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
+            return
+        }
 
         // Guarda en Repository para que OutfitResultViewModel los lea
         OutfitRepository.instance.currentOutfits = outfits
