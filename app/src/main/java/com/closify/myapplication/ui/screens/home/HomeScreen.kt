@@ -7,12 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.closify.myapplication.domain.model.Outfit
-import androidx.compose.ui.tooling.preview.Preview
 import com.closify.myapplication.domain.model.Occasion
+import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.HomeEvent
 import com.closify.myapplication.ui.viewmodel.HomeNavigationEffect
@@ -47,8 +48,10 @@ fun HomeScreen(
     onEvent: (HomeEvent) -> Unit
 ) {
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background
-        // TODO: agregar BottomNavBar aquí (próximo PR)
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            ClosifyTopBar()
+        }
     ) { innerPadding ->
         HomeContent(
             username = uiState.username,

@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.ui.screens.profile.components.ProfileTopBar
 import com.closify.myapplication.ui.viewmodel.ProfileViewModel
 
 @Composable
@@ -37,11 +38,13 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            ProfileTopBar(onSettingsClick = onSettingsClick)
+        }
     ) { innerPadding ->
         ProfileContent(
             uiState = uiState,
-            onSettingsClick = onSettingsClick,
             onLikeClick = viewModel::onLikeClick,
             onUpdatePostTitle = viewModel::onUpdatePostTitle,
             onDeletePost = viewModel::onDeletePost,
