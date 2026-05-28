@@ -1,10 +1,6 @@
 package com.closify.myapplication.data.repository
 
-import com.closify.myapplication.domain.model.Garment
-import com.closify.myapplication.domain.model.GarmentCategory
-import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.domain.model.WeatherCondition
 
 class WardrobeRepository {
 
@@ -12,20 +8,8 @@ class WardrobeRepository {
         val instance = WardrobeRepository()
     }
 
-    fun getAllGarments(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
-        MockClosifyData.garments.filter { it.ownerUserId == userId }
-
-    fun getGarmentsByCategory(category: GarmentCategory): List<Garment> =
-        getAllGarments().filter { it.category == category }
-
-    fun getGarmentsByOccasion(occasion: Occasion): List<Garment> =
-        getAllGarments().filter { occasion in it.suitableOccasions || Occasion.ANY in it.suitableOccasions }
-
-    fun getGarmentsByWeather(weather: WeatherCondition): List<Garment> =
-        getAllGarments().filter { weather in it.suitableWeather || WeatherCondition.ANY in it.suitableWeather }
-
     fun calculateWardrobeUsagePercentage(posts: List<OutfitPost>): Int {
-        val totalGarments = getAllGarments().size
+        val totalGarments = GarmentRepository.instance.getAllByUserId().size
         if (totalGarments == 0) return 0
 
         val usedGarmentIds = posts

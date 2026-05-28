@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.camera
+package com.closify.myapplication.ui.screens.addgarment
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +37,7 @@ import com.closify.myapplication.ui.viewmodel.CameraEvent
 import com.closify.myapplication.ui.viewmodel.CameraMode
 
 @Composable
-fun CameraContent(
+fun AddGarmentContent(
     selectedMode: CameraMode,
     onEvent: (CameraEvent) -> Unit,
     onCardClick: () -> Unit = {},
@@ -170,9 +170,9 @@ private fun DashedCard(
 
 @Preview(showSystemUi = true)
 @Composable
-private fun CameraContentPreview() {
+private fun AddGarmentContentPreview() {
     ClosifyTheme {
-        CameraContent(
+        AddGarmentContent(
             selectedMode = CameraMode.GALLERY,
             onEvent = {}
         )

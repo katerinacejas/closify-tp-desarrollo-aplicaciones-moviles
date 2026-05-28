@@ -161,7 +161,7 @@ internal object MockClosifyData {
         )
     )
 
-    val garments = listOf(
+    val garments = mutableListOf(
         garment("blusa_1", "Blusa rosa", GarmentCategory.TOP),
         garment("jean_1", "Jean claro", GarmentCategory.BOTTOM),
         garment("zapatillas_blancas", "Zapatillas blancas", GarmentCategory.FOOTWEAR),

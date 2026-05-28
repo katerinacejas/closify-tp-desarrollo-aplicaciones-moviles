@@ -20,8 +20,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
-import com.closify.myapplication.ui.screens.camera.CameraScreen
-import com.closify.myapplication.ui.screens.camera.ClassifyGarmentScreen
+import com.closify.myapplication.ui.screens.addgarment.AddGarmentScreen
+import com.closify.myapplication.ui.screens.addgarment.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.friends.FriendsScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
@@ -124,7 +124,7 @@ fun AppNavGraph(
                         navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
                     }
                     val cameraViewModel: CameraViewModel = viewModel(parentEntry)
-                    CameraScreen(
+                    AddGarmentScreen(
                         viewModel = cameraViewModel,
                         onNavigateToClassify = {
                             navController.navigate(Screen.ClassifyGarment.route)
