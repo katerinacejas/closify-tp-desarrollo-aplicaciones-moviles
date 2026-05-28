@@ -12,11 +12,12 @@ import com.closify.myapplication.ui.screens.register.RegisterScreen
 @Composable
 fun AuthNavGraph(
     onLoginSuccess: () -> Unit,
+    startDestination: String = Screen.Onboarding.route,
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Onboarding.route
+        startDestination = startDestination
     ) {
 
         composable(Screen.Onboarding.route) {
