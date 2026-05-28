@@ -39,10 +39,20 @@ class UserRepository {
     suspend fun register(
         email: String,
         password: String,
-        username: String
+        username: String,
+        fullName: String,
+        birthDate: String,
+        bio: String
     ): Result<Unit> {
         delay(1000)
-        val user = MockClosifyData.registerAuthUser(email, password, username)
+        val user = MockClosifyData.registerAuthUser(
+            email = email,
+            password = password,
+            username = username,
+            fullName = fullName,
+            birthDate = birthDate,
+            bio = bio
+        )
         currentUserId = user.id
         currentUsername = user.username
         return Result.success(Unit)

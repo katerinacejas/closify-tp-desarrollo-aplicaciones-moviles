@@ -539,25 +539,35 @@ internal object MockClosifyData {
     fun findAuthUser(email: String, password: String): User? =
         authUsers.firstOrNull { it.user.email == email && it.password == password }?.user
 
-    fun isUsernameAvailable(username: String): Boolean =
-        authUsers.none { it.user.username.lowercase() == username.lowercase() } &&
-                users.none { it.username.lowercase() == username.lowercase() }
+    fun isUsernameAvailable(username: String): Boolean {
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
+        return authUsers.none { it.user.username.lowercase() == normalizedUsername.lowercase() } &&
+                users.none { it.username.lowercase() == normalizedUsername.lowercase() }
+    }
 
     fun registerAuthUser(
         email: String,
         password: String,
-        username: String
+        username: String,
+        fullName: String,
+        birthDate: String,
+        bio: String
     ): User {
         val id = "auth_${authUsers.size + 1}"
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
         val user = User(
             id = id,
-            email = email,
+            email = email.trim(),
             profile = UserProfile(
                 id = id,
-                fullName = username,
-                username = username,
-                birthDate = "",
-                bio = "",
+                fullName = fullName,
+                username = normalizedUsername,
+                birthDate = birthDate,
+                bio = bio,
                 avatarImageResId = R.drawable.avatar_default,
                 bannerImageResId = R.drawable.banner_default
             )
