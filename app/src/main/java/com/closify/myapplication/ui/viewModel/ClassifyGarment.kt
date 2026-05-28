@@ -1,12 +1,12 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
-import com.closify.myapplication.domain.usecase.SaveGarmentUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +41,7 @@ sealed interface ClassifyGarmentEvent {
 
 class ClassifyGarmentViewModel(
     imageUri: String,
-    private val saveGarmentUseCase: SaveGarmentUseCase = SaveGarmentUseCase()
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClassifyGarmentUiState(imageUri = imageUri))
@@ -100,7 +100,7 @@ class ClassifyGarmentViewModel(
                 DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
             )
         )
-        saveGarmentUseCase(garment)
+        garmentRepository.addGarment(garment)
         _uiState.update { it.copy(step = ClassifyStep.SAVED) }
     }
 }
