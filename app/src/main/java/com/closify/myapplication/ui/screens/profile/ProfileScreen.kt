@@ -14,6 +14,7 @@ import com.closify.myapplication.ui.viewmodel.ProfileViewModel
 fun ProfileScreen(
     onSettingsClick: () -> Unit,
     onOpenUserProfile: (String) -> Unit,
+    targetPostId: String? = null,
     viewModel: ProfileViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -29,6 +30,7 @@ fun ProfileScreen(
             onDeletePost = viewModel::onDeletePost,
             onOpenUserProfile = onOpenUserProfile,
             onToggleFriend = viewModel::onToggleFriend,
+            targetPostId = targetPostId,
             modifier = Modifier.padding(innerPadding)
         )
     }

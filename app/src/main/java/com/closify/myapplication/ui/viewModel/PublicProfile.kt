@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Comment
+import com.closify.myapplication.domain.model.FriendRequest
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
@@ -17,6 +18,8 @@ data class PublicProfileUiState(
     val currentUser: UserSummary,
     val profile: UserProfile? = null,
     val isFriend: Boolean = false,
+    val hasPendingOutgoingRequest: Boolean = false,
+    val pendingIncomingRequest: FriendRequest? = null,
     val friends: List<UserSummary> = emptyList(),
     val garmentsCount: Int = 0,
     val wardrobeUsagePercentage: Int = 0,
@@ -59,6 +62,8 @@ class PublicProfileViewModel(
             currentUser = currentUser,
             profile = profile,
             isFriend = socialRepository.isFriend(currentUser.id, userId),
+            hasPendingOutgoingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId) != null,
+            pendingIncomingRequest = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId),
             friends = friends,
             garmentsCount = garmentsCount,
             wardrobeUsagePercentage = if (garmentsCount == 0) 0 else ((usedGarments.size * 100) / garmentsCount).coerceIn(0, 100),
@@ -72,9 +77,19 @@ class PublicProfileViewModel(
         val currentUserId = _uiState.value.currentUser.id
         if (socialRepository.isFriend(currentUserId, userId)) {
             socialRepository.removeFriend(currentUserId, userId)
-        } else {
-            socialRepository.addFriend(currentUserId, userId)
+        } else if (socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) == null) {
+            socialRepository.sendFriendRequest(currentUserId, userId)
         }
+        refresh()
+    }
+
+    fun onAcceptIncomingFriendRequest(requestId: String) {
+        socialRepository.respondToFriendRequest(requestId, accepted = true)
+        refresh()
+    }
+
+    fun onRejectIncomingFriendRequest(requestId: String) {
+        socialRepository.respondToFriendRequest(requestId, accepted = false)
         refresh()
     }
 

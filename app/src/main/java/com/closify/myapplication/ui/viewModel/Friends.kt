@@ -1,6 +1,7 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Comment
@@ -11,10 +12,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+enum class FriendRelationshipStatus {
+    FRIEND,
+    OUTGOING_PENDING,
+    NONE
+}
+
 data class FriendSearchResult(
     val user: UserSummary,
+    val relationshipStatus: FriendRelationshipStatus
+) {
     val isFriend: Boolean
-)
+        get() = relationshipStatus == FriendRelationshipStatus.FRIEND
+}
 
 data class FriendsUiState(
     val currentUser: UserSummary,
@@ -23,11 +33,13 @@ data class FriendsUiState(
     val friendSearchResults: List<FriendSearchResult> = emptyList(),
     val otherSearchResults: List<FriendSearchResult> = emptyList(),
     val commentDrafts: Map<String, String> = emptyMap(),
-    val posts: List<OutfitPost> = emptyList()
+    val posts: List<OutfitPost> = emptyList(),
+    val hasUnreadNotifications: Boolean = false
 )
 
 class FriendsViewModel(
     private val socialRepository: SocialRepository = SocialRepository.instance,
+    private val notificationRepository: NotificationRepository = NotificationRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
@@ -54,7 +66,8 @@ class FriendsViewModel(
         _uiState.value = _uiState.value.copy(
             currentUser = user,
             friendsCount = friendIds.size,
-            posts = buildFeedPosts()
+            posts = buildFeedPosts(),
+            hasUnreadNotifications = notificationRepository.getUnreadCount(user.id) > 0
         )
     }
 
@@ -69,7 +82,7 @@ class FriendsViewModel(
                 .map { user ->
                     FriendSearchResult(
                         user = user,
-                        isFriend = user.id in friendIds
+                        relationshipStatus = relationshipStatusFor(user.id)
                     )
                 }
         }
@@ -86,7 +99,7 @@ class FriendsViewModel(
         if (userId in friendIds) {
             socialRepository.removeFriend(currentUserId, userId)
         } else {
-            socialRepository.addFriend(currentUserId, userId)
+            socialRepository.sendFriendRequest(currentUserId, userId)
         }
         friendIds = socialRepository.getFriends(currentUserId).map { it.id }.toSet()
 
@@ -94,7 +107,7 @@ class FriendsViewModel(
 
         val updatedSearchResults = (currentState.friendSearchResults + currentState.otherSearchResults)
             .distinctBy { it.user.id }
-            .map { it.copy(isFriend = it.user.id in friendIds) }
+            .map { it.copy(relationshipStatus = relationshipStatusFor(it.user.id)) }
 
         _uiState.value = currentState.copy(
             friendsCount = friendIds.size,
@@ -175,4 +188,13 @@ class FriendsViewModel(
 
     private fun buildFeedPosts(): List<OutfitPost> =
         socialRepository.sortPostsNewestFirst(allPosts.filter { it.author.id in friendIds })
+
+    private fun relationshipStatusFor(userId: String): FriendRelationshipStatus {
+        val currentUserId = _uiState.value.currentUser.id
+        return when {
+            userId in friendIds -> FriendRelationshipStatus.FRIEND
+            socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) != null -> FriendRelationshipStatus.OUTGOING_PENDING
+            else -> FriendRelationshipStatus.NONE
+        }
+    }
 }

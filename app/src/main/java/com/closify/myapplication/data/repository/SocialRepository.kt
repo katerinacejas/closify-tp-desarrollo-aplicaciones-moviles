@@ -26,7 +26,7 @@ class SocialRepository {
         MockClosifyData.userById(userId)?.profile
 
     fun isFriend(userId: String, otherUserId: String): Boolean =
-        getFriends(userId).any { it.id == otherUserId }
+        MockClosifyData.isFriend(userId, otherUserId)
 
     fun addFriend(userId: String = MockClosifyData.CURRENT_USER_ID, friendId: String) {
         MockClosifyData.addFriend(userId, friendId)
@@ -35,6 +35,21 @@ class SocialRepository {
     fun removeFriend(userId: String = MockClosifyData.CURRENT_USER_ID, friendId: String) {
         MockClosifyData.removeFriend(userId, friendId)
     }
+
+    fun sendFriendRequest(senderId: String, receiverId: String): FriendRequest? =
+        MockClosifyData.sendFriendRequest(senderId, receiverId)
+
+    fun getPendingOutgoingFriendRequest(senderId: String, receiverId: String): FriendRequest? =
+        MockClosifyData.pendingOutgoingFriendRequest(senderId, receiverId)
+
+    fun getPendingIncomingFriendRequest(receiverId: String, senderId: String): FriendRequest? =
+        MockClosifyData.pendingIncomingFriendRequest(receiverId, senderId)
+
+    fun respondToFriendRequest(requestId: String, accepted: Boolean): FriendRequest? =
+        MockClosifyData.respondToFriendRequest(requestId, accepted)
+
+    fun getFriendRequest(requestId: String): FriendRequest? =
+        MockClosifyData.friendRequestById(requestId)
 
     fun currentDateLabel(): String = MockClosifyData.CURRENT_DATE_LABEL
 

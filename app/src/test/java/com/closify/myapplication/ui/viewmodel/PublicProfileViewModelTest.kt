@@ -31,9 +31,9 @@ class PublicProfileViewModelTest {
     }
 
     @Test
-    fun toggleFriend_updatesRelationshipAndVisibilityState() {
+    fun toggleNonFriend_sendsPendingRequestWithoutShowingPosts() {
         val viewModel = PublicProfileViewModel()
-        val userId = "user_11"
+        val userId = "user_12"
 
         viewModel.loadProfile(userId)
         if (viewModel.uiState.value.isFriend) {
@@ -43,8 +43,7 @@ class PublicProfileViewModelTest {
         assertFalse(viewModel.uiState.value.isFriend)
 
         viewModel.onToggleFriend(userId)
-        assertTrue(viewModel.uiState.value.isFriend)
-
-        viewModel.onToggleFriend(userId)
+        assertFalse(viewModel.uiState.value.isFriend)
+        assertTrue(viewModel.uiState.value.hasPendingOutgoingRequest)
     }
 }
