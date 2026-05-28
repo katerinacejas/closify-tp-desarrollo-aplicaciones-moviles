@@ -1,0 +1,32 @@
+app/src/main/java/com/closify/myapplication/navigation/Screen.kt
+  s_f319fd003c2854::t_fbd5403c72800b 14
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_f319fd003c2854::t_8f137c9b952a43 11,15,20,28-30,79,81-93,95-100,102,104,106-113,115,118
+  s_f319fd003c2854::t_949414b67ac01b 14
+  s_f319fd003c2854::t_15f19fa6ea9dfb 103,105
+app/src/main/java/com/closify/myapplication/ui/viewModel/Camera.kt
+  s_f319fd003c2854::t_e53232d09a9801 12-13,18,28-29
+app/src/main/java/com/closify/myapplication/ui/screens/camera/CameraScreen.kt
+  s_f319fd003c2854::t_e0791a659417ad 21,29-32,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "c4532b959f9eb0324b95f9960ef4eb477e10843d",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
