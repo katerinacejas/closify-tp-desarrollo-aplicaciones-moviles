@@ -217,7 +217,7 @@ internal object MockClosifyData {
         ownedOutfit("outfit_18", "Domingo relajado", "24 de mayo de 2026", JUAN_USER_ID, "juan_buzo_gris", "juan_jean", "juan_zapatillas")
     )
 
-    val outfitPosts = listOf(
+    private val mutableOutfitPosts = mutableListOf(
         OutfitPost(
             id = "post_1",
             author = currentUser.toSummary(),
@@ -455,6 +455,9 @@ internal object MockClosifyData {
             comments = emptyList()
         )
     )
+
+    val outfitPosts: List<OutfitPost>
+        get() = mutableOutfitPosts.toList()
 
     val suggestedOutfits = listOf(
         SuggestedOutfit(
@@ -726,6 +729,25 @@ internal object MockClosifyData {
         mutableNotifications.replaceAll { notification ->
             if (notification.receiver.id == userId) notification.copy(read = true) else notification
         }
+    }
+
+    fun addOutfitPost(post: OutfitPost): OutfitPost {
+        mutableOutfitPosts.add(0, post)
+        return post
+    }
+
+    fun updateOutfitPost(post: OutfitPost): OutfitPost {
+        val index = mutableOutfitPosts.indexOfFirst { it.id == post.id }
+        if (index == -1) {
+            mutableOutfitPosts.add(0, post)
+        } else {
+            mutableOutfitPosts[index] = post
+        }
+        return post
+    }
+
+    fun deleteOutfitPost(postId: String) {
+        mutableOutfitPosts.removeAll { it.id == postId }
     }
 
     fun isFriend(userId: String, otherUserId: String): Boolean =

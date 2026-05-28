@@ -29,6 +29,7 @@ import com.closify.myapplication.ui.screens.friends.FriendsScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.notifications.NotificationsScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
+import com.closify.myapplication.ui.screens.planner.PlannerScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
 import com.closify.myapplication.ui.screens.publicprofile.PublicProfileScreen
 import com.closify.myapplication.ui.screens.settings.SettingsScreen
@@ -216,7 +217,7 @@ fun AppNavGraph(
             }
 
             composable(Screen.Calendar.route) {
-                PlaceholderScreen("Calendario")
+                PlannerScreen()
             }
 
             composable(Screen.Profile.route) {
