@@ -8,23 +8,34 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
+import com.closify.myapplication.ui.screens.camera.CameraScreen
+import com.closify.myapplication.ui.screens.camera.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.friends.FriendsScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
 import com.closify.myapplication.ui.screens.publicprofile.PublicProfileScreen
+import com.closify.myapplication.ui.screens.settings.SettingsScreen
+import com.closify.myapplication.ui.viewmodel.CameraViewModel
+
+private const val CAMERA_FLOW_ROUTE = "camera_flow"
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onLogout: () -> Unit = {}
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
@@ -44,6 +55,7 @@ fun AppNavGraph(
                         if (currentRoute == Screen.OutfitResult.route) {
                             navController.popBackStack()
                         }
+
                         navController.navigate(screen.route) {
                             popUpTo(Screen.Home.route) { saveState = false }
                             launchSingleTop = true
@@ -73,7 +85,10 @@ fun AppNavGraph(
                 )
             }
 
-            composable(Screen.Wardrobe.route) { PlaceholderScreen("Guardarropa") }
+            composable(Screen.Wardrobe.route) {
+                PlaceholderScreen("Guardarropa")
+            }
+
             composable(Screen.Friends.route) {
                 FriendsScreen(
                     onNotificationsClick = {
@@ -84,8 +99,12 @@ fun AppNavGraph(
                     }
                 )
             }
+
             composable(Screen.FriendProfile.route) { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString(Screen.FriendProfile.ARG_USER_ID).orEmpty()
+                val userId = backStackEntry.arguments
+                    ?.getString(Screen.FriendProfile.ARG_USER_ID)
+                    .orEmpty()
+
                 PublicProfileScreen(
                     userId = userId,
                     onOpenUserProfile = { nextUserId ->
@@ -95,15 +114,62 @@ fun AppNavGraph(
                     }
                 )
             }
-            composable(Screen.Camera.route) { PlaceholderScreen("Camara") }
-            composable(Screen.Calendar.route) { PlaceholderScreen("Calendario") }
+
+            navigation(
+                startDestination = Screen.Camera.route,
+                route = CAMERA_FLOW_ROUTE
+            ) {
+                composable(Screen.Camera.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
+                    }
+                    val cameraViewModel: CameraViewModel = viewModel(parentEntry)
+                    CameraScreen(
+                        viewModel = cameraViewModel,
+                        onNavigateToClassify = {
+                            navController.navigate(Screen.ClassifyGarment.route)
+                        }
+                    )
+                }
+
+                composable(Screen.ClassifyGarment.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
+                    }
+                    val cameraViewModel: CameraViewModel = viewModel(parentEntry)
+                    val cameraUiState by cameraViewModel.uiState.collectAsStateWithLifecycle()
+                    ClassifyGarmentScreen(
+                        imageUri = cameraUiState.selectedImageUri,
+                        onBack = { navController.popBackStack() },
+                        onSaved = {
+                            navController.navigate(Screen.Wardrobe.route) {
+                                popUpTo(CAMERA_FLOW_ROUTE) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            }
+
+            composable(Screen.Calendar.route) {
+                PlaceholderScreen("Calendario")
+            }
+
             composable(Screen.Profile.route) {
                 ProfileScreen(
                     onSettingsClick = {
-                        /* TODO: Implementar navegacion a configuracion */
+                        navController.navigate(Screen.Settings.route)
                     },
                     onOpenUserProfile = { userId ->
                         navController.navigate(Screen.FriendProfile.createRoute(userId))
+                    }
+                )
+            }
+
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onLogout = onLogout,
+                    onBackToHome = {
+                        navController.popBackStack()
                     }
                 )
             }
