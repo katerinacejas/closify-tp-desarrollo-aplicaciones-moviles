@@ -1,19 +1,34 @@
+# ── Build ─────────────────────────────────────────────────────────────────────
 *.iml
 .gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
+*.apk
+*.aab
+*.ap_
+
+# ── Configuración local (no versionar) ────────────────────────────────────────
 local.properties
 
-# Kotlin
+# ── Keystore y firma (NUNCA versionar) ────────────────────────────────────────
+*.jks
+*.keystore
+signing.properties
+release.properties
+
+# ── Android Studio / IntelliJ ─────────────────────────────────────────────────
+/.idea/
+
+# ── Kotlin ────────────────────────────────────────────────────────────────────
 .kotlin/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
+
+# ── Pre-commit (configuración local, no versionar) ────────────────────────────
 .pre-commit-config.yaml
