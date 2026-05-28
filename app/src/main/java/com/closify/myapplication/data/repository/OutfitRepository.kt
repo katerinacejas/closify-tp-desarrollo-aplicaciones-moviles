@@ -34,7 +34,7 @@ class OutfitRepository {
         outfits.forEach { outfit ->
             if (_favoriteOutfits.none { it.id == outfit.id }) {
                 _favoriteOutfits.add(outfit)
-                MockClosifyData.outfitPosts.add(
+                MockClosifyData.addOutfitPost(
                     OutfitPost(
                         id = UUID.randomUUID().toString(),
                         author = author,
@@ -74,4 +74,46 @@ class OutfitRepository {
         MockClosifyData.outfitPosts.filter {
             it.author.id == userId && it.type == OutfitPostType.PLANNED
         }
+
+    fun savePlannedOutfitPost(
+        userId: String,
+        title: String?,
+        outfit: Outfit,
+        plannedDate: String,
+        createdAt: String
+    ): OutfitPost? {
+        val author = MockClosifyData.userById(userId)?.toSummary() ?: return null
+        val post = OutfitPost(
+            id = "planned_post_${MockClosifyData.outfitPosts.size + 1}",
+            author = author,
+            outfit = outfit.copy(ownerUserId = userId),
+            title = title?.take(100)?.ifBlank { null },
+            type = OutfitPostType.PLANNED,
+            createdAt = createdAt,
+            plannedDate = plannedDate
+        )
+        return MockClosifyData.addOutfitPost(post)
+    }
+
+    fun updatePlannedOutfitPost(
+        postId: String,
+        title: String?,
+        outfit: Outfit,
+        plannedDate: String
+    ): OutfitPost? {
+        val currentPost = MockClosifyData.outfitPosts.firstOrNull { it.id == postId } ?: return null
+        val updatedPost = currentPost.copy(
+            outfit = outfit.copy(ownerUserId = currentPost.author.id),
+            title = title?.take(100)?.ifBlank { null },
+            plannedDate = plannedDate
+        )
+        return MockClosifyData.updateOutfitPost(updatedPost)
+    }
+
+    fun deletePlannedOutfitPost(postId: String) {
+        MockClosifyData.deleteOutfitPost(postId)
+    }
+
+    fun getPlannedPostById(postId: String): OutfitPost? =
+        MockClosifyData.outfitPosts.firstOrNull { it.id == postId && it.type == OutfitPostType.PLANNED }
 }
