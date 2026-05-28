@@ -18,16 +18,18 @@ import com.closify.myapplication.ui.viewmodel.CameraViewModel
 
 @Composable
 fun CameraScreen(
-    onNavigateToClassify: (String) -> Unit,
+    onNavigateToClassify: () -> Unit,
     viewModel: CameraViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Launcher para seleccionar imagen de la galería
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        uri?.let { onNavigateToClassify(it.toString()) }
+        uri?.let {
+            viewModel.onEvent(CameraEvent.SetImageUri(it.toString()))
+            onNavigateToClassify()
+        }
     }
 
     Scaffold(
@@ -41,7 +43,7 @@ fun CameraScreen(
                     CameraMode.GALLERY -> galleryLauncher.launch(
                         PickVisualMediaRequest(PickVisualMedia.ImageOnly)
                     )
-                    CameraMode.CAMERA  -> { /* TODO: implementar cámara */ }
+                    CameraMode.CAMERA -> { /* TODO: implementar cámara */ }
                 }
             },
             modifier = Modifier.padding(innerPadding)

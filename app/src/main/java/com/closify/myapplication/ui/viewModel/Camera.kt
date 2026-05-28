@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.update
 enum class CameraMode { GALLERY, CAMERA }
 
 data class CameraUiState(
-    val selectedMode: CameraMode = CameraMode.GALLERY
+    val selectedMode: CameraMode = CameraMode.GALLERY,
+    val selectedImageUri: String = ""
 )
 
 sealed interface CameraEvent {
     data class SelectMode(val mode: CameraMode) : CameraEvent
+    data class SetImageUri(val uri: String) : CameraEvent
 }
 
 class CameraViewModel : ViewModel() {
@@ -23,7 +25,8 @@ class CameraViewModel : ViewModel() {
 
     fun onEvent(event: CameraEvent) {
         when (event) {
-            is CameraEvent.SelectMode -> _uiState.update { it.copy(selectedMode = event.mode) }
+            is CameraEvent.SelectMode  -> _uiState.update { it.copy(selectedMode = event.mode) }
+            is CameraEvent.SetImageUri -> _uiState.update { it.copy(selectedImageUri = event.uri) }
         }
     }
 }

@@ -8,21 +8,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.closify.myapplication.ui.screens.camera.CameraScreen
 import com.closify.myapplication.ui.screens.camera.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
+import com.closify.myapplication.ui.viewmodel.CameraViewModel
+
+private const val CAMERA_FLOW_ROUTE = "camera_flow"
 
 @Composable
 fun AppNavGraph(
@@ -36,7 +41,6 @@ fun AppNavGraph(
             BottomNavBar(
                 currentRoute = currentRoute,
                 onItemSelected = { screen ->
-                    // Si estamos en OutfitResult primero volvemos atrás
                     if (currentRoute == Screen.OutfitResult.route) {
                         navController.popBackStack()
                     }
@@ -70,38 +74,48 @@ fun AppNavGraph(
                 )
             }
 
-            // — Placeholders —
             composable(Screen.Wardrobe.route)  { PlaceholderScreen("Guardarropa") }
             composable(Screen.Friends.route)   { PlaceholderScreen("Amigos") }
-            composable(Screen.Camera.route) {
-                CameraScreen(
-                    onNavigateToClassify = { uri ->
-                        navController.navigate(Screen.ClassifyGarment.createRoute(uri))
+            composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
+
+            navigation(
+                startDestination = Screen.Camera.route,
+                route = CAMERA_FLOW_ROUTE
+            ) {
+                composable(Screen.Camera.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
                     }
-                )
+                    val cameraViewModel: CameraViewModel = viewModel(parentEntry)
+                    CameraScreen(
+                        viewModel = cameraViewModel,
+                        onNavigateToClassify = {
+                            navController.navigate(Screen.ClassifyGarment.route)
+                        }
+                    )
+                }
+
+                composable(Screen.ClassifyGarment.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
+                    }
+                    val cameraViewModel: CameraViewModel = viewModel(parentEntry)
+                    val cameraUiState by cameraViewModel.uiState.collectAsStateWithLifecycle()
+                    ClassifyGarmentScreen(
+                        imageUri = cameraUiState.selectedImageUri,
+                        onBack = { navController.popBackStack() },
+                        onSaved = {
+                            navController.navigate(Screen.Wardrobe.route) {
+                                popUpTo(CAMERA_FLOW_ROUTE) { inclusive = true }
+                            }
+                        }
+                    )
+                }
             }
 
-            composable(
-                route = Screen.ClassifyGarment.route,
-                arguments = listOf(navArgument("imageUri") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
-                ClassifyGarmentScreen(
-                    imageUri = imageUri,
-                    onBack = { navController.popBackStack() },
-                    onSaved = {
-                        navController.navigate(Screen.Wardrobe.route) {
-                            popUpTo(Screen.Camera.route) { inclusive = true }
-                        }
-                    }
-                )
-            }
-            composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    onSettingsClick = {
-                        /* TODO: Implementar navegación a configuración */
-                    }
+                    onSettingsClick = { /* TODO */ }
                 )
             }
         }
