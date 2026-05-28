@@ -1,0 +1,25 @@
+app/src/main/java/com/closify/myapplication/ui/screens/planner/PlannerContent.kt
+  s_f319fd003c2854::t_321fb8e8845583 132-136
+  s_f319fd003c2854::t_0d1c755f4680f3 80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "d528b4fab29b32f3a0fdbc2ce8a2ff8ad963c11f",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
