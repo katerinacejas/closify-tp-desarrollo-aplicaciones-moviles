@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.closify.myapplication.ui.viewmodel.CameraEvent
 import com.closify.myapplication.ui.viewmodel.CameraMode
 import com.closify.myapplication.ui.viewmodel.CameraViewModel
+import com.closify.myapplication.ui.components.ClosifyTopBar
 
 @Composable
 fun AddGarmentScreen(
@@ -33,7 +34,10 @@ fun AddGarmentScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            ClosifyTopBar()
+        }
     ) { innerPadding ->
         AddGarmentContent(
             selectedMode = uiState.selectedMode,

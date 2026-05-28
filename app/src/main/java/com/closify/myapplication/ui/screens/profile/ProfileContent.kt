@@ -24,7 +24,6 @@ import com.closify.myapplication.ui.viewmodel.ProfileUiState
 @Composable
 fun ProfileContent(
     uiState: ProfileUiState,
-    onSettingsClick: () -> Unit,
     onLikeClick: (String) -> Unit,
     onUpdatePostTitle: (String, String) -> Unit,
     onDeletePost: (String) -> Unit,
@@ -47,7 +46,7 @@ fun ProfileContent(
     LaunchedEffect(targetPostId, uiState.posts) {
         val postIndex = uiState.posts.indexOfFirst { it.id == targetPostId }
         if (postIndex >= 0) {
-            listState.animateScrollToItem(index = 4 + postIndex)
+            listState.animateScrollToItem(index = 3 + postIndex)
         }
     }
 
@@ -116,10 +115,6 @@ fun ProfileContent(
         state = listState,
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        item {
-            ProfileTopBar(onSettingsClick = onSettingsClick)
-        }
-
         item {
             ProfileHeader(
                 name = uiState.name,
@@ -195,7 +190,6 @@ private fun ProfileContentPreview() {
                 friends = friends,
                 posts = posts
             ),
-            onSettingsClick = {},
             onLikeClick = {},
             onUpdatePostTitle = { _, _ -> },
             onDeletePost = {},

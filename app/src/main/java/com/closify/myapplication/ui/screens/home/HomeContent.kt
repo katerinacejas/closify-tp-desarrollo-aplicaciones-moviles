@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyButton
-import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.screens.home.components.OccasionSection
 import com.closify.myapplication.ui.screens.home.components.WeatherSection
 import com.closify.myapplication.ui.theme.ClosifyTheme
@@ -46,11 +45,7 @@ fun HomeContent(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-
-        ClosifyLogo(size = 48.dp)
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = buildAnnotatedString {

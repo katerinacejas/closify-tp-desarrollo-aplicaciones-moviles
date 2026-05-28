@@ -173,7 +173,14 @@ class RegisterViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            userRepository.register(state.email, state.password, state.username)
+            userRepository.register(
+                email = state.email,
+                password = state.password,
+                username = state.username,
+                fullName = state.name.trim(),
+                birthDate = formatBirthDate(state.birthDay, state.birthMonth, state.birthYear),
+                bio = state.bio.trim()
+            )
                 .onSuccess {
                     _uiState.update { it.copy(isLoading = false, registerSuccess = true) }
                 }
@@ -205,5 +212,25 @@ class RegisterViewModel(
         } catch (e: Exception) {
             false
         }
+    }
+
+    private fun formatBirthDate(day: String, month: String, year: String): String {
+        val monthName = when (month.toInt()) {
+            1 -> "enero"
+            2 -> "febrero"
+            3 -> "marzo"
+            4 -> "abril"
+            5 -> "mayo"
+            6 -> "junio"
+            7 -> "julio"
+            8 -> "agosto"
+            9 -> "septiembre"
+            10 -> "octubre"
+            11 -> "noviembre"
+            12 -> "diciembre"
+            else -> ""
+        }
+
+        return "${day.toInt()} de $monthName de ${year.toInt()}"
     }
 }
