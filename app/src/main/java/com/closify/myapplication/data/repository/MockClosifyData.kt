@@ -86,7 +86,8 @@ internal object MockClosifyData {
 
     private val authUsers = mutableListOf(
         MockAuthUser(currentUser, "Maria123!"),
-        MockAuthUser(juanUser, "Juan123!")
+        MockAuthUser(juanUser, "Juan123!"),
+        MockAuthUser(user("user_2", "Ayelen Martinez", "@aye_martinez"), "Ayelen123!")
     )
 
     val users = mutableListOf(

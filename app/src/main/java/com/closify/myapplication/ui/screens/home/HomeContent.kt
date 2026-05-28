@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyButton
+import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.screens.home.components.OccasionSection
 import com.closify.myapplication.ui.screens.home.components.WeatherSection
@@ -37,9 +38,18 @@ fun HomeContent(
     isAutoWeather: Boolean,
     isLoadingWeather: Boolean,
     isGenerateEnabled: Boolean,
+    showNoGarmentsDialog: Boolean = false,
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    if (showNoGarmentsDialog) {
+        ClosifyConfirmationDialog(
+            title = "Aún no tenes prendas",
+            subtitle = "Agrega prendas en tu guardarropa\npara poder generar outfits",
+            buttonText = "Continuar",
+            onDismiss = { onEvent(HomeEvent.DismissNoGarmentsDialog) }
+        )
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
