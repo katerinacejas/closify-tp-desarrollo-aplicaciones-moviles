@@ -1,0 +1,27 @@
+app/src/main/java/com/closify/myapplication/ui/screens/wardrobe/WardrobeDetailScreen.kt
+  s_f319fd003c2854::t_a61191afcba63c 126-129,133-137,143-147,153-159,163
+app/src/main/java/com/closify/myapplication/ui/components/BottomNavBar.kt
+  s_f319fd003c2854::t_f2a194a9a597cd 46
+  s_f319fd003c2854::t_c9e0c7d6345fe4 64,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "5dcbf8731b62c4adbb276cf950b7d7adebcabe42",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
