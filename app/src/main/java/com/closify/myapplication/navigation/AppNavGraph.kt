@@ -24,6 +24,7 @@ import com.closify.myapplication.ui.screens.addgarment.AddGarmentScreen
 import com.closify.myapplication.ui.screens.addgarment.ClassifyGarmentScreen
 import com.closify.myapplication.ui.screens.friends.FriendsScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
+import com.closify.myapplication.ui.screens.notifications.NotificationsScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
 import com.closify.myapplication.ui.screens.publicprofile.PublicProfileScreen
@@ -92,7 +93,7 @@ fun AppNavGraph(
             composable(Screen.Friends.route) {
                 FriendsScreen(
                     onNotificationsClick = {
-                        /* TODO: Implementar pantalla de notificaciones */
+                        navController.navigate(Screen.Notifications.route)
                     },
                     onOpenUserProfile = { userId ->
                         navController.navigate(Screen.FriendProfile.createRoute(userId))
@@ -161,6 +162,40 @@ fun AppNavGraph(
                     },
                     onOpenUserProfile = { userId ->
                         navController.navigate(Screen.FriendProfile.createRoute(userId))
+                    }
+                )
+            }
+
+            composable(Screen.ProfilePost.route) { backStackEntry ->
+                val postId = backStackEntry.arguments
+                    ?.getString(Screen.ProfilePost.ARG_POST_ID)
+                    .orEmpty()
+
+                ProfileScreen(
+                    targetPostId = postId,
+                    onSettingsClick = {
+                        navController.navigate(Screen.Settings.route)
+                    },
+                    onOpenUserProfile = { userId ->
+                        navController.navigate(Screen.FriendProfile.createRoute(userId))
+                    }
+                )
+            }
+
+            composable(Screen.Notifications.route) {
+                NotificationsScreen(
+                    onOpenUserProfile = { userId ->
+                        navController.navigate(Screen.FriendProfile.createRoute(userId))
+                    },
+                    onOpenPostInProfile = { postId ->
+                        navController.navigate(Screen.ProfilePost.createRoute(postId))
+                    },
+                    onBackClick = {
+                        navController.navigate(Screen.Friends.route) {
+                            popUpTo(Screen.Friends.route) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = false
+                        }
                     }
                 )
             }

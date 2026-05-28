@@ -23,6 +23,8 @@ fun PublicProfileScreen(
         uiState = uiState,
         onOpenUserProfile = onOpenUserProfile,
         onToggleFriend = viewModel::onToggleFriend,
+        onAcceptIncomingFriendRequest = viewModel::onAcceptIncomingFriendRequest,
+        onRejectIncomingFriendRequest = viewModel::onRejectIncomingFriendRequest,
         onLikeClick = viewModel::onLikeClick,
         onCommentDraftChange = viewModel::onCommentDraftChange,
         onSendComment = viewModel::onSendComment

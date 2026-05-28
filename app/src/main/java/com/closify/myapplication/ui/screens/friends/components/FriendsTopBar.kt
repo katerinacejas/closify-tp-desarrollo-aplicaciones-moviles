@@ -1,6 +1,7 @@
 package com.closify.myapplication.ui.screens.friends.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.theme.ClosifyTheme
+import com.closify.myapplication.ui.theme.ErrorColor
 import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
@@ -35,6 +38,7 @@ fun FriendsTopBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onNotificationsClick: () -> Unit,
+    hasUnreadNotifications: Boolean,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -64,12 +68,22 @@ fun FriendsTopBar(
                 onClick = onNotificationsClick,
                 modifier = Modifier.size(42.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(23.dp)
-                )
+                Box(contentAlignment = Alignment.TopEnd) {
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = "Notificaciones",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(23.dp)
+                    )
+
+                    if (hasUnreadNotifications) {
+                        Box(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .background(ErrorColor, CircleShape)
+                        )
+                    }
+                }
             }
         }
     }
@@ -133,7 +147,8 @@ private fun FriendsTopBarPreview() {
         FriendsTopBar(
             searchQuery = "",
             onSearchQueryChange = {},
-            onNotificationsClick = {}
+            onNotificationsClick = {},
+            hasUnreadNotifications = true
         )
     }
 }

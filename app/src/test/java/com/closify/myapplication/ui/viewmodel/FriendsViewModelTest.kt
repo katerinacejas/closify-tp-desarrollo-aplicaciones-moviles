@@ -30,9 +30,9 @@ class FriendsViewModelTest {
     }
 
     @Test
-    fun togglingNonFriend_addsFriendAndShowsTheirPosts() {
+    fun togglingNonFriend_sendsPendingRequestWithoutShowingPosts() {
         val viewModel = FriendsViewModel()
-        val userId = "user_11"
+        val userId = "user_12"
 
         if (viewModel.uiState.value.posts.any { it.author.id == userId }) {
             viewModel.onToggleFriend(userId)
@@ -43,7 +43,11 @@ class FriendsViewModelTest {
         viewModel.onToggleFriend(userId)
 
         val state = viewModel.uiState.value
-        assertTrue(state.posts.any { it.author.id == userId })
+        assertFalse(state.posts.any { it.author.id == userId })
+
+        viewModel.onSearchQueryChange("Ayito")
+        val searchResult = viewModel.uiState.value.otherSearchResults.first { it.user.id == userId }
+        assertTrue(searchResult.relationshipStatus == FriendRelationshipStatus.OUTGOING_PENDING)
 
         viewModel.onToggleFriend(userId)
     }

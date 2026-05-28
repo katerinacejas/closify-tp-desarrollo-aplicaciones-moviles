@@ -56,6 +56,7 @@ import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.theme.PrimaryDark
 import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.FriendSearchResult
+import com.closify.myapplication.ui.viewmodel.FriendRelationshipStatus
 import com.closify.myapplication.ui.viewmodel.FriendsUiState
 
 @Composable
@@ -117,7 +118,8 @@ fun FriendsContent(
             FriendsTopBar(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
-                onNotificationsClick = onNotificationsClick
+                onNotificationsClick = onNotificationsClick,
+                hasUnreadNotifications = uiState.hasUnreadNotifications
             )
         }
 
@@ -215,8 +217,7 @@ private fun FriendsSearchResults(
                 friends.forEach { result ->
                     SearchUserRow(
                         user = result.user,
-                        actionText = "Eliminar",
-                        isFriend = true,
+                        relationshipStatus = result.relationshipStatus,
                         onUserClick = onUserClick,
                         onToggleFriend = onToggleFriend
                     )
@@ -240,8 +241,7 @@ private fun FriendsSearchResults(
             otherUsers.forEach { result ->
                 SearchUserRow(
                     user = result.user,
-                    actionText = "Agregar",
-                    isFriend = false,
+                    relationshipStatus = result.relationshipStatus,
                     onUserClick = onUserClick,
                     onToggleFriend = onToggleFriend
                 )
@@ -253,11 +253,18 @@ private fun FriendsSearchResults(
 @Composable
 private fun SearchUserRow(
     user: UserSummary,
-    actionText: String,
-    isFriend: Boolean,
+    relationshipStatus: FriendRelationshipStatus,
     onUserClick: (String) -> Unit,
     onToggleFriend: (String) -> Unit
 ) {
+    val isPending = relationshipStatus == FriendRelationshipStatus.OUTGOING_PENDING
+    val isFriend = relationshipStatus == FriendRelationshipStatus.FRIEND
+    val actionText = when (relationshipStatus) {
+        FriendRelationshipStatus.FRIEND -> "Eliminar"
+        FriendRelationshipStatus.OUTGOING_PENDING -> "Pendiente"
+        FriendRelationshipStatus.NONE -> "Agregar"
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -295,9 +302,12 @@ private fun SearchUserRow(
 
         Button(
             onClick = { onToggleFriend(user.id) },
+            enabled = !isPending,
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isFriend) RosaSecondary else PrimaryDark
+                containerColor = if (isFriend) RosaSecondary else PrimaryDark,
+                disabledContainerColor = PrimaryDark.copy(alpha = 0.35f),
+                disabledContentColor = MaterialTheme.colorScheme.onPrimary
             ),
             contentPadding = PaddingValues(horizontal = 14.dp),
             modifier = Modifier

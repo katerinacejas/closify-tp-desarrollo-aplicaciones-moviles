@@ -2,10 +2,12 @@ package com.closify.myapplication.ui.screens.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,8 +30,10 @@ fun ProfileContent(
     onDeletePost: (String) -> Unit,
     onOpenUserProfile: (String) -> Unit,
     onToggleFriend: (String) -> Unit,
+    targetPostId: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val listState = rememberLazyListState()
     var showFriendsDialog by remember { mutableStateOf(false) }
     var selectedLikesOutfitId by remember { mutableStateOf<String?>(null) }
     var selectedCommentsOutfitId by remember { mutableStateOf<String?>(null) }
@@ -39,6 +43,13 @@ fun ProfileContent(
     val selectedCommentsOutfit = uiState.posts.firstOrNull { it.id == selectedCommentsOutfitId }
     val selectedEditOutfit = uiState.posts.firstOrNull { it.id == selectedEditOutfitId }
     val selectedDeleteOutfit = uiState.posts.firstOrNull { it.id == selectedDeleteOutfitId }
+
+    LaunchedEffect(targetPostId, uiState.posts) {
+        val postIndex = uiState.posts.indexOfFirst { it.id == targetPostId }
+        if (postIndex >= 0) {
+            listState.animateScrollToItem(index = 4 + postIndex)
+        }
+    }
 
     if (showFriendsDialog) {
         FriendsDialog(
@@ -102,6 +113,7 @@ fun ProfileContent(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        state = listState,
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item {

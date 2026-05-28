@@ -38,7 +38,6 @@ internal object MockClosifyData {
     private val defaultFriendIdsByUser = mapOf(
         MARIA_USER_ID to setOf(
             "user_2",
-            "user_3",
             "user_4",
             "user_5",
             "user_6",
@@ -143,21 +142,34 @@ internal object MockClosifyData {
                 }
             }
 
-    val friendRequests = listOf(
+    private val mutableFriendRequests = defaultFriendRequests().toMutableList()
+
+    val friendRequests: List<FriendRequest>
+        get() = mutableFriendRequests.toList()
+
+    private fun defaultFriendRequests(): List<FriendRequest> = listOf(
         FriendRequest(
             id = "request_1",
-            sender = summary("user_7"),
+            sender = summary("user_3"),
             receiver = currentUser.toSummary(),
             status = FriendRequestStatus.PENDING,
-            createdAt = "26 de mayo de 2026"
+            createdAt = "hace 3 horas"
         ),
         FriendRequest(
             id = "request_2",
-            sender = currentUser.toSummary(),
-            receiver = summary("user_8"),
+            sender = summary("user_6"),
+            receiver = currentUser.toSummary(),
             status = FriendRequestStatus.ACCEPTED,
-            createdAt = "20 de mayo de 2026",
-            respondedAt = "21 de mayo de 2026"
+            createdAt = "hace 57 minutos",
+            respondedAt = "hace 57 minutos"
+        ),
+        FriendRequest(
+            id = "request_3",
+            sender = currentUser.toSummary(),
+            receiver = summary("user_4"),
+            status = FriendRequestStatus.ACCEPTED,
+            createdAt = "hace 5 horas",
+            respondedAt = "hace 5 horas"
         )
     )
 
@@ -461,39 +473,60 @@ internal object MockClosifyData {
         )
     )
 
-    val notifications = listOf(
+    private val mutableNotifications = defaultNotifications().toMutableList()
+
+    val notifications: List<Notification>
+        get() = mutableNotifications.toList()
+
+    private fun defaultNotifications(): List<Notification> = listOf(
+        Notification(
+            id = "notification_0",
+            receiver = currentUser.toSummary(),
+            sender = summary("user_6"),
+            type = NotificationType.POST_LIKE,
+            postId = "post_1",
+            createdAt = "hace 30 minutos"
+        ),
         Notification(
             id = "notification_1",
             receiver = currentUser.toSummary(),
             sender = summary("user_4"),
             type = NotificationType.POST_LIKE,
             postId = "post_1",
-            createdAt = "25 de mayo de 2026"
+            createdAt = "hace 43 minutos"
         ),
         Notification(
             id = "notification_2",
             receiver = currentUser.toSummary(),
-            sender = summary("user_7"),
+            sender = summary("user_4"),
             type = NotificationType.POST_COMMENT,
             postId = "post_1",
             commentId = "comment_1",
-            createdAt = "25 de mayo de 2026"
+            createdAt = "hace 43 minutos"
         ),
         Notification(
             id = "notification_3",
             receiver = currentUser.toSummary(),
-            sender = summary("user_7"),
+            sender = summary("user_6"),
             type = NotificationType.FRIEND_REQUEST_RECEIVED,
-            friendRequestId = "request_1",
-            createdAt = "26 de mayo de 2026"
+            friendRequestId = "request_2",
+            createdAt = "hace 57 minutos"
         ),
         Notification(
             id = "notification_4",
             receiver = currentUser.toSummary(),
-            sender = summary("user_8"),
+            sender = summary("user_3"),
+            type = NotificationType.FRIEND_REQUEST_RECEIVED,
+            friendRequestId = "request_1",
+            createdAt = "hace 3 horas"
+        ),
+        Notification(
+            id = "notification_5",
+            receiver = currentUser.toSummary(),
+            sender = summary("user_4"),
             type = NotificationType.FRIEND_REQUEST_ACCEPTED,
-            friendRequestId = "request_2",
-            createdAt = "21 de mayo de 2026",
+            friendRequestId = "request_3",
+            createdAt = "hace 5 horas",
             read = true
         )
     )
@@ -562,6 +595,92 @@ internal object MockClosifyData {
         friendIdsByUser[friendId]?.remove(userId)
     }
 
+    fun friendRequestById(requestId: String): FriendRequest? =
+        mutableFriendRequests.firstOrNull { it.id == requestId }
+
+    fun pendingOutgoingFriendRequest(senderId: String, receiverId: String): FriendRequest? =
+        mutableFriendRequests.firstOrNull {
+            it.sender.id == senderId &&
+                it.receiver.id == receiverId &&
+                it.status == FriendRequestStatus.PENDING
+        }
+
+    fun pendingIncomingFriendRequest(receiverId: String, senderId: String): FriendRequest? =
+        mutableFriendRequests.firstOrNull {
+            it.sender.id == senderId &&
+                it.receiver.id == receiverId &&
+                it.status == FriendRequestStatus.PENDING
+        }
+
+    fun sendFriendRequest(senderId: String, receiverId: String): FriendRequest? {
+        if (senderId == receiverId || isFriend(senderId, receiverId)) return null
+
+        pendingOutgoingFriendRequest(senderId, receiverId)?.let { return it }
+
+        val sender = userById(senderId)?.toSummary() ?: return null
+        val receiver = userById(receiverId)?.toSummary() ?: return null
+        val request = FriendRequest(
+            id = "request_${mutableFriendRequests.size + 1}",
+            sender = sender,
+            receiver = receiver,
+            status = FriendRequestStatus.PENDING,
+            createdAt = "ahora"
+        )
+        mutableFriendRequests.add(0, request)
+        mutableNotifications.add(
+            0,
+            Notification(
+                id = "notification_${mutableNotifications.size + 1}",
+                receiver = receiver,
+                sender = sender,
+                type = NotificationType.FRIEND_REQUEST_RECEIVED,
+                friendRequestId = request.id,
+                createdAt = "ahora"
+            )
+        )
+        return request
+    }
+
+    fun respondToFriendRequest(requestId: String, accepted: Boolean): FriendRequest? {
+        val index = mutableFriendRequests.indexOfFirst { it.id == requestId }
+        if (index == -1) return null
+
+        val request = mutableFriendRequests[index]
+        if (request.status != FriendRequestStatus.PENDING) return request
+
+        val updatedRequest = request.copy(
+            status = if (accepted) FriendRequestStatus.ACCEPTED else FriendRequestStatus.REJECTED,
+            respondedAt = "ahora"
+        )
+        mutableFriendRequests[index] = updatedRequest
+
+        if (accepted) {
+            addFriend(request.sender.id, request.receiver.id)
+            mutableNotifications.add(
+                0,
+                Notification(
+                    id = "notification_${mutableNotifications.size + 1}",
+                    receiver = request.sender,
+                    sender = request.receiver,
+                    type = NotificationType.FRIEND_REQUEST_ACCEPTED,
+                    friendRequestId = request.id,
+                    createdAt = "ahora"
+                )
+            )
+        }
+
+        return updatedRequest
+    }
+
+    fun markNotificationsAsRead(userId: String) {
+        mutableNotifications.replaceAll { notification ->
+            if (notification.receiver.id == userId) notification.copy(read = true) else notification
+        }
+    }
+
+    fun isFriend(userId: String, otherUserId: String): Boolean =
+        otherUserId in friendIds(userId)
+
     fun removeCurrentUserFriend(friendId: String) {
         removeFriend(CURRENT_USER_ID, friendId)
     }
@@ -569,6 +688,10 @@ internal object MockClosifyData {
     fun resetCurrentUserFriends() {
         friendIdsByUser.clear()
         friendIdsByUser.putAll(buildFriendIdsByUser())
+        mutableFriendRequests.clear()
+        mutableFriendRequests.addAll(defaultFriendRequests())
+        mutableNotifications.clear()
+        mutableNotifications.addAll(defaultNotifications())
     }
 
     private fun buildFriendIdsByUser(): MutableMap<String, MutableSet<String>> {
