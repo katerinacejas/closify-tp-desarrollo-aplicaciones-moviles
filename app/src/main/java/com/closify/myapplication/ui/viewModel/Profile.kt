@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.data.repository.MockClosifyData
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -102,16 +103,16 @@ class ProfileViewModel(
 
     fun onUpdatePostTitle(postId: String, title: String) {
         val currentState = _uiState.value
+        val updatedTitle = title.take(100).ifBlank { null }
 
         _uiState.value = currentState.copy(
             posts = currentState.posts.map { post ->
-                if (post.id == postId) {
-                    post.copy(title = title.take(100).ifBlank { null })
-                } else {
-                    post
-                }
+                if (post.id == postId) post.copy(title = updatedTitle) else post
             }
         )
+
+        val post = currentState.posts.firstOrNull { it.id == postId } ?: return
+        MockClosifyData.updateOutfitPost(post.copy(title = updatedTitle))
     }
 
     fun onDeletePost(postId: String) {
@@ -131,6 +132,8 @@ class ProfileViewModel(
                 currentState.plannedOutfitsCount
             }
         )
+
+        MockClosifyData.deleteOutfitPost(postId)
     }
 
     fun onToggleFriend(friendId: String) {

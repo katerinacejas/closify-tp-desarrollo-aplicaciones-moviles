@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     }
 
     data object ClassifyGarment : Screen("classify_garment")
+    data object SaveFavorites : Screen("save_favorites")
 
     data object Wardrobe : Screen("wardrobe")
     data object Friends : Screen("friends")

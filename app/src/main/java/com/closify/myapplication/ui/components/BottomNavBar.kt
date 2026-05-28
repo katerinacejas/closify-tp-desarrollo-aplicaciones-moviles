@@ -43,7 +43,7 @@ fun BottomNavBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        shape = RoundedCornerShape(0.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 6.dp,
         shadowElevation = 8.dp
@@ -61,7 +61,7 @@ fun BottomNavBar(
                     onClick = { onItemSelected(item.screen) },
                     icon = {
                         Box(
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(40.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -69,7 +69,7 @@ fun BottomNavBar(
                                 contentDescription = item.contentDescription,
                                 tint = Color.Unspecified,
                                 modifier = Modifier
-                                    .size(if (isSelected) 34.dp else 30.dp)
+                                    .size(if (isSelected) 30.dp else 26.dp)
                                     .graphicsLayer {
                                         alpha = if (isSelected) 1f else 0.72f
                                     }
