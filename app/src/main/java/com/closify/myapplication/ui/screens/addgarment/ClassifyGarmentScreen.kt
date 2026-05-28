@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.camera
+package com.closify.myapplication.ui.screens.addgarment
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

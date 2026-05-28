@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.camera.components
+package com.closify.myapplication.ui.screens.addgarment.components
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio

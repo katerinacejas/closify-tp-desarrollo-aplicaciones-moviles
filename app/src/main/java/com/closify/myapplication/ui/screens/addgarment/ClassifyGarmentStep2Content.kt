@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.camera
+package com.closify.myapplication.ui.screens.addgarment
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.ui.components.SelectableChip
-import com.closify.myapplication.ui.screens.camera.components.ClassifyGarmentHeader
+import com.closify.myapplication.ui.screens.addgarment.components.ClassifyGarmentHeader
 import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentEvent
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentUiState

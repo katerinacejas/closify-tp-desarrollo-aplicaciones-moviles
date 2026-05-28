@@ -14,7 +14,7 @@ class GenerateOutfitsUseCase(
         weather: WeatherCondition,
         occasion: Occasion
     ): List<Outfit> {
-        val all = garmentRepository.getAll()
+        val all = garmentRepository.getAllByUserId()
 
         // Filtrá prendas compatibles con clima y ocasión
         // ANY actúa como "comodín" — es compatible con todo

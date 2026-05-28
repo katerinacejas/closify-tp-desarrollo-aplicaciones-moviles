@@ -1,10 +1,11 @@
 package com.closify.myapplication.data.repository
 
 import com.closify.myapplication.domain.model.Garment
+import com.closify.myapplication.domain.model.GarmentCategory
+import com.closify.myapplication.domain.model.Occasion
+import com.closify.myapplication.domain.model.WeatherCondition
 
-class GarmentRepository(
-    private val wardrobeRepository: WardrobeRepository = WardrobeRepository.instance
-) {
+class GarmentRepository {
 
     companion object {
         val instance = GarmentRepository()
@@ -14,5 +15,6 @@ class GarmentRepository(
         MockClosifyData.garments.add(garment)
     }
 
-    fun getAll(): List<Garment> = wardrobeRepository.getAllGarments()
+    fun getAllByUserId(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
+        MockClosifyData.garments.filter { it.ownerUserId == userId }
 }

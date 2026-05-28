@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.camera
+package com.closify.myapplication.ui.screens.addgarment
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -17,7 +17,7 @@ import com.closify.myapplication.ui.viewmodel.CameraMode
 import com.closify.myapplication.ui.viewmodel.CameraViewModel
 
 @Composable
-fun CameraScreen(
+fun AddGarmentScreen(
     onNavigateToClassify: () -> Unit,
     viewModel: CameraViewModel = viewModel()
 ) {
@@ -35,7 +35,7 @@ fun CameraScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        CameraContent(
+        AddGarmentContent(
             selectedMode = uiState.selectedMode,
             onEvent = viewModel::onEvent,
             onCardClick = {
