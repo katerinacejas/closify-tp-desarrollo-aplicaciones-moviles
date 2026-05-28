@@ -32,6 +32,7 @@ import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.planner.PlannerScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
 import com.closify.myapplication.ui.screens.publicprofile.PublicProfileScreen
+import com.closify.myapplication.ui.screens.savefavorites.SaveFavoritesScreen
 import com.closify.myapplication.ui.screens.settings.SettingsScreen
 import com.closify.myapplication.ui.screens.wardrobe.GarmentDetailScreen
 import com.closify.myapplication.ui.screens.wardrobe.WardrobeDetailScreen
@@ -89,7 +90,21 @@ fun AppNavGraph(
 
             composable(Screen.OutfitResult.route) {
                 OutfitResultScreen(
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onNavigateToSaveFavorites = {
+                        navController.navigate(Screen.SaveFavorites.route)
+                    }
+                )
+            }
+
+            composable(Screen.SaveFavorites.route) {
+                SaveFavoritesScreen(
+                    onBack = { navController.popBackStack() },
+                    onSaved = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = false }
+                        }
+                    }
                 )
             }
 

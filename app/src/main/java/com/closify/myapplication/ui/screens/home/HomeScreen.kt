@@ -60,6 +60,7 @@ fun HomeScreen(
             isAutoWeather = uiState.isAutoWeather,
             isLoadingWeather = uiState.isLoadingWeather,
             isGenerateEnabled = uiState.isGenerateEnabled,
+            dialog = uiState.dialog,
             onEvent = onEvent,
             modifier = Modifier.padding(innerPadding)
         )

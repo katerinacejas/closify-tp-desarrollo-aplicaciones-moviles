@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyButton
+import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
+import com.closify.myapplication.ui.viewmodel.HomeDialog
 import com.closify.myapplication.ui.screens.home.components.OccasionSection
 import com.closify.myapplication.ui.screens.home.components.WeatherSection
 import com.closify.myapplication.ui.theme.ClosifyTheme
@@ -36,9 +38,25 @@ fun HomeContent(
     isAutoWeather: Boolean,
     isLoadingWeather: Boolean,
     isGenerateEnabled: Boolean,
+    dialog: HomeDialog? = null,
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    when (dialog) {
+        HomeDialog.NO_GARMENTS -> ClosifyConfirmationDialog(
+            title = "Tu guardarropa está vacío",
+            subtitle = "Agrega prendas en tu guardarropa\npara poder generar outfits",
+            buttonText = "Continuar",
+            onDismiss = { onEvent(HomeEvent.DismissDialog) }
+        )
+        HomeDialog.NO_COMBINATIONS -> ClosifyConfirmationDialog(
+            title = "Sin combinaciones posibles",
+            subtitle = "No encontramos prendas que combinen\ncon el clima y ocasión que elegiste",
+            buttonText = "Continuar",
+            onDismiss = { onEvent(HomeEvent.DismissDialog) }
+        )
+        null -> Unit
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -57,7 +75,7 @@ fun HomeContent(
                     )
                 ) {
                     append("BUEN DÍA")
-                    if (username.isNotEmpty()) append(", ${username.uppercase()}")
+                    if (username.isNotEmpty()) append(", ${username.removePrefix("@").uppercase()}")
                 }
             },
             style = MaterialTheme.typography.labelLarge,
