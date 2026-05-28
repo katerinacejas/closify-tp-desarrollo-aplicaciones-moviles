@@ -27,14 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.closify.myapplication.ui.screens.wardrobe.components.DeleteGarmentDialog
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,8 +62,6 @@ fun GarmentDetailScreen(
     viewModel: WardrobeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(garmentId) {
@@ -78,7 +72,6 @@ fun GarmentDetailScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             WardrobeHeader(
                 searchQuery = uiState.searchQuery,
@@ -102,10 +95,7 @@ fun GarmentDetailScreen(
                     onConfirmClick = {
                         showDeleteDialog = false
                         viewModel.onEvent(WardrobeEvent.DeleteGarment(garment.id))
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Prenda eliminada correctamente")
-                            onBack()
-                        }
+                        onBack()
                     }
                 )
             }

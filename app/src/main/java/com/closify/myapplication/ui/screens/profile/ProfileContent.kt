@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,6 @@ import com.closify.myapplication.ui.viewmodel.ProfileUiState
 @Composable
 fun ProfileContent(
     uiState: ProfileUiState,
-    onSettingsClick: () -> Unit,
     onLikeClick: (String) -> Unit,
     onUpdatePostTitle: (String, String) -> Unit,
     onDeletePost: (String) -> Unit,
@@ -39,6 +39,15 @@ fun ProfileContent(
     var selectedCommentsOutfitId by remember { mutableStateOf<String?>(null) }
     var selectedEditOutfitId by remember { mutableStateOf<String?>(null) }
     var selectedDeleteOutfitId by remember { mutableStateOf<String?>(null) }
+    var pendingDeleteId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(pendingDeleteId) {
+        if (pendingDeleteId != null) {
+            delay(200)
+            selectedDeleteOutfitId = pendingDeleteId
+            pendingDeleteId = null
+        }
+    }
     val selectedLikesOutfit = uiState.posts.firstOrNull { it.id == selectedLikesOutfitId }
     val selectedCommentsOutfit = uiState.posts.firstOrNull { it.id == selectedCommentsOutfitId }
     val selectedEditOutfit = uiState.posts.firstOrNull { it.id == selectedEditOutfitId }
@@ -47,7 +56,7 @@ fun ProfileContent(
     LaunchedEffect(targetPostId, uiState.posts) {
         val postIndex = uiState.posts.indexOfFirst { it.id == targetPostId }
         if (postIndex >= 0) {
-            listState.animateScrollToItem(index = 4 + postIndex)
+            listState.animateScrollToItem(index = 3 + postIndex)
         }
     }
 
@@ -93,8 +102,8 @@ fun ProfileContent(
                 selectedEditOutfitId = null
             },
             onDeleteClick = {
-                selectedDeleteOutfitId = selectedEditOutfit.id
                 selectedEditOutfitId = null
+                pendingDeleteId = selectedEditOutfit.id
             },
             onDismiss = { selectedEditOutfitId = null }
         )
@@ -116,10 +125,6 @@ fun ProfileContent(
         state = listState,
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        item {
-            ProfileTopBar(onSettingsClick = onSettingsClick)
-        }
-
         item {
             ProfileHeader(
                 name = uiState.name,
@@ -195,7 +200,6 @@ private fun ProfileContentPreview() {
                 friends = friends,
                 posts = posts
             ),
-            onSettingsClick = {},
             onLikeClick = {},
             onUpdatePostTitle = { _, _ -> },
             onDeletePost = {},

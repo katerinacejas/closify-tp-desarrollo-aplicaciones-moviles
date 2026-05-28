@@ -540,25 +540,47 @@ internal object MockClosifyData {
     fun findAuthUser(email: String, password: String): User? =
         authUsers.firstOrNull { it.user.email == email && it.password == password }?.user
 
-    fun isUsernameAvailable(username: String): Boolean =
-        authUsers.none { it.user.username.lowercase() == username.lowercase() } &&
-                users.none { it.username.lowercase() == username.lowercase() }
+    fun isCurrentPassword(userId: String, password: String): Boolean =
+        authUsers.any { it.user.id == userId && it.password == password }
+
+    fun updateAuthUserPassword(userId: String, newPassword: String): Boolean {
+        val index = authUsers.indexOfFirst { it.user.id == userId }
+        if (index == -1) return false
+
+        val currentAuthUser = authUsers[index]
+        authUsers[index] = currentAuthUser.copy(password = newPassword)
+        return true
+    }
+
+    fun isUsernameAvailable(username: String): Boolean {
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
+        return authUsers.none { it.user.username.lowercase() == normalizedUsername.lowercase() } &&
+                users.none { it.username.lowercase() == normalizedUsername.lowercase() }
+    }
 
     fun registerAuthUser(
         email: String,
         password: String,
-        username: String
+        username: String,
+        fullName: String,
+        birthDate: String,
+        bio: String
     ): User {
         val id = "auth_${authUsers.size + 1}"
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
         val user = User(
             id = id,
-            email = email,
+            email = email.trim(),
             profile = UserProfile(
                 id = id,
-                fullName = username,
-                username = username,
-                birthDate = "",
-                bio = "",
+                fullName = fullName,
+                username = normalizedUsername,
+                birthDate = birthDate,
+                bio = bio,
                 avatarImageResId = R.drawable.avatar_default,
                 bannerImageResId = R.drawable.banner_default
             )
@@ -567,6 +589,34 @@ internal object MockClosifyData {
         users.add(user)
         friendIdsByUser[user.id] = mutableSetOf()
         return user
+    }
+
+    fun updateUserProfile(
+        userId: String,
+        fullName: String,
+        username: String,
+        birthDate: String,
+        bio: String
+    ): User? {
+        val user = userById(userId) ?: return null
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
+        val updatedUser = user.copy(
+            profile = user.profile.copy(
+                fullName = fullName.trim(),
+                username = normalizedUsername,
+                birthDate = birthDate,
+                bio = bio.trim()
+            )
+        )
+
+        users.replaceAll { if (it.id == userId) updatedUser else it }
+        authUsers.replaceAll { authUser ->
+            if (authUser.user.id == userId) authUser.copy(user = updatedUser) else authUser
+        }
+
+        return updatedUser
     }
 
     fun summary(userId: String): UserSummary =

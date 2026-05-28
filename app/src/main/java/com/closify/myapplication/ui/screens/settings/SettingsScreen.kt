@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.closify.myapplication.ui.components.ClosifyLogo
+import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.theme.LilaPrimary
@@ -107,19 +107,9 @@ private fun SettingsMenu(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        ClosifyLogo(size = 48.dp)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                },
-                actions = { Spacer(modifier = Modifier.size(48.dp)) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+            ClosifyTopBar(
+                showBackButton = true,
+                onBackClick = onBack
             )
         }
     ) { innerPadding ->
