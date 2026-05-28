@@ -14,13 +14,8 @@ class SocialRepository {
     }
 
     fun getFriends(userId: String = MockClosifyData.CURRENT_USER_ID): List<UserSummary> =
-        if (userId == MockClosifyData.CURRENT_USER_ID) {
-            MockClosifyData.currentFriendIds().mapNotNull { MockClosifyData.userById(it)?.toSummary() }
-        } else {
-            MockClosifyData.friendships
-                .filter { it.userA.id == userId || it.userB.id == userId }
-                .map { if (it.userA.id == userId) it.userB else it.userA }
-        }
+        MockClosifyData.friendIds(userId)
+            .mapNotNull { MockClosifyData.userById(it)?.toSummary() }
 
     fun getAllUserSummaries(userId: String = MockClosifyData.CURRENT_USER_ID): List<UserSummary> =
         MockClosifyData.users
@@ -34,15 +29,11 @@ class SocialRepository {
         getFriends(userId).any { it.id == otherUserId }
 
     fun addFriend(userId: String = MockClosifyData.CURRENT_USER_ID, friendId: String) {
-        if (userId == MockClosifyData.CURRENT_USER_ID && friendId != userId) {
-            MockClosifyData.addCurrentUserFriend(friendId)
-        }
+        MockClosifyData.addFriend(userId, friendId)
     }
 
     fun removeFriend(userId: String = MockClosifyData.CURRENT_USER_ID, friendId: String) {
-        if (userId == MockClosifyData.CURRENT_USER_ID) {
-            MockClosifyData.removeCurrentUserFriend(friendId)
-        }
+        MockClosifyData.removeFriend(userId, friendId)
     }
 
     fun currentDateLabel(): String = MockClosifyData.CURRENT_DATE_LABEL

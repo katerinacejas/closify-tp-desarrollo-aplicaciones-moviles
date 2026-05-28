@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
+import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
@@ -31,7 +32,8 @@ data class ProfileUiState(
 
 class ProfileViewModel(
     private val profileRepository: ProfileRepository = ProfileRepository.instance,
-    private val socialRepository: SocialRepository = SocialRepository.instance
+    private val socialRepository: SocialRepository = SocialRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -42,10 +44,11 @@ class ProfileViewModel(
     }
 
     private fun loadProfile() {
-        val profile = profileRepository.getProfile()
-        val friends = profileRepository.getFriends()
-        val posts = profileRepository.getPosts()
-        val garments = profileRepository.getWardrobeGarments()
+        val userId = userRepository.getCurrentUserOrDefault().id
+        val profile = profileRepository.getProfile(userId)
+        val friends = profileRepository.getFriends(userId)
+        val posts = profileRepository.getPosts(userId)
+        val garments = profileRepository.getWardrobeGarments(userId)
 
         _uiState.value = ProfileUiState(
             userId = profile.id,
@@ -55,7 +58,7 @@ class ProfileViewModel(
             birthDate = profile.birthDate,
             friendsCount = friends.size,
             garmentsCount = garments.size,
-            wardrobeUsagePercentage = profileRepository.getWardrobeUsagePercentage(),
+            wardrobeUsagePercentage = profileRepository.getWardrobeUsagePercentage(userId),
             favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
             plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
             bannerImageResId = profile.bannerImageResId,

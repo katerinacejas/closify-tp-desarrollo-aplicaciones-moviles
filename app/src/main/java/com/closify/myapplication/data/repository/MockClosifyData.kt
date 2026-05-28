@@ -26,61 +26,73 @@ internal object MockClosifyData {
         val password: String
     )
 
-    const val CURRENT_USER_ID = "user_1"
+    const val MARIA_USER_ID = "user_1"
+    const val JUAN_USER_ID = "user_17"
+    const val CURRENT_USER_ID = MARIA_USER_ID
     const val CURRENT_DATE_LABEL = "27 de mayo de 2026"
     const val PUBLIC_PROFILE_BASE_GARMENTS_COUNT = 24
     const val DEFAULT_USER_BIRTH_DATE = "3 de septiembre de 1999"
     const val DEFAULT_USER_BIO = "Organizo mi guardarropa para no decir \"no tengo nada que ponerme\" todos los dias"
     val currentWeather = WeatherCondition.MILD
     private const val RESOURCE_PREFIX = "android.resource://com.closify.myapplication/drawable/"
-    private val currentUserFriendIds = mutableSetOf(
-        "user_2",
-        "user_3",
-        "user_4",
-        "user_5",
-        "user_6",
-        "user_9",
-        "user_10"
+    private val defaultFriendIdsByUser = mapOf(
+        MARIA_USER_ID to setOf(
+            "user_2",
+            "user_3",
+            "user_4",
+            "user_5",
+            "user_6",
+            "user_9",
+            "user_10",
+            JUAN_USER_ID
+        ),
+        JUAN_USER_ID to setOf(
+            MARIA_USER_ID,
+            "user_2",
+            "user_6",
+            "user_11"
+        )
     )
+    private val friendIdsByUser = buildFriendIdsByUser()
 
     val currentUser = User(
         id = CURRENT_USER_ID,
-        email = "kate@closify.com",
+        email = "maria@gmail.com",
         profile = UserProfile(
             id = CURRENT_USER_ID,
-            fullName = "Katerina Cejas",
-            username = "@kate_cejas_1999",
+            fullName = "Maria Cejas",
+            username = "@maria_cejas",
             birthDate = "3 de septiembre de 1999",
-            bio = "hola soy kate, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
+            bio = "hola soy maria, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
             avatarImageResId = R.drawable.avatar_default,
             bannerImageResId = R.drawable.banner_default
         ),
         createdAt = "1 de mayo de 2026"
     )
 
-    private val authUsers = mutableListOf(
-        MockAuthUser(currentUser, "Password1!"),
-        MockAuthUser(currentUser.copy(email = "maria@gmail.com"), "Maria123!"),
-        MockAuthUser(
-            user = User(
-                id = "auth_juan",
-                email = "juan@gmail.com",
-                profile = UserProfile(
-                    id = "auth_juan",
-                    fullName = "Juan",
-                    username = "juan",
-                    birthDate = "",
-                    bio = "",
-                    avatarImageResId = R.drawable.avatar_default,
-                    bannerImageResId = R.drawable.banner_default
-                )
-            ),
-            password = "Juan123!"
-        )
+    private val juanUser = User(
+        id = JUAN_USER_ID,
+        email = "juan@gmail.com",
+        profile = UserProfile(
+            id = JUAN_USER_ID,
+            fullName = "Juan Perez",
+            username = "@juan_perez",
+            birthDate = "18 de octubre de 1998",
+            bio = "Me gusta armar outfits simples para cursar, salir y no repetir siempre lo mismo.",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        ),
+        createdAt = "2 de mayo de 2026"
     )
 
-    val users = listOf(
+    private val authUsers = mutableListOf(
+        MockAuthUser(currentUser, "Maria123!"),
+        MockAuthUser(juanUser, "Juan123!")
+    )
+
+    val users = mutableListOf(
         currentUser,
+        juanUser,
         user(
             "user_2",
             "Ayelen Martinez",
@@ -106,18 +118,30 @@ internal object MockClosifyData {
 
     val friends: List<UserSummary>
         get() = users
-        .filter { it.id in currentUserFriendIds }
+        .filter { it.id in friendIds(CURRENT_USER_ID) }
         .map { it.toSummary() }
 
     val friendships: List<Friendship>
-        get() = friends.mapIndexed { index, friend ->
-            Friendship(
-                id = "friendship_${index + 1}",
-                userA = currentUser.toSummary(),
-                userB = friend,
-                createdAt = "10 de mayo de 2026"
-            )
-        }
+        get() = friendIdsByUser
+            .flatMap { (userId, friendIds) ->
+                friendIds.map { friendId -> setOf(userId, friendId) }
+            }
+            .distinct()
+            .mapIndexedNotNull { index, pair ->
+                val ids = pair.toList()
+                val userA = userById(ids[0])?.toSummary()
+                val userB = userById(ids[1])?.toSummary()
+                if (userA == null || userB == null) {
+                    null
+                } else {
+                    Friendship(
+                        id = "friendship_${index + 1}",
+                        userA = userA,
+                        userB = userB,
+                        createdAt = "10 de mayo de 2026"
+                    )
+                }
+            }
 
     val friendRequests = listOf(
         FriendRequest(
@@ -152,7 +176,12 @@ internal object MockClosifyData {
         garment("campera_jean", "Campera de jean", GarmentCategory.OUTERWEAR),
         garment("falda_elegante", "Falda elegante", GarmentCategory.BOTTOM),
         garment("zapatos_elegantes_1", "Zapatos elegantes", GarmentCategory.FOOTWEAR),
-        garment("vestido_negro", "Vestido negro", GarmentCategory.FULL_BODY)
+        garment("vestido_negro", "Vestido negro", GarmentCategory.FULL_BODY),
+        garment("juan_camisa_azul", "Camisa azul de Juan", GarmentCategory.TOP, ownerUserId = JUAN_USER_ID, imageName = "camisa_azul"),
+        garment("juan_pantalon_beige", "Pantalon beige de Juan", GarmentCategory.BOTTOM, ownerUserId = JUAN_USER_ID, imageName = "pantalon_beige"),
+        garment("juan_zapatillas", "Zapatillas blancas de Juan", GarmentCategory.FOOTWEAR, ownerUserId = JUAN_USER_ID, imageName = "zapatillas_blancas"),
+        garment("juan_buzo_gris", "Buzo gris de Juan", GarmentCategory.TOP, ownerUserId = JUAN_USER_ID, imageName = "buzo_gris"),
+        garment("juan_jean", "Jean de Juan", GarmentCategory.BOTTOM, ownerUserId = JUAN_USER_ID, imageName = "jean_1")
     )
 
     val outfits = listOf(
@@ -171,7 +200,9 @@ internal object MockClosifyData {
         outfit("outfit_13", "Cena de fin de ano", "23 de mayo de 2026", "blusa_elegante_1", "falda_elegante", "zapatos_elegantes_1"),
         outfit("outfit_14", "Primer post de Ayelen", "28 de mayo de 2026", "blusa_1", "pantalon_elegante", "zapatos_elegantes_1"),
         outfit("outfit_15", "Look comodo de Ayito", "22 de mayo de 2026", "buzo_gris", "jean_1", "zapatillas_blancas"),
-        outfit("outfit_16", "Plan de Aylin", "17 de mayo de 2026", "camisa_azul", "pantalon_beige", "botas_negras")
+        outfit("outfit_16", "Plan de Aylin", "17 de mayo de 2026", "camisa_azul", "pantalon_beige", "botas_negras"),
+        ownedOutfit("outfit_17", "Presentacion en la facu", "27 de mayo de 2026", JUAN_USER_ID, "juan_camisa_azul", "juan_pantalon_beige", "juan_zapatillas"),
+        ownedOutfit("outfit_18", "Domingo relajado", "24 de mayo de 2026", JUAN_USER_ID, "juan_buzo_gris", "juan_jean", "juan_zapatillas")
     )
 
     val outfitPosts = listOf(
@@ -382,6 +413,34 @@ internal object MockClosifyData {
                 Like("like_24", summary("user_12"), "17 de mayo de 2026")
             ),
             comments = emptyList()
+        ),
+        OutfitPost(
+            id = "post_17",
+            author = summary(JUAN_USER_ID),
+            outfit = outfit("outfit_17"),
+            title = "Look para presentar el TP en la facu",
+            type = OutfitPostType.PLANNED,
+            createdAt = "27 de mayo de 2026",
+            plannedDate = "4 de junio de 2026",
+            likedBy = listOf(
+                Like("like_25", summary(MARIA_USER_ID), "27 de mayo de 2026"),
+                Like("like_26", summary("user_6"), "27 de mayo de 2026")
+            ),
+            comments = listOf(
+                Comment("comment_12", summary(MARIA_USER_ID), "Muy prolijo, re va para presentar!", "27 de mayo de 2026")
+            )
+        ),
+        OutfitPost(
+            id = "post_18",
+            author = summary(JUAN_USER_ID),
+            outfit = outfit("outfit_18"),
+            title = "Domingo comodo pero presentable",
+            type = OutfitPostType.FAVORITE,
+            createdAt = "24 de mayo de 2026",
+            likedBy = listOf(
+                Like("like_27", summary("user_2"), "24 de mayo de 2026")
+            ),
+            comments = emptyList()
         )
     )
 
@@ -471,6 +530,8 @@ internal object MockClosifyData {
             )
         )
         authUsers.add(MockAuthUser(user = user, password = password))
+        users.add(user)
+        friendIdsByUser[user.id] = mutableSetOf()
         return user
     }
 
@@ -480,23 +541,45 @@ internal object MockClosifyData {
     fun outfit(outfitId: String): Outfit =
         requireNotNull(outfits.firstOrNull { it.id == outfitId }) { "Unknown mock outfit id: $outfitId" }
 
-    fun currentFriendIds(): Set<String> = currentUserFriendIds.toSet()
+    fun friendIds(userId: String): Set<String> =
+        friendIdsByUser[userId].orEmpty().toSet()
+
+    fun currentFriendIds(): Set<String> = friendIds(CURRENT_USER_ID)
+
+    fun addFriend(userId: String, friendId: String) {
+        if (userId == friendId || users.none { it.id == userId } || users.none { it.id == friendId }) return
+
+        friendIdsByUser.getOrPut(userId) { mutableSetOf() }.add(friendId)
+        friendIdsByUser.getOrPut(friendId) { mutableSetOf() }.add(userId)
+    }
 
     fun addCurrentUserFriend(friendId: String) {
-        if (friendId != CURRENT_USER_ID && users.any { it.id == friendId }) {
-            currentUserFriendIds.add(friendId)
-        }
+        addFriend(CURRENT_USER_ID, friendId)
+    }
+
+    fun removeFriend(userId: String, friendId: String) {
+        friendIdsByUser[userId]?.remove(friendId)
+        friendIdsByUser[friendId]?.remove(userId)
     }
 
     fun removeCurrentUserFriend(friendId: String) {
-        currentUserFriendIds.remove(friendId)
+        removeFriend(CURRENT_USER_ID, friendId)
     }
 
     fun resetCurrentUserFriends() {
-        currentUserFriendIds.clear()
-        currentUserFriendIds.addAll(
-            listOf("user_2", "user_3", "user_4", "user_5", "user_6", "user_9", "user_10")
-        )
+        friendIdsByUser.clear()
+        friendIdsByUser.putAll(buildFriendIdsByUser())
+    }
+
+    private fun buildFriendIdsByUser(): MutableMap<String, MutableSet<String>> {
+        val friendships = mutableMapOf<String, MutableSet<String>>()
+        defaultFriendIdsByUser.forEach { (userId, friendIds) ->
+            friendIds.forEach { friendId ->
+                friendships.getOrPut(userId) { mutableSetOf() }.add(friendId)
+                friendships.getOrPut(friendId) { mutableSetOf() }.add(userId)
+            }
+        }
+        return friendships
     }
 
     private fun user(
@@ -524,12 +607,14 @@ internal object MockClosifyData {
         id: String,
         name: String,
         category: GarmentCategory,
+        ownerUserId: String = CURRENT_USER_ID,
+        imageName: String = id
     ): Garment = Garment(
         id = id,
-        ownerUserId = CURRENT_USER_ID,
+        ownerUserId = ownerUserId,
         name = name,
         category = category,
-        imageUrl = "$RESOURCE_PREFIX$id",
+        imageUrl = "$RESOURCE_PREFIX$imageName",
         suitableWeather = setOf(WeatherCondition.ANY),
         suitableOccasions = setOf(Occasion.ANY),
         createdAt = "1 de mayo de 2026"
@@ -540,12 +625,20 @@ internal object MockClosifyData {
         name: String?,
         createdAt: String,
         vararg garmentIds: String
+    ): Outfit = ownedOutfit(id, name, createdAt, CURRENT_USER_ID, *garmentIds)
+
+    private fun ownedOutfit(
+        id: String,
+        name: String?,
+        createdAt: String,
+        ownerUserId: String,
+        vararg garmentIds: String
     ): Outfit {
         val garmentsById = garments.associateBy { it.id }
         return Outfit(
             id = id,
             garments = garmentIds.mapNotNull { garmentsById[it] },
-            ownerUserId = CURRENT_USER_ID,
+            ownerUserId = ownerUserId,
             name = name,
             createdAt = createdAt
         )

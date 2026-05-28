@@ -169,10 +169,10 @@ private fun ProfileContentPreview() {
         ProfileContent(
             uiState = ProfileUiState(
                 userId = profile.id,
-                name = "Katerina Cejas",
-                username = "@kate_cejas_1999",
-                bio = "hola soy kate, me gusta planificar outfits porque sino colapso a ultimo momento. me gusta el rosita",
-                birthDate = "3 de septiembre de 1999",
+                name = profile.name,
+                username = profile.username,
+                bio = profile.bio,
+                birthDate = profile.birthDate,
                 friendsCount = friends.size,
                 garmentsCount = garments.size,
                 wardrobeUsagePercentage = repository.getWardrobeUsagePercentage(),
