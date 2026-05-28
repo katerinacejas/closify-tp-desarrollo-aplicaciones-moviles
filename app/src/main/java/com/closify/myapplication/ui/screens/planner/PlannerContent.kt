@@ -77,6 +77,7 @@ import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.theme.LavandaAccent
@@ -128,7 +129,11 @@ fun PlannerContent(
     }
 
     if (uiState.showSavedDialog) {
-        SavedPlanningDialog(onContinueClick = onSavedDialogContinue)
+        ClosifyConfirmationDialog(
+            title = "¡Outfit guardado!",
+            subtitle = "Podés verlo en tu calendario y en tus\npost de outfits planificados",
+            onDismiss = onSavedDialogContinue
+        )
     }
 
     when (uiState.step) {
@@ -684,70 +689,6 @@ private fun EditPlannedGarmentsDialog(
                         text = "Guardar",
                         style = MaterialTheme.typography.labelLarge
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SavedPlanningDialog(
-    onContinueClick: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = onContinueClick,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 22.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Card(
-                modifier = Modifier.width(342.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "¡Outfit guardado!",
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "Podes verlo en tu calendario y en tus\npost de outfits planificados",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(26.dp))
-
-                    Button(
-                        onClick = onContinueClick,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryDark,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        modifier = Modifier
-                            .width(196.dp)
-                            .height(40.dp)
-                    ) {
-                        Text(
-                            text = "Continuar",
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
                 }
             }
         }
