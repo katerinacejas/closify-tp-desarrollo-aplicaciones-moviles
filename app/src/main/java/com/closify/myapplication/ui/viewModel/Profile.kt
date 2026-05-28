@@ -40,10 +40,10 @@ class ProfileViewModel(
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
-        loadProfile()
+        refreshProfile()
     }
 
-    private fun loadProfile() {
+    fun refreshProfile() {
         val userId = userRepository.getCurrentUserOrDefault().id
         val profile = profileRepository.getProfile(userId)
         val friends = profileRepository.getFriends(userId)

@@ -578,6 +578,34 @@ internal object MockClosifyData {
         return user
     }
 
+    fun updateUserProfile(
+        userId: String,
+        fullName: String,
+        username: String,
+        birthDate: String,
+        bio: String
+    ): User? {
+        val user = userById(userId) ?: return null
+        val normalizedUsername = username.trim().let { value ->
+            if (value.startsWith("@")) value else "@$value"
+        }
+        val updatedUser = user.copy(
+            profile = user.profile.copy(
+                fullName = fullName.trim(),
+                username = normalizedUsername,
+                birthDate = birthDate,
+                bio = bio.trim()
+            )
+        )
+
+        users.replaceAll { if (it.id == userId) updatedUser else it }
+        authUsers.replaceAll { authUser ->
+            if (authUser.user.id == userId) authUser.copy(user = updatedUser) else authUser
+        }
+
+        return updatedUser
+    }
+
     fun summary(userId: String): UserSummary =
         requireNotNull(userById(userId)) { "Unknown mock user id: $userId" }.toSummary()
 

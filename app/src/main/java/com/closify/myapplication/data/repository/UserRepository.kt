@@ -62,4 +62,22 @@ class UserRepository {
         delay(300)
         return MockClosifyData.isUsernameAvailable(username)
     }
+
+    fun updateCurrentUserProfile(
+        fullName: String,
+        username: String,
+        birthDate: String,
+        bio: String
+    ): Result<Unit> {
+        val updatedUser = MockClosifyData.updateUserProfile(
+            userId = currentUserId,
+            fullName = fullName,
+            username = username,
+            birthDate = birthDate,
+            bio = bio
+        ) ?: return Result.failure(Exception("No se pudo actualizar el perfil."))
+
+        currentUsername = updatedUser.username
+        return Result.success(Unit)
+    }
 }
