@@ -28,8 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.Garment
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
 
 @Composable
@@ -43,7 +41,7 @@ internal fun PlannedGarmentsCard(
             .fillMaxWidth()
             .height(154.dp)
             .clip(RoundedCornerShape(24.dp))
-            .then(Modifier.border(1.dp, RosaSecondary, RoundedCornerShape(24.dp)))
+            .then(Modifier.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp)))
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
         Row(
@@ -107,7 +105,7 @@ internal fun PlannerTitleField(
             unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            cursorColor = PrimaryDark
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         modifier = modifier.fillMaxWidth().height(116.dp)
     )

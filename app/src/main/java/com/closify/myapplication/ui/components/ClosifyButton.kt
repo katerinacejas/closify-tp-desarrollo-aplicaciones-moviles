@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.ui.theme.ClosifyTheme
@@ -33,7 +32,7 @@ fun ClosifyButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 strokeWidth = 2.dp,
                 modifier = Modifier.size(20.dp)
             )
@@ -41,7 +40,7 @@ fun ClosifyButton(
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

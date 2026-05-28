@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.WeatherCondition
-import com.closify.myapplication.ui.theme.LavandaAccent
 import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
 
 @Composable
@@ -58,7 +57,7 @@ internal fun WeatherIcon(
                 WeatherCondition.HOT   -> { icon = Icons.Rounded.WbSunny;  tint = Color(0xFFFFD600) }
                 WeatherCondition.COLD  -> { icon = Icons.Rounded.WaterDrop; tint = Color(0xFF1E88E5) }
                 WeatherCondition.WINDY -> { icon = Icons.Rounded.Cloud;     tint = Color(0xFF1E88E5) }
-                else                   -> { icon = Icons.Rounded.Cloud;     tint = LavandaAccent    }
+                else                   -> { icon = Icons.Rounded.Cloud;     tint = MaterialTheme.colorScheme.outlineVariant }
             }
             Icon(
                 imageVector = icon,

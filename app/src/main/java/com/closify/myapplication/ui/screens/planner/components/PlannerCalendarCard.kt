@@ -37,8 +37,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.WeatherCondition
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
 import java.time.LocalDate
 import java.time.YearMonth
@@ -91,11 +89,11 @@ internal fun PlannerDateField(
         textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = RosaSecondary,
-            unfocusedBorderColor = RosaSecondary,
+            focusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
             focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            cursorColor = PrimaryDark,
+            cursorColor = MaterialTheme.colorScheme.primary,
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface
         ),
@@ -152,8 +150,8 @@ internal fun PlannerCalendarCard(
                     onClick = onCancelSelection,
                     shape = RoundedCornerShape(18.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = RosaSecondary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     contentPadding = PaddingValues(horizontal = 18.dp),
                     modifier = Modifier.height(40.dp)
@@ -165,7 +163,7 @@ internal fun PlannerCalendarCard(
                     onClick = onConfirmSelection,
                     shape = RoundedCornerShape(18.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryDark,
+                        containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     contentPadding = PaddingValues(horizontal = 18.dp),
@@ -220,8 +218,8 @@ private fun CalendarDayCell(
         Box(
             modifier = Modifier.size(38.dp).then(
                 when {
-                    isSelected       -> Modifier.clip(CircleShape).background(PrimaryDark)
-                    hasPlannedOutfit -> Modifier.border(2.dp, RosaSecondary, CircleShape)
+                    isSelected       -> Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primary)
+                    hasPlannedOutfit -> Modifier.border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
                     else             -> Modifier
                 }
             ),

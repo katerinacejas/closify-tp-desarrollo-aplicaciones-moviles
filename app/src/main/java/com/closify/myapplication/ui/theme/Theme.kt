@@ -29,6 +29,8 @@ private val LightColorScheme = lightColorScheme(
     onSurface           = TextPrimary,          // #2E2438
     surfaceVariant      = SurfaceVariantColor,  // #F4ECFF — cards suaves / secciones
     onSurfaceVariant    = TextSecondary,        // #7B6B8F
+    outline             = RosaSecondary,
+    outlineVariant      = LavandaAccent,
 
     error               = ErrorColor,           // #E57373
     onError             = SurfaceColor,         // #FFFFFF
@@ -37,28 +39,30 @@ private val LightColorScheme = lightColorScheme(
 // ── Esquema de colores oscuro ─────────────────────────────────────────────────
 
 private val DarkColorScheme = darkColorScheme(
-    primary             = LilaPrimary,          // #B9A7F7 — botones principales dark
-    onPrimary           = DarkBackgroundColor,  // #17111F
-    primaryContainer    = PrimaryDark,          // #7C3AED
-    onPrimaryContainer  = DarkTextColor,        // #F8F1FF
+    primary             = DarkPrimaryStrong,
+    onPrimary           = DarkTextPrimary,
+    primaryContainer    = DarkPrimary,
+    onPrimaryContainer  = DarkBackgroundColor,
 
-    secondary           = RosaSecondary,        // #F8BBD0
-    onSecondary         = DarkBackgroundColor,  // #17111F
-    secondaryContainer  = RosaSecondary,
+    secondary           = DarkSecondary,
+    onSecondary         = DarkBackgroundColor,
+    secondaryContainer  = DarkSecondary,
     onSecondaryContainer = DarkBackgroundColor,
 
-    tertiary            = LavandaAccent,        // #D8B4FE
-    onTertiary          = DarkBackgroundColor,  // #17111F
+    tertiary            = DarkAccent,
+    onTertiary          = DarkBackgroundColor,
 
-    background          = DarkBackgroundColor,  // #17111F — fondo dark
-    onBackground        = DarkTextColor,        // #F8F1F
-    surface             = DarkSurfaceColor,     // #241A2E — cards dark
-    onSurface           = DarkTextColor,        // #F8F1FF
-    surfaceVariant      = DarkSurfaceColor,     // #241A2E
-    onSurfaceVariant    = DarkTextColor,        // #F8F1FF
+    background          = DarkBackgroundColor,
+    onBackground        = DarkTextPrimary,
+    surface             = DarkSurfaceColor,
+    onSurface           = DarkTextPrimary,
+    surfaceVariant      = DarkSurfaceVariantColor,
+    onSurfaceVariant    = DarkTextSecondary,
+    outline             = DarkOutlineColor,
+    outlineVariant      = DarkAccent,
 
-    error               = ErrorColor,           // #E57373
-    onError             = SurfaceColor,         // #FFFFFF
+    error               = DarkErrorColor,
+    onError             = DarkBackgroundColor,
 )
 
 // ── Tema principal de la app ──────────────────────────────────────────────────

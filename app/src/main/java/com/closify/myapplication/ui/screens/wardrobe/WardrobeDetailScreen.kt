@@ -37,7 +37,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -124,40 +123,44 @@ fun WardrobeDetailContent(
 
 @Composable
 fun FilterTitle(category: GarmentCategory?, weather: WeatherCondition?, occasion: Occasion?) {
+    val primary = MaterialTheme.colorScheme.primary
+    val secondary = MaterialTheme.colorScheme.secondary
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+
     val (icon, color, label) = when {
         category != null -> {
             val (i, c, l) = when (category) {
-                GarmentCategory.TOP -> Triple(Icons.Default.ArrowUpward, Color(0xFFB9A7F7), "Superior")
-                GarmentCategory.BOTTOM -> Triple(Icons.Default.ArrowDownward, Color(0xFFB9A7F7), "Inferior")
-                GarmentCategory.FOOTWEAR -> Triple(Icons.Default.RadioButtonUnchecked, Color(0xFFF8BBD0), "Calzado")
-                GarmentCategory.OUTERWEAR -> Triple(Icons.Default.CheckBoxOutlineBlank, Color(0xFFF8BBD0), "Abrigo")
-                GarmentCategory.FULL_BODY -> Triple(Icons.Default.Person, Color(0xFF7C3AED), "FullBody")
+                GarmentCategory.TOP      -> Triple(Icons.Default.ArrowUpward,         primary,          "Superior")
+                GarmentCategory.BOTTOM   -> Triple(Icons.Default.ArrowDownward,        primary,          "Inferior")
+                GarmentCategory.FOOTWEAR -> Triple(Icons.Default.RadioButtonUnchecked, secondary,        "Calzado")
+                GarmentCategory.OUTERWEAR -> Triple(Icons.Default.CheckBoxOutlineBlank, secondary,       "Abrigo")
+                GarmentCategory.FULL_BODY -> Triple(Icons.Default.Person,              primary,          "FullBody")
             }
             Triple(i, c, "Estante: $l")
         }
         weather != null -> {
             val (i, c, l) = when (weather) {
-                WeatherCondition.HOT -> Triple(Icons.Default.WbSunny, Color(0xFFB9A7F7), "Calor")
-                WeatherCondition.COLD -> Triple(Icons.Default.AcUnit, Color(0xFFB9A7F7), "Frío")
-                WeatherCondition.WINDY -> Triple(Icons.Default.Air, Color(0xFFB9A7F7), "Ventoso")
-                WeatherCondition.MILD -> Triple(Icons.Default.WbCloudy, Color(0xFFB9A7F7), "Templado")
-                WeatherCondition.ANY -> Triple(Icons.Default.AllInclusive, Color(0xFF7C3AED), "Indistinto")
+                WeatherCondition.HOT   -> Triple(Icons.Default.WbSunny,      primary,          "Calor")
+                WeatherCondition.COLD  -> Triple(Icons.Default.AcUnit,        primary,          "Frío")
+                WeatherCondition.WINDY -> Triple(Icons.Default.Air,           primary,          "Ventoso")
+                WeatherCondition.MILD  -> Triple(Icons.Default.WbCloudy,      primary,          "Templado")
+                WeatherCondition.ANY   -> Triple(Icons.Default.AllInclusive,  primary,          "Indistinto")
             }
             Triple(i, c, "Estante: $l")
         }
         occasion != null -> {
             val (i, c, l) = when (occasion) {
-                Occasion.PARTY -> Triple(Icons.Default.NightsStay, Color(0xFFB9A7F7), "Fiesta")
-                Occasion.WORK -> Triple(Icons.Default.Work, Color(0xFFB9A7F7), "Trabajo")
-                Occasion.CASUAL -> Triple(Icons.Default.Explore, Color(0xFFB9A7F7), "Paseo")
-                Occasion.ACADEMIC -> Triple(Icons.Default.Bookmark, Color(0xFFB9A7F7), "Académico")
-                Occasion.CHILL -> Triple(Icons.Default.MusicNote, Color(0xFFB9A7F7), "Chill")
-                Occasion.ELEGANT -> Triple(Icons.Default.Sell, Color(0xFFB9A7F7), "Elegante")
-                Occasion.ANY -> Triple(Icons.Default.Hexagon, Color(0xFF7C3AED), "Indistinto")
+                Occasion.PARTY    -> Triple(Icons.Default.NightsStay, primary,   "Fiesta")
+                Occasion.WORK     -> Triple(Icons.Default.Work,        primary,   "Trabajo")
+                Occasion.CASUAL   -> Triple(Icons.Default.Explore,     primary,   "Paseo")
+                Occasion.ACADEMIC -> Triple(Icons.Default.Bookmark,    primary,   "Académico")
+                Occasion.CHILL    -> Triple(Icons.Default.MusicNote,   primary,   "Chill")
+                Occasion.ELEGANT  -> Triple(Icons.Default.Sell,        primary,   "Elegante")
+                Occasion.ANY      -> Triple(Icons.Default.Hexagon,     primary,   "Indistinto")
             }
             Triple(i, c, "Estante: $l")
         }
-        else -> Triple(Icons.Default.AllInclusive, Color.Gray, "Estante")
+        else -> Triple(Icons.Default.AllInclusive, onSurfaceVariant, "Estante")
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {

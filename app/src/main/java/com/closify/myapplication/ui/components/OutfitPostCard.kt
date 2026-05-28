@@ -39,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
-import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
 fun OutfitPostCard(
@@ -130,7 +129,7 @@ fun OutfitPostCard(
                             contentDescription = "Me gusta",
                             modifier = Modifier.size(22.dp),
                             tint = if (isLikedByCurrentUser) {
-                                RosaSecondary
+                                MaterialTheme.colorScheme.secondary
                             } else {
                                 MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
                             }
@@ -202,7 +201,7 @@ private fun OutfitPostAuthor(
             modifier = Modifier
                 .size(54.dp)
                 .clip(CircleShape)
-                .border(1.dp, RosaSecondary, CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                 .then(
                     if (onAuthorClick != null) {
                         Modifier.clickable { onAuthorClick(post.author.id) }

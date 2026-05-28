@@ -40,8 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.closify.myapplication.domain.model.UserSummary
-import com.closify.myapplication.ui.theme.LavandaAccent
-import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
 fun SocialDialogScaffold(
@@ -74,7 +72,7 @@ fun SocialDialogScaffold(
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 6.dp,
             tonalElevation = 2.dp,
-            border = androidx.compose.foundation.BorderStroke(1.dp, RosaSecondary)
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Column(
                 modifier = Modifier
@@ -129,7 +127,7 @@ fun SocialDialogEmptyContent(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(iconSize),
-            tint = LavandaAccent
+            tint = MaterialTheme.colorScheme.outlineVariant
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -166,7 +164,7 @@ fun SocialDialogUserRow(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .border(1.dp, RosaSecondary, CircleShape)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                     .then(if (onUserClick != null) Modifier.clickable(onClick = onUserClick) else Modifier),
                 contentScale = ContentScale.Crop
             )

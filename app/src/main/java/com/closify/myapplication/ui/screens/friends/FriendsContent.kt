@@ -53,8 +53,6 @@ import com.closify.myapplication.ui.components.SocialCommentsDialog
 import com.closify.myapplication.ui.components.SocialLikesDialog
 import com.closify.myapplication.ui.screens.friends.components.FriendsTopBar
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.FriendSearchResult
 import com.closify.myapplication.ui.viewmodel.FriendRelationshipStatus
 import com.closify.myapplication.ui.viewmodel.FriendsUiState
@@ -277,7 +275,7 @@ private fun SearchUserRow(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .border(1.dp, RosaSecondary, CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                 .clickable { onUserClick(user.id) },
             contentScale = ContentScale.Crop
         )
@@ -305,8 +303,9 @@ private fun SearchUserRow(
             enabled = !isPending,
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isFriend) RosaSecondary else PrimaryDark,
-                disabledContainerColor = PrimaryDark.copy(alpha = 0.35f),
+                containerColor = if (isFriend) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                contentColor = if (isFriend) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
                 disabledContentColor = MaterialTheme.colorScheme.onPrimary
             ),
             contentPadding = PaddingValues(horizontal = 14.dp),
@@ -317,7 +316,7 @@ private fun SearchUserRow(
             Text(
                 text = actionText,
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onPrimary
+                color = if (isFriend) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
             )
         }
     }

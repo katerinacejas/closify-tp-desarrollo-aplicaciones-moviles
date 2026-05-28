@@ -44,8 +44,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.ui.theme.PrimaryDark
-import com.closify.myapplication.ui.theme.RosaSecondary
 import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
 
 @Composable
@@ -108,7 +106,7 @@ internal fun EditPlannedGarmentsDialog(
                     onClick = { onSaveChanges(draftGarments) },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryDark,
+                        containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     modifier = Modifier.align(Alignment.CenterHorizontally).width(172.dp).height(40.dp)
@@ -185,7 +183,7 @@ internal fun PlannedOutfitDialog(
                     modifier = Modifier.fillMaxWidth().height(178.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(MaterialTheme.colorScheme.surface)
-                        .border(1.dp, RosaSecondary, RoundedCornerShape(24.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
                         .padding(horizontal = 18.dp, vertical = 14.dp)
                 ) {
                     Column {
@@ -217,7 +215,7 @@ internal fun PlannedOutfitDialog(
                 Button(
                     onClick = onDeleteClick,
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = MaterialTheme.colorScheme.onPrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                     contentPadding = PaddingValues(horizontal = 12.dp),
                     modifier = Modifier.width(190.dp).height(44.dp)
                 ) {
@@ -237,12 +235,12 @@ internal fun EditableGarmentBox(
     Box(
         modifier = modifier.height(152.dp).clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, RosaSecondary, RoundedCornerShape(18.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
             .padding(10.dp)
     ) {
         PlannerGarmentImage(garment = garment, alpha = 1f, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
         IconButton(onClick = onRemove, modifier = Modifier.align(Alignment.TopEnd).size(28.dp)) {
-            Icon(imageVector = Icons.Rounded.Close, contentDescription = "Quitar prenda", tint = PrimaryDark, modifier = Modifier.size(22.dp))
+            Icon(imageVector = Icons.Rounded.Close, contentDescription = "Quitar prenda", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
         }
     }
 }
