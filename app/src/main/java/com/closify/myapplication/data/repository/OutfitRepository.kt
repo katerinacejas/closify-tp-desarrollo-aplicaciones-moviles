@@ -4,6 +4,10 @@ import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.SuggestedOutfit
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.UUID
 
 class OutfitRepository {
 
@@ -14,15 +18,32 @@ class OutfitRepository {
     // Outfits generados por HomeViewModel — leídos por OutfitResultViewModel
     var currentOutfits: List<Outfit> = emptyList()
 
+    // Outfits seleccionados para guardar — leídos por SaveFavoritesViewModel
+    var pendingFavorites: List<Outfit> = emptyList()
+
     // Favoritos guardados en memoria
     // TODO: reemplazar por Firebase Firestore
     private val _favoriteOutfits = mutableListOf<Outfit>()
     val favoriteOutfits: List<Outfit> get() = _favoriteOutfits.toList()
 
     fun saveFavorites(outfits: List<Outfit>) {
+        val author = UserRepository.instance.getCurrentUserOrDefault().toSummary()
+        val createdAt = LocalDate.now().format(
+            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+        )
         outfits.forEach { outfit ->
             if (_favoriteOutfits.none { it.id == outfit.id }) {
                 _favoriteOutfits.add(outfit)
+                MockClosifyData.outfitPosts.add(
+                    OutfitPost(
+                        id = UUID.randomUUID().toString(),
+                        author = author,
+                        outfit = outfit,
+                        title = outfit.name,
+                        type = OutfitPostType.FAVORITE,
+                        createdAt = createdAt
+                    )
+                )
             }
         }
     }

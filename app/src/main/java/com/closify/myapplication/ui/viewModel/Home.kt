@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+enum class HomeDialog { NO_GARMENTS, NO_COMBINATIONS }
+
 data class HomeUiState(
     val username: String = "",
     val selectedWeather: WeatherCondition? = null,
@@ -25,7 +27,7 @@ data class HomeUiState(
     val isAutoWeather: Boolean = false,
     val isLoadingWeather: Boolean = false,
     val isGenerateEnabled: Boolean = false,
-    val showNoGarmentsDialog: Boolean = false
+    val dialog: HomeDialog? = null
 )
 
 sealed interface HomeEvent {
@@ -33,7 +35,7 @@ sealed interface HomeEvent {
     data class SelectOccasion(val occasion: Occasion) : HomeEvent
     data class ToggleAutoWeather(val isAuto: Boolean) : HomeEvent
     data object GenerateOutfits : HomeEvent
-    data object DismissNoGarmentsDialog : HomeEvent
+    data object DismissDialog : HomeEvent
 }
 
 sealed interface HomeNavigationEffect {
@@ -59,8 +61,8 @@ class HomeViewModel(
             is HomeEvent.SelectWeather      -> selectWeather(event.weather)
             is HomeEvent.SelectOccasion     -> selectOccasion(event.occasion)
             is HomeEvent.ToggleAutoWeather  -> toggleAutoWeather(event.isAuto)
-            is HomeEvent.GenerateOutfits         -> generateOutfits()
-            is HomeEvent.DismissNoGarmentsDialog -> _uiState.update { it.copy(showNoGarmentsDialog = false) }
+            is HomeEvent.GenerateOutfits -> generateOutfits()
+            is HomeEvent.DismissDialog   -> _uiState.update { it.copy(dialog = null) }
         }
     }
 
@@ -108,11 +110,16 @@ class HomeViewModel(
         val occasion = state.selectedOccasion ?: return
 
         if (garmentRepository.getAllByUserId().isEmpty()) {
-            _uiState.update { it.copy(showNoGarmentsDialog = true) }
+            _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
             return
         }
 
         val outfits = generateOutfitsUseCase(weather, occasion)
+
+        if (outfits.isEmpty()) {
+            _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
+            return
+        }
 
         // Guarda en Repository para que OutfitResultViewModel los lea
         OutfitRepository.instance.currentOutfits = outfits

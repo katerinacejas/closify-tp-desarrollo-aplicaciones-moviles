@@ -24,6 +24,7 @@ import com.closify.myapplication.ui.viewmodel.OutfitResultViewModel
 @Composable
 fun OutfitResultScreen(
     onBack: () -> Unit,
+    onNavigateToSaveFavorites: () -> Unit,
     viewModel: OutfitResultViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -51,10 +52,11 @@ fun OutfitResultScreen(
         OutfitResultContent(
             outfits = uiState.outfits,
             favoriteIds = uiState.favoriteIds,
-            showSavedDialog = uiState.showSavedDialog,
             onToggleFavorite = { viewModel.onEvent(OutfitResultEvent.ToggleFavorite(it)) },
-            onSaveFavorites = { viewModel.onEvent(OutfitResultEvent.SaveFavorites) },
-            onDismissDialog = { viewModel.onEvent(OutfitResultEvent.DismissDialog) },
+            onContinue = {
+                viewModel.onEvent(OutfitResultEvent.Continue)
+                onNavigateToSaveFavorites()
+            },
             modifier = Modifier.padding(innerPadding)
         )
     }

@@ -218,7 +218,7 @@ internal object MockClosifyData {
         ownedOutfit("outfit_18", "Domingo relajado", "24 de mayo de 2026", JUAN_USER_ID, "juan_buzo_gris", "juan_jean", "juan_zapatillas")
     )
 
-    val outfitPosts = listOf(
+    val outfitPosts = mutableListOf(
         OutfitPost(
             id = "post_1",
             author = currentUser.toSummary(),
