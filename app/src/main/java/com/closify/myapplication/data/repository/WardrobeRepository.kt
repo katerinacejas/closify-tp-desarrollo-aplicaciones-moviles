@@ -19,10 +19,25 @@ class WardrobeRepository {
         getAllGarments().filter { it.category == category }
 
     fun getGarmentsByOccasion(occasion: Occasion): List<Garment> =
-        getAllGarments().filter { occasion in it.suitableOccasions || Occasion.ANY in it.suitableOccasions }
+        getAllGarments().filter { 
+            if (occasion == Occasion.ANY) {
+                Occasion.ANY in it.suitableOccasions
+            } else {
+                occasion in it.suitableOccasions
+            }
+        }
 
     fun getGarmentsByWeather(weather: WeatherCondition): List<Garment> =
-        getAllGarments().filter { weather in it.suitableWeather || WeatherCondition.ANY in it.suitableWeather }
+        getAllGarments().filter { 
+            if (weather == WeatherCondition.ANY) {
+                WeatherCondition.ANY in it.suitableWeather
+            } else {
+                weather in it.suitableWeather
+            }
+        }
+
+    fun getGarmentsByName(query: String): List<Garment> =
+        getAllGarments().filter { it.name.contains(query, ignoreCase = true) }
 
     fun calculateWardrobeUsagePercentage(posts: List<OutfitPost>): Int {
         val totalGarments = getAllGarments().size

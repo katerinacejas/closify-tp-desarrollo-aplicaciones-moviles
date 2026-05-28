@@ -82,21 +82,21 @@ internal object MockClosifyData {
     )
 
     val garments = listOf(
-        garment("blusa_1", "Blusa rosa", GarmentCategory.TOP),
-        garment("jean_1", "Jean claro", GarmentCategory.BOTTOM),
-        garment("zapatillas_blancas", "Zapatillas blancas", GarmentCategory.FOOTWEAR),
-        garment("vestido_floral", "Vestido floral", GarmentCategory.FULL_BODY),
-        garment("botas_negras", "Botas negras", GarmentCategory.FOOTWEAR),
-        garment("camisa_azul", "Camisa azul", GarmentCategory.TOP),
-        garment("buzo_gris", "Buzo gris", GarmentCategory.TOP),
-        garment("pantalon_beige", "Pantalon beige", GarmentCategory.BOTTOM),
-        garment("pantalon_elegante", "Pantalon elegante", GarmentCategory.BOTTOM),
-        garment("blusa_elegante_1", "Blusa elegante", GarmentCategory.TOP),
-        garment("zapatillas_negras", "Zapatillas negras", GarmentCategory.FOOTWEAR),
-        garment("campera_jean", "Campera de jean", GarmentCategory.OUTERWEAR),
-        garment("falda_elegante", "Falda elegante", GarmentCategory.BOTTOM),
-        garment("zapatos_elegantes_1", "Zapatos elegantes", GarmentCategory.FOOTWEAR),
-        garment("vestido_negro", "Vestido negro", GarmentCategory.FULL_BODY)
+        garment("blusa_1", "Blusa rosa", GarmentCategory.TOP, setOf(WeatherCondition.HOT, WeatherCondition.MILD), setOf(Occasion.CASUAL, Occasion.CHILL, Occasion.PARTY)),
+        garment("jean_1", "Jean claro", GarmentCategory.BOTTOM, setOf(WeatherCondition.MILD, WeatherCondition.COLD, WeatherCondition.WINDY), setOf(Occasion.CASUAL, Occasion.ACADEMIC, Occasion.WORK)),
+        garment("zapatillas_blancas", "Zapatillas blancas", GarmentCategory.FOOTWEAR, setOf(WeatherCondition.HOT, WeatherCondition.MILD), setOf(Occasion.CASUAL, Occasion.ACADEMIC, Occasion.CHILL)),
+        garment("vestido_floral", "Vestido floral", GarmentCategory.FULL_BODY, setOf(WeatherCondition.HOT, WeatherCondition.MILD), setOf(Occasion.CASUAL, Occasion.PARTY)),
+        garment("botas_negras", "Botas negras", GarmentCategory.FOOTWEAR, setOf(WeatherCondition.COLD, WeatherCondition.WINDY, WeatherCondition.MILD), setOf(Occasion.WORK, Occasion.ELEGANT, Occasion.CASUAL)),
+        garment("camisa_azul", "Camisa azul", GarmentCategory.TOP, setOf(WeatherCondition.MILD), setOf(Occasion.WORK, Occasion.ACADEMIC, Occasion.ELEGANT)),
+        garment("buzo_gris", "Buzo gris", GarmentCategory.TOP, setOf(WeatherCondition.COLD, WeatherCondition.WINDY, WeatherCondition.MILD), setOf(Occasion.CASUAL, Occasion.CHILL, Occasion.ACADEMIC)),
+        garment("pantalon_beige", "Pantalon beige", GarmentCategory.BOTTOM, setOf(WeatherCondition.MILD), setOf(Occasion.WORK, Occasion.ACADEMIC, Occasion.CASUAL)),
+        garment("pantalon_elegante", "Pantalon elegante", GarmentCategory.BOTTOM, setOf(WeatherCondition.MILD, WeatherCondition.COLD), setOf(Occasion.WORK, Occasion.ELEGANT, Occasion.PARTY)),
+        garment("blusa_elegante_1", "Blusa elegante", GarmentCategory.TOP, setOf(WeatherCondition.MILD, WeatherCondition.COLD), setOf(Occasion.ELEGANT, Occasion.PARTY, Occasion.WORK)),
+        garment("zapatillas_negras", "Zapatillas negras", GarmentCategory.FOOTWEAR, setOf(WeatherCondition.MILD, WeatherCondition.COLD), setOf(Occasion.ACADEMIC, Occasion.WORK, Occasion.CHILL)),
+        garment("campera_jean", "Campera de jean", GarmentCategory.OUTERWEAR, setOf(WeatherCondition.MILD, WeatherCondition.WINDY), setOf(Occasion.CASUAL, Occasion.ACADEMIC, Occasion.CHILL)),
+        garment("falda_elegante", "Falda elegante", GarmentCategory.BOTTOM, setOf(WeatherCondition.HOT, WeatherCondition.MILD), setOf(Occasion.CASUAL, Occasion.PARTY, Occasion.ELEGANT)),
+        garment("zapatos_elegantes_1", "Zapatos elegantes", GarmentCategory.FOOTWEAR, setOf(WeatherCondition.HOT), setOf(Occasion.ELEGANT, Occasion.PARTY)),
+        garment("vestido_negro", "Vestido negro", GarmentCategory.FULL_BODY, setOf(WeatherCondition.HOT, WeatherCondition.ANY), setOf(Occasion.ELEGANT, Occasion.PARTY, Occasion.ANY))
     )
 
     val outfits = listOf(
@@ -248,14 +248,16 @@ internal object MockClosifyData {
         id: String,
         name: String,
         category: GarmentCategory,
+        weather: Set<WeatherCondition> = setOf(WeatherCondition.ANY),
+        occasions: Set<Occasion> = setOf(Occasion.ANY)
     ): Garment = Garment(
         id = id,
         ownerUserId = CURRENT_USER_ID,
         name = name,
         category = category,
         imageUrl = "$RESOURCE_PREFIX$id",
-        suitableWeather = setOf(WeatherCondition.ANY),
-        suitableOccasions = setOf(Occasion.ANY),
+        suitableWeather = weather,
+        suitableOccasions = occasions,
         createdAt = "1 de mayo de 2026"
     )
 
