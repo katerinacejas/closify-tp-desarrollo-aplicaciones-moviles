@@ -1,28 +1,9 @@
 package com.closify.myapplication.ui.screens.profile.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ChatBubbleOutline
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.domain.model.OutfitPostType
-import com.closify.myapplication.ui.theme.RosaSecondary
+import com.closify.myapplication.ui.components.OutfitPostCard
 
 @Composable
 fun ProfileOutfitCard(
@@ -35,130 +16,14 @@ fun ProfileOutfitCard(
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth()
-        ) {
-            if (!outfit.title.isNullOrBlank()) {
-                Text(
-                    text = outfit.title,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            Text(
-                text = outfit.dateLabel,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                outfit.outfit.garments.forEach { garment ->
-                    val context = LocalContext.current
-                    val resName = garment.imageUrl.substringAfterLast("/")
-                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) {
-                        Image(
-                            painter = painterResource(id = resId),
-                            contentDescription = garment.name,
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        // Placeholder if not found
-                        Box(modifier = Modifier.weight(1f).aspectRatio(1f).padding(4.dp))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onLikeClick, modifier = Modifier.size(28.dp)) {
-                        Icon(
-                            imageVector = if (isLikedByCurrentUser) {
-                                Icons.Rounded.Favorite
-                            } else {
-                                Icons.Rounded.FavoriteBorder
-                            },
-                            contentDescription = "Me gusta",
-                            modifier = Modifier.size(22.dp),
-                            tint = if (isLikedByCurrentUser) {
-                                RosaSecondary
-                            } else {
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
-                            }
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${outfit.likesCount} me gustas",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            onClick = onLikesTextClick
-                        )
-                    )
-                    
-                    Spacer(modifier = Modifier.width(16.dp))
-                    
-                    IconButton(onClick = onCommentsClick, modifier = Modifier.size(28.dp)) {
-                        Icon(
-                            imageVector = Icons.Rounded.ChatBubbleOutline,
-                            contentDescription = "Comentarios",
-                            modifier = Modifier.size(21.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${outfit.commentsCount} comentarios",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            onClick = onCommentsTextClick
-                        )
-                    )
-                }
-
-                IconButton(onClick = onEditClick, modifier = Modifier.size(28.dp)) {
-                    Icon(
-                        imageVector = Icons.Rounded.Edit,
-                        contentDescription = "Editar",
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        }
-    }
+    OutfitPostCard(
+        post = outfit,
+        isLikedByCurrentUser = isLikedByCurrentUser,
+        onLikeClick = onLikeClick,
+        onLikesTextClick = onLikesTextClick,
+        onCommentsClick = onCommentsClick,
+        onCommentsTextClick = onCommentsTextClick,
+        onEditClick = onEditClick,
+        modifier = modifier
+    )
 }
-
-private val OutfitPost.dateLabel: String
-    get() = when (type) {
-        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $createdAt"
-        OutfitPostType.PLANNED -> "Planificado para el dia: ${plannedDate ?: createdAt}"
-    }

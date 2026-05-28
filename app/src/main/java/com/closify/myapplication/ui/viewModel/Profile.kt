@@ -2,8 +2,8 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
-import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.ProfileRepository
+import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
@@ -23,14 +23,15 @@ data class ProfileUiState(
     val wardrobeUsagePercentage: Int = 0,
     val favoriteOutfitsCount: Int = 0,
     val plannedOutfitsCount: Int = 0,
-    @param:DrawableRes val bannerImageResId: Int? = R.drawable.banner_default,
-    @param:DrawableRes val profileImageResId: Int? = R.drawable.avatar_default,
+    @param:DrawableRes val bannerImageResId: Int? = null,
+    @param:DrawableRes val profileImageResId: Int? = null,
     val friends: List<UserSummary> = emptyList(),
     val posts: List<OutfitPost> = emptyList()
 )
 
 class ProfileViewModel(
-    private val profileRepository: ProfileRepository = ProfileRepository.instance
+    private val profileRepository: ProfileRepository = ProfileRepository.instance,
+    private val socialRepository: SocialRepository = SocialRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -66,6 +67,7 @@ class ProfileViewModel(
 
     fun onLikeClick(postId: String) {
         val currentState = _uiState.value
+        val profileImageResId = currentState.profileImageResId ?: return
 
         _uiState.value = currentState.copy(
             posts = currentState.posts.map { post ->
@@ -73,12 +75,12 @@ class ProfileViewModel(
                     val myLike = Like(
                         id = "me",
                         user = UserSummary(
-                            id = "user_1",
+                            id = currentState.userId,
                             fullName = currentState.name,
                             username = currentState.username,
-                            profileImageResId = currentState.profileImageResId ?: R.drawable.avatar_default
+                            profileImageResId = profileImageResId
                         ),
-                        createdAt = "25 de mayo de 2026"
+                        createdAt = socialRepository.currentDateLabel()
                     )
                     val nextLiked = post.likedBy.none { it.user.id == myLike.user.id }
                     post.copy(
@@ -125,6 +127,23 @@ class ProfileViewModel(
             } else {
                 currentState.plannedOutfitsCount
             }
+        )
+    }
+
+    fun onToggleFriend(friendId: String) {
+        val currentState = _uiState.value
+        val isFriend = currentState.friends.any { it.id == friendId }
+
+        if (isFriend) {
+            socialRepository.removeFriend(currentState.userId, friendId)
+        } else {
+            socialRepository.addFriend(currentState.userId, friendId)
+        }
+
+        val friends = profileRepository.getFriends(currentState.userId)
+        _uiState.value = currentState.copy(
+            friends = friends,
+            friendsCount = friends.size
         )
     }
 }

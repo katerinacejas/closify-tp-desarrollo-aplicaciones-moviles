@@ -16,9 +16,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.closify.myapplication.ui.components.BottomNavBar
+import com.closify.myapplication.ui.screens.friends.FriendsScreen
 import com.closify.myapplication.ui.screens.home.HomeScreen
 import com.closify.myapplication.ui.screens.outfitresult.OutfitResultScreen
 import com.closify.myapplication.ui.screens.profile.ProfileScreen
+import com.closify.myapplication.ui.screens.publicprofile.PublicProfileScreen
 
 @Composable
 fun AppNavGraph(
@@ -32,15 +34,20 @@ fun AppNavGraph(
             BottomNavBar(
                 currentRoute = currentRoute,
                 onItemSelected = { screen ->
-                    // Si estamos en OutfitResult primero volvemos atrás
-                    if (currentRoute == Screen.OutfitResult.route) {
-                        navController.popBackStack()
-                    }
-                    if (screen.route != Screen.Home.route || currentRoute != Screen.Home.route) {
+                    if (currentRoute == screen.route) {
                         navController.navigate(screen.route) {
-                            popUpTo(Screen.Home.route) { saveState = true }
+                            popUpTo(screen.route) { inclusive = true }
                             launchSingleTop = true
-                            restoreState = true
+                            restoreState = false
+                        }
+                    } else {
+                        if (currentRoute == Screen.OutfitResult.route) {
+                            navController.popBackStack()
+                        }
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Home.route) { saveState = false }
+                            launchSingleTop = true
+                            restoreState = false
                         }
                     }
                 }
@@ -66,15 +73,37 @@ fun AppNavGraph(
                 )
             }
 
-            // — Placeholders —
-            composable(Screen.Wardrobe.route)  { PlaceholderScreen("Guardarropa") }
-            composable(Screen.Friends.route)   { PlaceholderScreen("Amigos") }
-            composable(Screen.Camera.route)    { PlaceholderScreen("Cámara") }
-            composable(Screen.Calendar.route)  { PlaceholderScreen("Calendario") }
+            composable(Screen.Wardrobe.route) { PlaceholderScreen("Guardarropa") }
+            composable(Screen.Friends.route) {
+                FriendsScreen(
+                    onNotificationsClick = {
+                        /* TODO: Implementar pantalla de notificaciones */
+                    },
+                    onOpenUserProfile = { userId ->
+                        navController.navigate(Screen.FriendProfile.createRoute(userId))
+                    }
+                )
+            }
+            composable(Screen.FriendProfile.route) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString(Screen.FriendProfile.ARG_USER_ID).orEmpty()
+                PublicProfileScreen(
+                    userId = userId,
+                    onOpenUserProfile = { nextUserId ->
+                        navController.navigate(Screen.FriendProfile.createRoute(nextUserId)) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.Camera.route) { PlaceholderScreen("Camara") }
+            composable(Screen.Calendar.route) { PlaceholderScreen("Calendario") }
             composable(Screen.Profile.route) {
                 ProfileScreen(
                     onSettingsClick = {
-                        /* TODO: Implementar navegación a configuración */
+                        /* TODO: Implementar navegacion a configuracion */
+                    },
+                    onOpenUserProfile = { userId ->
+                        navController.navigate(Screen.FriendProfile.createRoute(userId))
                     }
                 )
             }
@@ -89,7 +118,7 @@ private fun PlaceholderScreen(name: String) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "$name — próximamente",
+            text = "$name proximamente",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

@@ -27,7 +27,5 @@ class ProfileRepository(
         wardrobeRepository.calculateWardrobeUsagePercentage(getPosts(userId))
 
     fun getPosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
-        MockClosifyData.outfitPosts
-            .filter { it.author.id == userId }
-            .sortedByDescending { it.createdAt }
+        socialRepository.getPostsByUser(userId)
 }

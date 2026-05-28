@@ -26,6 +26,8 @@ fun ProfileContent(
     onLikeClick: (String) -> Unit,
     onUpdatePostTitle: (String, String) -> Unit,
     onDeletePost: (String) -> Unit,
+    onOpenUserProfile: (String) -> Unit,
+    onToggleFriend: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showFriendsDialog by remember { mutableStateOf(false) }
@@ -41,6 +43,11 @@ fun ProfileContent(
     if (showFriendsDialog) {
         FriendsDialog(
             friends = uiState.friends,
+            onFriendClick = { userId ->
+                showFriendsDialog = false
+                onOpenUserProfile(userId)
+            },
+            onToggleFriend = onToggleFriend,
             onDismiss = { showFriendsDialog = false }
         )
     }
@@ -48,6 +55,10 @@ fun ProfileContent(
     if (selectedLikesOutfit != null) {
         LikesDialog(
             likes = selectedLikesOutfit.likedBy,
+            onUserClick = { userId ->
+                selectedLikesOutfitId = null
+                onOpenUserProfile(userId)
+            },
             onDismiss = { selectedLikesOutfitId = null }
         )
     }
@@ -55,6 +66,10 @@ fun ProfileContent(
     if (selectedCommentsOutfit != null) {
         CommentsDialog(
             comments = selectedCommentsOutfit.comments,
+            onUserClick = { userId ->
+                selectedCommentsOutfitId = null
+                onOpenUserProfile(userId)
+            },
             onDismiss = { selectedCommentsOutfitId = null }
         )
     }
@@ -171,7 +186,9 @@ private fun ProfileContentPreview() {
             onSettingsClick = {},
             onLikeClick = {},
             onUpdatePostTitle = { _, _ -> },
-            onDeletePost = {}
+            onDeletePost = {},
+            onOpenUserProfile = {},
+            onToggleFriend = {}
         )
     }
 }
