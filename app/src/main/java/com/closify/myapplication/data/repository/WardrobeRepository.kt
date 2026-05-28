@@ -13,7 +13,7 @@ class WardrobeRepository {
     }
 
     fun getAllGarments(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
-        GarmentRepository.instance.getAllForUser(userId)
+        MockClosifyData.garments.filter { it.ownerUserId == userId }
 
     fun getGarmentsByCategory(category: GarmentCategory): List<Garment> =
         getAllGarments().filter { it.category == category }

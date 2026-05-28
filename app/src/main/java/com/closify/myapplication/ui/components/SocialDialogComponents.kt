@@ -1,4 +1,4 @@
-package com.closify.myapplication.ui.screens.profile.components
+package com.closify.myapplication.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -43,7 +44,7 @@ import com.closify.myapplication.ui.theme.LavandaAccent
 import com.closify.myapplication.ui.theme.RosaSecondary
 
 @Composable
-internal fun ProfileDialogScaffold(
+fun SocialDialogScaffold(
     title: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -64,19 +65,11 @@ internal fun ProfileDialogScaffold(
                 .fillMaxWidth()
                 .wrapContentHeight()
         }
-        val contentModifier = if (heightFraction != null) {
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        } else {
-            Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        }
 
         Surface(
             modifier = surfaceModifier
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .imePadding(),
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 6.dp,
@@ -84,7 +77,9 @@ internal fun ProfileDialogScaffold(
             border = androidx.compose.foundation.BorderStroke(1.dp, RosaSecondary)
         ) {
             Column(
-                modifier = contentModifier
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (heightFraction != null) Modifier.fillMaxHeight() else Modifier.wrapContentHeight())
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -110,7 +105,6 @@ internal fun ProfileDialogScaffold(
                 }
 
                 Spacer(modifier = Modifier.height(contentTopSpacing))
-
                 content()
             }
         }
@@ -118,7 +112,7 @@ internal fun ProfileDialogScaffold(
 }
 
 @Composable
-internal fun ProfileDialogEmptyContent(
+fun SocialDialogEmptyContent(
     icon: ImageVector,
     message: String,
     modifier: Modifier = Modifier,
@@ -150,7 +144,7 @@ internal fun ProfileDialogEmptyContent(
 }
 
 @Composable
-internal fun ProfileDialogUserRow(
+fun SocialDialogUserRow(
     user: UserSummary,
     supportingText: String,
     modifier: Modifier = Modifier,

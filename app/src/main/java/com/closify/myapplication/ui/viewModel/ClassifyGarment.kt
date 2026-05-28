@@ -1,7 +1,7 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.closify.myapplication.data.repository.MockClosifyData
+import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -90,7 +90,7 @@ class ClassifyGarmentViewModel(
         val state = _uiState.value
         val garment = Garment(
             id = UUID.randomUUID().toString(),
-            ownerUserId = MockClosifyData.CURRENT_USER_ID,
+            ownerUserId = UserRepository.instance.currentUserId,
             name = state.name.trim(),
             category = state.selectedCategory!!,
             imageUrl = state.imageUri,

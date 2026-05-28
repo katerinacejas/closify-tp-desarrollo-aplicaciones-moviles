@@ -13,6 +13,6 @@ class WeatherRepository {
         // TODO: reemplazar por llamada a API de clima real
         // Ej: OpenWeatherMap, WeatherAPI
         delay(1500)
-        return WeatherCondition.MILD
+        return MockClosifyData.currentWeather
     }
 }
