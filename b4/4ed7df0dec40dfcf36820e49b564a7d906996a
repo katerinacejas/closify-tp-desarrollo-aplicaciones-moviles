@@ -1,0 +1,30 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/Profile.kt
+  s_f319fd003c2854::t_46f3355ba99bc6 5
+  s_f319fd003c2854::t_596696b95e3415 135-136
+  s_f319fd003c2854::t_27dd1d73677d7a 106,110,113-115
+app/src/main/java/com/closify/myapplication/ui/screens/profile/ProfileContent.kt
+  s_f319fd003c2854::t_5d2e4cd18b8617 106
+  s_f319fd003c2854::t_29ff155bd61ad1 42-50
+  s_f319fd003c2854::t_58f38683f20e0b 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b44ed7df0dec40dfcf36820e49b564a7d906996a",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
