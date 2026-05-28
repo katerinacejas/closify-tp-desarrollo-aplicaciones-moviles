@@ -1,0 +1,54 @@
+app/src/main/java/com/closify/myapplication/navigation/AppNavGraph.kt
+  s_f319fd003c2854::t_717c39beae2820 91-96
+app/src/main/java/com/closify/myapplication/ui/screens/camera/components/ClassifyGarmentHeader.kt
+  s_f319fd003c2854::t_8c6fa693e3745d 1-67
+app/src/main/java/com/closify/myapplication/ui/screens/outfitresult/OutfitResultContent.kt
+  s_f319fd003c2854::t_b11d48ee66a24d 22
+  s_f319fd003c2854::t_2d4cf0fa1e0c63 95-99
+app/src/main/java/com/closify/myapplication/ui/screens/camera/ClassifyGarmentScreen.kt
+  s_f319fd003c2854::t_14231a5024a4dd 67,74
+  s_f319fd003c2854::t_426530a47e388f 66,68-73,75-79
+  s_f319fd003c2854::t_69c7460b085d0d 17,24,31,80-82
+  s_f319fd003c2854::t_528b424ff54a05 83-86
+  s_f319fd003c2854::t_9c5a4eb0ece726 87
+  s_f319fd003c2854::t_79262fa7feada1 22
+  s_f319fd003c2854::t_f6e3ac7ca749f4 20
+  s_f319fd003c2854::t_cc1ba219c4f0e7 49-52
+app/src/main/java/com/closify/myapplication/ui/screens/home/components/SectionCard.kt
+  s_f319fd003c2854::t_75d29711047577 25,27
+app/src/main/java/com/closify/myapplication/ui/screens/camera/ClassifyGarmentStep2Content.kt
+  s_f319fd003c2854::t_bb6a10254c1199 46
+app/src/main/java/com/closify/myapplication/ui/screens/camera/ClassifyGarmentStep1Content.kt
+  s_f319fd003c2854::t_f6d2de0c6bd62e 54
+app/src/main/java/com/closify/myapplication/ui/components/ClosifyConfirmationDialog.kt
+  s_f319fd003c2854::t_7fdef107de8826 39
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  s_f319fd003c2854::t_19c16a5af61bef 12-13,21-22,31,42-47,54-56,58-59,62,68-69,79-81
+  s_f319fd003c2854::t_642c616ce99d50 32
+  s_f319fd003c2854::t_3343aef1f07ca8 48
+  s_f319fd003c2854::t_b8c53dd88abb78 66-67
+  s_f319fd003c2854::t_0c5ecc0a05cb90 19,29,57
+  s_f319fd003c2854::t_417b0ed22f1a6e 5
+  s_f319fd003c2854::t_f3bb4e1c73598d 70-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "5a620a30f1dee91a0c44d13c3418a2997b66ec85",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
