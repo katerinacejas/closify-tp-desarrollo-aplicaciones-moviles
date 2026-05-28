@@ -1,13 +1,20 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.data.repository.MockClosifyData
+import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.domain.usecase.SaveGarmentUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.UUID
 
 enum class ClassifyStep { BASIC, OCCASION, SAVED }
 
@@ -32,7 +39,10 @@ sealed interface ClassifyGarmentEvent {
     data object Back : ClassifyGarmentEvent
 }
 
-class ClassifyGarmentViewModel(imageUri: String) : ViewModel() {
+class ClassifyGarmentViewModel(
+    imageUri: String,
+    private val saveGarmentUseCase: SaveGarmentUseCase = SaveGarmentUseCase()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClassifyGarmentUiState(imageUri = imageUri))
     val uiState: StateFlow<ClassifyGarmentUiState> = _uiState.asStateFlow()
@@ -77,7 +87,20 @@ class ClassifyGarmentViewModel(imageUri: String) : ViewModel() {
     }
 
     private fun save() {
-        // TODO: llamar al repositorio para guardar la prenda
+        val state = _uiState.value
+        val garment = Garment(
+            id = UUID.randomUUID().toString(),
+            ownerUserId = MockClosifyData.CURRENT_USER_ID,
+            name = state.name.trim(),
+            category = state.selectedCategory!!,
+            imageUrl = state.imageUri,
+            suitableWeather = state.selectedWeathers.ifEmpty { setOf(WeatherCondition.ANY) },
+            suitableOccasions = state.selectedOccasions.ifEmpty { setOf(Occasion.ANY) },
+            createdAt = LocalDate.now().format(
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+            )
+        )
+        saveGarmentUseCase(garment)
         _uiState.update { it.copy(step = ClassifyStep.SAVED) }
     }
 }

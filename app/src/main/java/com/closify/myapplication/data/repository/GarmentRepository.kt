@@ -43,7 +43,16 @@ class GarmentRepository {
         val instance = GarmentRepository()
     }
 
-    fun getAll(): List<Garment> = WardrobeRepository.instance.getAllGarments()
+    private val sessionGarments = mutableListOf<Garment>()
+
+    fun addGarment(garment: Garment) {
+        sessionGarments.add(garment)
+    }
+
+    fun getAllForUser(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
+        garments + sessionGarments.filter { it.ownerUserId == userId }
+
+    fun getAll(): List<Garment> = getAllForUser()
 
     // ── Mock data ─────────────────────────────────────────────────────────────
     // TODO: reemplazar por Firebase Firestore

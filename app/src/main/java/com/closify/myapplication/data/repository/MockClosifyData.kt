@@ -39,6 +39,36 @@ internal object MockClosifyData {
         createdAt = "1 de mayo de 2026"
     )
 
+    val maria = User(
+        id = "auth_maria",
+        email = "maria@gmail.com",
+        profile = UserProfile(
+            id = "auth_maria",
+            fullName = "Maria",
+            username = "maria",
+            birthDate = "",
+            bio = "",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        )
+    )
+
+    val juan = User(
+        id = "auth_juan",
+        email = "juan@gmail.com",
+        profile = UserProfile(
+            id = "auth_juan",
+            fullName = "Juan",
+            username = "juan",
+            birthDate = "",
+            bio = "",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        )
+    )
+
+    val authUsers = listOf(currentUser, maria, juan)
+
     val users = listOf(
         currentUser,
         user("user_2", "Ayelen Martinez", "@aye_martinez"),

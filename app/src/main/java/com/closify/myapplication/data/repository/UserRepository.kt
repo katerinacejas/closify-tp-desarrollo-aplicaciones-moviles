@@ -18,38 +18,8 @@ class UserRepository {
 
     private val users = mutableListOf(
         UserRecord(MockClosifyData.currentUser, "Password1!"),
-        UserRecord(
-            user = User(
-                id = "auth_maria",
-                email = "maria@gmail.com",
-                profile = UserProfile(
-                    id = "auth_maria",
-                    fullName = "Maria",
-                    username = "maria",
-                    birthDate = "",
-                    bio = "",
-                    avatarImageResId = R.drawable.avatar_default,
-                    bannerImageResId = R.drawable.banner_default
-                )
-            ),
-            password = "Maria123!"
-        ),
-        UserRecord(
-            user = User(
-                id = "auth_juan",
-                email = "juan@gmail.com",
-                profile = UserProfile(
-                    id = "auth_juan",
-                    fullName = "Juan",
-                    username = "juan",
-                    birthDate = "",
-                    bio = "",
-                    avatarImageResId = R.drawable.avatar_default,
-                    bannerImageResId = R.drawable.banner_default
-                )
-            ),
-            password = "Juan123!"
-        )
+        UserRecord(MockClosifyData.maria, "Maria123!"),
+        UserRecord(MockClosifyData.juan, "Juan123!")
     )
 
     var currentUserId: String = ""
