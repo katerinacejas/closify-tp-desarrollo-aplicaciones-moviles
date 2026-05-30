@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.domain.model.WeatherCondition
-import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
+import com.closify.myapplication.domain.model.PlannerForecastDay
 
 @Composable
 internal fun WeatherInfoRow(

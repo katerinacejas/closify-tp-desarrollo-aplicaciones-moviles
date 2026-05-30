@@ -2,7 +2,6 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.GarmentRepository
-import com.closify.myapplication.data.repository.MockClosifyData
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -46,30 +45,14 @@ class WardrobeViewModel(
     }
 
     private fun loadGarments() {
-        val garments = garmentRepository.getAllByUserId()
-        
-        // Conteo por Categoría
-        val catCounts = garments.groupBy { it.category }
-            .mapValues { it.value.size }
-        
-        // Conteo por Clima
-        val weathCounts = mutableMapOf<WeatherCondition, Int>()
-        WeatherCondition.entries.forEach { condition ->
-            weathCounts[condition] = garmentRepository.getByWeather(condition).size
+        _uiState.update {
+            it.copy(
+                categoryCounts = garmentRepository.getCategoryCounts(),
+                weatherCounts = garmentRepository.getWeatherCounts(),
+                occasionCounts = garmentRepository.getOccasionCounts(),
+                allGarments = garmentRepository.getAllByUserId()
+            )
         }
-
-        // Conteo por Ocasión
-        val occCounts = mutableMapOf<Occasion, Int>()
-        Occasion.entries.forEach { occasion ->
-            occCounts[occasion] = garmentRepository.getByOccasion(occasion).size
-        }
-        
-        _uiState.update { it.copy(
-            categoryCounts = catCounts,
-            weatherCounts = weathCounts,
-            occasionCounts = occCounts,
-            allGarments = garments
-        ) }
 
         if (_uiState.value.selectedFilter == WardrobeFilter.ALL) {
             filterGarments()
@@ -79,15 +62,22 @@ class WardrobeViewModel(
     fun onEvent(event: WardrobeEvent) {
         when (event) {
             is WardrobeEvent.SearchQueryChanged -> {
-                _uiState.update { it.copy(searchQuery = event.query) }
+                _uiState.update {
+                    it.copy(
+                        searchQuery = event.query,
+                        selectedFilter = WardrobeFilter.ALL
+                    )
+                }
                 filterGarments()
             }
+
             is WardrobeEvent.FilterSelected -> {
                 _uiState.update { it.copy(selectedFilter = event.filter) }
                 if (event.filter == WardrobeFilter.ALL) {
                     filterGarments()
                 }
             }
+
             is WardrobeEvent.DeleteGarment -> {
                 deleteGarment(event.garmentId)
             }
@@ -95,32 +85,26 @@ class WardrobeViewModel(
     }
 
     fun loadGarmentsByCategory(category: GarmentCategory) {
-        val filtered = garmentRepository.getByCategory(category)
-        _uiState.update { it.copy(filteredGarments = filtered) }
+        _uiState.update { it.copy(filteredGarments = garmentRepository.getByCategory(category)) }
     }
 
     fun loadGarmentsByWeather(condition: WeatherCondition) {
-        val filtered = garmentRepository.getByWeather(condition)
-        _uiState.update { it.copy(filteredGarments = filtered) }
+        _uiState.update { it.copy(filteredGarments = garmentRepository.getByWeather(condition)) }
     }
 
     fun loadGarmentsByOccasion(occasion: Occasion) {
-        val filtered = garmentRepository.getByOccasion(occasion)
-        _uiState.update { it.copy(filteredGarments = filtered) }
+        _uiState.update { it.copy(filteredGarments = garmentRepository.getByOccasion(occasion)) }
     }
 
     fun getGarmentById(id: String) {
-        val garment = garmentRepository.getAllByUserId().find { it.id == id }
-        _uiState.update { it.copy(selectedGarment = garment) }
+        _uiState.update { it.copy(selectedGarment = garmentRepository.getById(id)) }
     }
 
     private fun deleteGarment(id: String) {
-        MockClosifyData.garments.removeIf { it.id == id }
-        
+        garmentRepository.deleteGarment(id)
         _uiState.update { state ->
-            val updatedFiltered = state.filteredGarments.filter { it.id != id }
             state.copy(
-                filteredGarments = updatedFiltered,
+                filteredGarments = state.filteredGarments.filterNot { it.id == id },
                 selectedGarment = null
             )
         }
@@ -128,13 +112,8 @@ class WardrobeViewModel(
     }
 
     private fun filterGarments() {
-        val query = _uiState.value.searchQuery
-        val allGarments = garmentRepository.getAllByUserId()
-        val filtered = if (query.isEmpty()) {
-            allGarments
-        } else {
-            allGarments.filter { it.name.contains(query, ignoreCase = true) }
+        _uiState.update {
+            it.copy(filteredGarments = garmentRepository.searchByName(it.searchQuery))
         }
-        _uiState.update { it.copy(filteredGarments = filtered) }
     }
 }

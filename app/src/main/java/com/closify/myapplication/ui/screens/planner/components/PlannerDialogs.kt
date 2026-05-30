@@ -44,7 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
+import com.closify.myapplication.domain.model.PlannerForecastDay
 
 @Composable
 internal fun EditPlannedGarmentsDialog(

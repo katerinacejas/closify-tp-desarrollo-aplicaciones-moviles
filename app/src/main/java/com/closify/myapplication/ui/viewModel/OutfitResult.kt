@@ -42,6 +42,6 @@ class OutfitResultViewModel(
 
     private fun storePendingFavorites() {
         val state = _uiState.value
-        outfitRepository.pendingFavorites = state.outfits.filter { it.id in state.favoriteIds }
+        outfitRepository.setPendingFavorites(state.outfits, state.favoriteIds)
     }
 }

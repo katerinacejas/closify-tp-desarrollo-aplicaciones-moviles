@@ -44,12 +44,14 @@ sealed interface HomeNavigationEffect {
 
 class HomeViewModel(
     private val generateOutfitsUseCase: GenerateOutfitsUseCase = GenerateOutfitsUseCase(),
+    private val outfitRepository: OutfitRepository = OutfitRepository.instance,
     private val weatherRepository: WeatherRepository = WeatherRepository.instance,
-    private val garmentRepository: GarmentRepository = GarmentRepository.instance
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        HomeUiState(username = UserRepository.instance.currentUsername)
+        HomeUiState(username = userRepository.currentUsername)
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -121,8 +123,7 @@ class HomeViewModel(
             return
         }
 
-        // Guarda en Repository para que OutfitResultViewModel los lea
-        OutfitRepository.instance.currentOutfits = outfits
+        outfitRepository.currentOutfits = outfits
 
         viewModelScope.launch {
             _navigationEffect.send(HomeNavigationEffect.NavigateToOutfitResult(outfits))

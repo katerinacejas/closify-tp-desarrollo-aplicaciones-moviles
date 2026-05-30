@@ -1,6 +1,8 @@
 package com.closify.myapplication.ui.viewmodel
 
 import com.closify.myapplication.data.repository.MockClosifyData
+import com.closify.myapplication.data.repository.NotificationRepository
+import com.closify.myapplication.domain.model.NotificationType
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -69,5 +71,32 @@ class FriendsViewModelTest {
         assertFalse(state.posts.any { it.author.id == userId })
 
         viewModel.onToggleFriend(userId)
+    }
+
+    @Test
+    fun sendingComment_persistsPostAndCreatesNotificationForAuthor() {
+        val viewModel = FriendsViewModel()
+        val postId = "post_18"
+        val commentText = "Me encanto este outfit"
+
+        viewModel.onCommentDraftChange(postId, commentText)
+        viewModel.onSendComment(postId)
+
+        val updatedPost = MockClosifyData.outfitPosts.first { it.id == postId }
+        assertTrue(
+            updatedPost.comments.any {
+                it.user.id == MockClosifyData.MARIA_USER_ID && it.text == commentText
+            }
+        )
+        assertFalse(viewModel.uiState.value.commentDrafts.containsKey(postId))
+
+        val juanNotifications = NotificationRepository.instance.getNotifications(MockClosifyData.JUAN_USER_ID)
+        assertTrue(
+            juanNotifications.any {
+                it.type == NotificationType.POST_COMMENT &&
+                        it.postId == postId &&
+                        it.sender.id == MockClosifyData.MARIA_USER_ID
+            }
+        )
     }
 }

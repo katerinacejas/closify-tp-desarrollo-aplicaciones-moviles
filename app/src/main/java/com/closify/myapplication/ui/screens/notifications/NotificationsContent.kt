@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.closify.myapplication.data.repository.NotificationRepository
+import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.domain.model.FriendRequestStatus
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.NotificationType
@@ -477,12 +478,13 @@ private fun FriendRequestActions(
 private fun NotificationsContentPreview() {
     ClosifyTheme {
         val repository = NotificationRepository.instance
+        val outfitPostRepository = OutfitPostRepository.instance
         NotificationsContent(
             uiState = NotificationsUiState(
                 notifications = repository.getNotifications().map {
                     NotificationUiItem(
                         notification = it,
-                        post = it.postId?.let(repository::getPost)
+                        post = it.postId?.let(outfitPostRepository::getPost)
                     )
                 }
             ),

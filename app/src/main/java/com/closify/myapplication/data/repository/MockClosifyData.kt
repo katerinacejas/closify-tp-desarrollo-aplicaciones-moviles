@@ -218,7 +218,9 @@ internal object MockClosifyData {
         ownedOutfit("outfit_18", "Domingo relajado", "24 de mayo de 2026", JUAN_USER_ID, "juan_buzo_gris", "juan_jean", "juan_zapatillas")
     )
 
-    private val mutableOutfitPosts = mutableListOf(
+    private val mutableOutfitPosts = defaultOutfitPosts().toMutableList()
+
+    private fun defaultOutfitPosts(): List<OutfitPost> = listOf(
         OutfitPost(
             id = "post_1",
             author = currentUser.toSummary(),
@@ -643,6 +645,28 @@ internal object MockClosifyData {
         mutableOutfitPosts.removeAll { it.id == postId }
     }
 
+    fun addNotification(
+        receiver: UserSummary,
+        sender: UserSummary,
+        type: NotificationType,
+        postId: String? = null,
+        commentId: String? = null,
+        friendRequestId: String? = null
+    ): Notification {
+        val notification = Notification(
+            id = "notification_${mutableNotifications.size + 1}",
+            receiver = receiver,
+            sender = sender,
+            type = type,
+            postId = postId,
+            commentId = commentId,
+            friendRequestId = friendRequestId,
+            createdAt = "ahora"
+        )
+        mutableNotifications.add(0, notification)
+        return notification
+    }
+
     fun friendIds(userId: String): Set<String> =
         friendIdsByUser[userId].orEmpty().toSet()
 
@@ -757,6 +781,8 @@ internal object MockClosifyData {
     fun resetCurrentUserFriends() {
         friendIdsByUser.clear()
         friendIdsByUser.putAll(buildFriendIdsByUser())
+        mutableOutfitPosts.clear()
+        mutableOutfitPosts.addAll(defaultOutfitPosts())
         mutableFriendRequests.clear()
         mutableFriendRequests.addAll(defaultFriendRequests())
         mutableNotifications.clear()
