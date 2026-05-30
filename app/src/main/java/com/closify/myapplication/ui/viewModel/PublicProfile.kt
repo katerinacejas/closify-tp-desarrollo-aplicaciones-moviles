@@ -1,11 +1,11 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.data.repository.OutfitPostRepository
+import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.domain.model.Comment
 import com.closify.myapplication.domain.model.FriendRequest
-import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.UserProfile
@@ -33,7 +33,9 @@ data class PublicProfileUiState(
 }
 
 class PublicProfileViewModel(
+    private val profileRepository: ProfileRepository = ProfileRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance,
+    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
@@ -52,11 +54,11 @@ class PublicProfileViewModel(
     fun refresh() {
         val userId = profileUserId ?: return
         val currentUser = userRepository.getCurrentUserOrDefault().toSummary()
-        val profile = socialRepository.getUserProfile(userId) ?: return
-        val posts = socialRepository.getPostsByUser(userId)
+        val profile = profileRepository.getUserProfile(userId) ?: return
+        val posts = outfitPostRepository.getPostsByUser(userId)
         val friends = socialRepository.getFriends(userId)
         val usedGarments = posts.flatMap { it.outfit.garments }.map { it.id }.toSet()
-        val garmentsCount = socialRepository.publicProfileBaseGarmentsCount() + usedGarments.size
+        val garmentsCount = profileRepository.publicProfileBaseGarmentsCount() + usedGarments.size
 
         _uiState.value = _uiState.value.copy(
             currentUser = currentUser,
@@ -100,31 +102,12 @@ class PublicProfileViewModel(
     }
 
     fun onLikeClick(postId: String) {
-        val currentState = _uiState.value
-        val currentUser = currentState.currentUser
+        val updatedPost = outfitPostRepository.toggleLike(
+            postId = postId,
+            user = _uiState.value.currentUser
+        ) ?: return
 
-        fun OutfitPost.toggleLike(): OutfitPost {
-            val alreadyLiked = likedBy.any { it.user.id == currentUser.id }
-            val myLike = Like(
-                id = "like_${currentUser.id}_$id",
-                user = currentUser,
-                createdAt = socialRepository.currentDateLabel()
-            )
-
-            return copy(
-                likedBy = if (alreadyLiked) {
-                    likedBy.filterNot { it.user.id == currentUser.id }
-                } else {
-                    listOf(myLike) + likedBy
-                }
-            )
-        }
-
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post ->
-                if (post.id == postId) post.toggleLike() else post
-            }
-        )
+        replacePost(updatedPost)
     }
 
     fun onSendComment(postId: String) {
@@ -132,24 +115,23 @@ class PublicProfileViewModel(
         if (text.isBlank()) return
 
         val currentState = _uiState.value
-        val currentUser = currentState.currentUser
+        val updatedPost = outfitPostRepository.addComment(
+            postId = postId,
+            user = currentState.currentUser,
+            text = text
+        ) ?: return
 
         _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post ->
-                if (post.id == postId) {
-                    post.copy(
-                        comments = post.comments + Comment(
-                            id = "comment_${currentUser.id}_${post.id}_${post.comments.size + 1}",
-                            user = currentUser,
-                            text = text,
-                            createdAt = socialRepository.currentDateLabel()
-                        )
-                    )
-                } else {
-                    post
-                }
-            },
+            posts = currentState.posts.map { post -> if (post.id == postId) updatedPost else post },
             commentDrafts = currentState.commentDrafts - postId
+        )
+    }
+
+    private fun replacePost(updatedPost: OutfitPost) {
+        _uiState.value = _uiState.value.copy(
+            posts = _uiState.value.posts.map { post ->
+                if (post.id == updatedPost.id) updatedPost else post
+            }
         )
     }
 }

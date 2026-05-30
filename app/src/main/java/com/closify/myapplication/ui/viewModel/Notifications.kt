@@ -2,6 +2,7 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.NotificationRepository
+import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.FriendRequest
@@ -23,6 +24,7 @@ data class NotificationsUiState(
 
 class NotificationsViewModel(
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
+    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
@@ -41,7 +43,7 @@ class NotificationsViewModel(
             notifications = notificationRepository.getNotifications(currentUserId).map { notification ->
                 NotificationUiItem(
                     notification = notification,
-                    post = notification.postId?.let(notificationRepository::getPost),
+                    post = notification.postId?.let(outfitPostRepository::getPost),
                     friendRequest = notification.friendRequestId?.let(socialRepository::getFriendRequest)
                 )
             }

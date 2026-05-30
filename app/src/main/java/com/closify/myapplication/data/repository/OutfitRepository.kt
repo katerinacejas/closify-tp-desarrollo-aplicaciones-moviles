@@ -9,7 +9,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
 
-class OutfitRepository {
+class OutfitRepository(
+    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance
+) {
 
     companion object {
         val instance = OutfitRepository()
@@ -34,7 +36,7 @@ class OutfitRepository {
         outfits.forEach { outfit ->
             if (_favoriteOutfits.none { it.id == outfit.id }) {
                 _favoriteOutfits.add(outfit)
-                MockClosifyData.addOutfitPost(
+                outfitPostRepository.addPost(
                     OutfitPost(
                         id = UUID.randomUUID().toString(),
                         author = author,
@@ -66,14 +68,10 @@ class OutfitRepository {
         MockClosifyData.suggestedOutfits
 
     fun getFavoritePosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
-        MockClosifyData.outfitPosts.filter {
-            it.author.id == userId && it.type == OutfitPostType.FAVORITE
-        }
+        outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
     fun getPlannedPosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
-        MockClosifyData.outfitPosts.filter {
-            it.author.id == userId && it.type == OutfitPostType.PLANNED
-        }
+        outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.PLANNED }
 
     fun savePlannedOutfitPost(
         userId: String,
@@ -92,7 +90,7 @@ class OutfitRepository {
             createdAt = createdAt,
             plannedDate = plannedDate
         )
-        return MockClosifyData.addOutfitPost(post)
+        return outfitPostRepository.addPost(post)
     }
 
     fun updatePlannedOutfitPost(
@@ -101,19 +99,19 @@ class OutfitRepository {
         outfit: Outfit,
         plannedDate: String
     ): OutfitPost? {
-        val currentPost = MockClosifyData.outfitPosts.firstOrNull { it.id == postId } ?: return null
+        val currentPost = outfitPostRepository.getPost(postId) ?: return null
         val updatedPost = currentPost.copy(
             outfit = outfit.copy(ownerUserId = currentPost.author.id),
             title = title?.take(100)?.ifBlank { null },
             plannedDate = plannedDate
         )
-        return MockClosifyData.updateOutfitPost(updatedPost)
+        return outfitPostRepository.updatePost(updatedPost)
     }
 
     fun deletePlannedOutfitPost(postId: String) {
-        MockClosifyData.deleteOutfitPost(postId)
+        outfitPostRepository.deletePost(postId)
     }
 
     fun getPlannedPostById(postId: String): OutfitPost? =
-        MockClosifyData.outfitPosts.firstOrNull { it.id == postId && it.type == OutfitPostType.PLANNED }
+        outfitPostRepository.getPost(postId)?.takeIf { it.type == OutfitPostType.PLANNED }
 }

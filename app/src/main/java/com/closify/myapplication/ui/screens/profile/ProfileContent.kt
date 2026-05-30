@@ -16,7 +16,9 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.ProfileRepository
+import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.ui.screens.profile.components.*
 import com.closify.myapplication.ui.theme.ClosifyTheme
@@ -178,9 +180,11 @@ fun ProfileContent(
 private fun ProfileContentPreview() {
     ClosifyTheme {
         val repository = ProfileRepository.instance
+        val socialRepository = SocialRepository.instance
+        val outfitPostRepository = OutfitPostRepository.instance
         val profile = repository.getProfile()
-        val friends = repository.getFriends()
-        val posts = repository.getPosts()
+        val friends = socialRepository.getFriends(profile.id)
+        val posts = outfitPostRepository.getPostsByUser(profile.id)
         val garments = repository.getWardrobeGarments()
 
         ProfileContent(
