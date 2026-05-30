@@ -62,7 +62,12 @@ class WardrobeViewModel(
     fun onEvent(event: WardrobeEvent) {
         when (event) {
             is WardrobeEvent.SearchQueryChanged -> {
-                _uiState.update { it.copy(searchQuery = event.query) }
+                _uiState.update {
+                    it.copy(
+                        searchQuery = event.query,
+                        selectedFilter = WardrobeFilter.ALL
+                    )
+                }
                 filterGarments()
             }
 
