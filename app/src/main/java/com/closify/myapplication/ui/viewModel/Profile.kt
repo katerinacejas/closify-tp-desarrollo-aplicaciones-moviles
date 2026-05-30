@@ -7,7 +7,6 @@ import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +48,7 @@ class ProfileViewModel(
         val profile = profileRepository.getProfile(userId)
         val friends = socialRepository.getFriends(userId)
         val posts = outfitPostRepository.getPostsByUser(userId)
-        val garments = profileRepository.getWardrobeGarments(userId)
+        val stats = profileRepository.getProfileStats(userId)
 
         _uiState.value = ProfileUiState(
             userId = profile.id,
@@ -58,10 +57,10 @@ class ProfileViewModel(
             bio = profile.bio,
             birthDate = profile.birthDate,
             friendsCount = friends.size,
-            garmentsCount = garments.size,
-            wardrobeUsagePercentage = profileRepository.getWardrobeUsagePercentage(userId),
-            favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
-            plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
+            garmentsCount = stats.garmentsCount,
+            wardrobeUsagePercentage = stats.wardrobeUsagePercentage,
+            favoriteOutfitsCount = stats.favoriteOutfitsCount,
+            plannedOutfitsCount = stats.plannedOutfitsCount,
             bannerImageResId = profile.bannerImageResId,
             profileImageResId = profile.profileImageResId,
             friends = friends,
@@ -87,35 +86,13 @@ class ProfileViewModel(
     }
 
     fun onUpdatePostTitle(postId: String, title: String) {
-        val currentState = _uiState.value
-        val updatedPost = outfitPostRepository.updatePostTitle(postId, title) ?: return
-
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post ->
-                if (post.id == postId) updatedPost else post
-            }
-        )
+        outfitPostRepository.updatePostTitle(postId, title) ?: return
+        refreshProfile()
     }
 
     fun onDeletePost(postId: String) {
-        val currentState = _uiState.value
-        val deletedPost = currentState.posts.firstOrNull { it.id == postId } ?: return
-
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.filterNot { it.id == postId },
-            favoriteOutfitsCount = if (deletedPost.type == OutfitPostType.FAVORITE) {
-                (currentState.favoriteOutfitsCount - 1).coerceAtLeast(0)
-            } else {
-                currentState.favoriteOutfitsCount
-            },
-            plannedOutfitsCount = if (deletedPost.type == OutfitPostType.PLANNED) {
-                (currentState.plannedOutfitsCount - 1).coerceAtLeast(0)
-            } else {
-                currentState.plannedOutfitsCount
-            }
-        )
-
         outfitPostRepository.deletePost(postId)
+        refreshProfile()
     }
 
     fun onToggleFriend(friendId: String) {

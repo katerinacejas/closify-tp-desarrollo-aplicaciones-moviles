@@ -3,6 +3,7 @@ package com.closify.myapplication.data.repository
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
+import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.SuggestedOutfit
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -22,6 +23,10 @@ class OutfitRepository(
 
     // Outfits seleccionados para guardar — leídos por SaveFavoritesViewModel
     var pendingFavorites: List<Outfit> = emptyList()
+
+    fun setPendingFavorites(outfits: List<Outfit>, favoriteIds: Set<String>) {
+        pendingFavorites = outfits.filter { it.id in favoriteIds }
+    }
 
     // Favoritos guardados en memoria
     // TODO: reemplazar por Firebase Firestore
@@ -48,6 +53,14 @@ class OutfitRepository(
                 )
             }
         }
+    }
+
+    fun saveFavorites(outfits: List<Outfit>, outfitNames: Map<String, String>) {
+        saveFavorites(
+            outfits.map { outfit ->
+                outfit.copy(name = outfitNames[outfit.id]?.trim()?.ifEmpty { null })
+            }
+        )
     }
 
     fun toggleFavorite(outfitId: String) {
@@ -93,6 +106,40 @@ class OutfitRepository(
         return outfitPostRepository.addPost(post)
     }
 
+    fun savePlanning(
+        userId: String,
+        title: String,
+        garments: List<Garment>,
+        plannedDate: String,
+        createdAt: String,
+        editingPostId: String?
+    ): OutfitPost? {
+        val outfit = Outfit(
+            id = editingPostId?.let { "outfit_$it" } ?: "planned_outfit_${System.currentTimeMillis()}",
+            garments = garments.distinctBy { it.id },
+            ownerUserId = userId,
+            name = title.ifBlank { null },
+            createdAt = createdAt
+        )
+
+        return if (editingPostId == null) {
+            savePlannedOutfitPost(
+                userId = userId,
+                title = title,
+                outfit = outfit,
+                plannedDate = plannedDate,
+                createdAt = createdAt
+            )
+        } else {
+            updatePlannedOutfitPost(
+                postId = editingPostId,
+                title = title,
+                outfit = outfit,
+                plannedDate = plannedDate
+            )
+        }
+    }
+
     fun updatePlannedOutfitPost(
         postId: String,
         title: String?,
@@ -114,4 +161,7 @@ class OutfitRepository(
 
     fun getPlannedPostById(postId: String): OutfitPost? =
         outfitPostRepository.getPost(postId)?.takeIf { it.type == OutfitPostType.PLANNED }
+
+    fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
+        getPlannedPosts(userId).firstOrNull { it.plannedDate == plannedDate }
 }

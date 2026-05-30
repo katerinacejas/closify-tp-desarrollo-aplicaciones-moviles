@@ -41,10 +41,7 @@ class SaveFavoritesViewModel(
 
     private fun save() {
         val state = _uiState.value
-        val outfitsToSave = state.outfits.map { outfit ->
-            outfit.copy(name = state.outfitNames[outfit.id]?.trim()?.ifEmpty { null })
-        }
-        outfitRepository.saveFavorites(outfitsToSave)
+        outfitRepository.saveFavorites(state.outfits, state.outfitNames)
         _uiState.update { it.copy(showSavedDialog = true) }
     }
 }

@@ -7,7 +7,6 @@ import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.FriendRequest
 import com.closify.myapplication.domain.model.OutfitPost
-import com.closify.myapplication.domain.model.OutfitPostType
 import com.closify.myapplication.domain.model.UserProfile
 import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,8 +56,7 @@ class PublicProfileViewModel(
         val profile = profileRepository.getUserProfile(userId) ?: return
         val posts = outfitPostRepository.getPostsByUser(userId)
         val friends = socialRepository.getFriends(userId)
-        val usedGarments = posts.flatMap { it.outfit.garments }.map { it.id }.toSet()
-        val garmentsCount = profileRepository.publicProfileBaseGarmentsCount() + usedGarments.size
+        val stats = profileRepository.getPublicProfileStats(userId)
 
         _uiState.value = _uiState.value.copy(
             currentUser = currentUser,
@@ -67,10 +65,10 @@ class PublicProfileViewModel(
             hasPendingOutgoingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId) != null,
             pendingIncomingRequest = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId),
             friends = friends,
-            garmentsCount = garmentsCount,
-            wardrobeUsagePercentage = if (garmentsCount == 0) 0 else ((usedGarments.size * 100) / garmentsCount).coerceIn(0, 100),
-            favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
-            plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
+            garmentsCount = stats.garmentsCount,
+            wardrobeUsagePercentage = stats.wardrobeUsagePercentage,
+            favoriteOutfitsCount = stats.favoriteOutfitsCount,
+            plannedOutfitsCount = stats.plannedOutfitsCount,
             posts = posts
         )
     }

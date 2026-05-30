@@ -48,7 +48,6 @@ class FriendsViewModel(
     )
     val uiState: StateFlow<FriendsUiState> = _uiState.asStateFlow()
     private var friendIds: Set<String> = emptySet()
-    private var allPosts: List<OutfitPost> = emptyList()
 
     init {
         loadFeed()
@@ -61,30 +60,24 @@ class FriendsViewModel(
     private fun loadFeed() {
         val user = userRepository.getCurrentUserOrDefault().toSummary()
         friendIds = socialRepository.getFriends(user.id).map { it.id }.toSet()
-        val allUserIds = socialRepository.getAllUserSummaries(user.id).map { it.id }.toSet()
-        allPosts = outfitPostRepository.getPostsByAuthors(allUserIds)
         _uiState.value = _uiState.value.copy(
             currentUser = user,
             friendsCount = friendIds.size,
-            posts = buildFeedPosts(),
+            posts = outfitPostRepository.getPostsByAuthors(friendIds),
             hasUnreadNotifications = notificationRepository.getUnreadCount(user.id) > 0
         )
     }
 
     fun onSearchQueryChange(query: String) {
         val currentState = _uiState.value
-        val cleanQuery = query.trim().removePrefix("@")
-        val allResults = if (cleanQuery.isBlank()) {
-            emptyList()
-        } else {
-            socialRepository.getAllUserSummaries(currentState.currentUser.id)
-                .filter { it.name.startsWith(cleanQuery, ignoreCase = true) }
-                .map { user ->
-                    FriendSearchResult(
-                        user = user,
-                        relationshipStatus = relationshipStatusFor(user.id)
-                    )
-                }
+        val allResults = socialRepository.searchUserSummariesByName(
+            query = query,
+            userId = currentState.currentUser.id
+        ).map { user ->
+            FriendSearchResult(
+                user = user,
+                relationshipStatus = relationshipStatusFor(user.id)
+            )
         }
 
         _uiState.value = currentState.copy(
@@ -111,7 +104,7 @@ class FriendsViewModel(
 
         _uiState.value = currentState.copy(
             friendsCount = friendIds.size,
-            posts = buildFeedPosts(),
+            posts = outfitPostRepository.getPostsByAuthors(friendIds),
             friendSearchResults = updatedSearchResults.filter { it.isFriend },
             otherSearchResults = updatedSearchResults.filterNot { it.isFriend }
         )
@@ -145,15 +138,9 @@ class FriendsViewModel(
             posts = currentState.posts.map { post -> if (post.id == postId) updatedPost else post },
             commentDrafts = currentState.commentDrafts - postId
         )
-        allPosts = allPosts.map { post -> if (post.id == postId) updatedPost else post }
-
     }
 
-    private fun buildFeedPosts(): List<OutfitPost> =
-        outfitPostRepository.sortNewestFirst(allPosts.filter { it.author.id in friendIds })
-
     private fun replacePost(updatedPost: OutfitPost) {
-        allPosts = allPosts.map { post -> if (post.id == updatedPost.id) updatedPost else post }
         _uiState.value = _uiState.value.copy(
             posts = _uiState.value.posts.map { post ->
                 if (post.id == updatedPost.id) updatedPost else post

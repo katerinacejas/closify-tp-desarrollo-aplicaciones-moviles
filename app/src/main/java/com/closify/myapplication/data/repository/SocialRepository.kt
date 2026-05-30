@@ -20,6 +20,17 @@ class SocialRepository {
             .filterNot { it.id == userId }
             .map { it.toSummary() }
 
+    fun searchUserSummariesByName(
+        query: String,
+        userId: String = MockClosifyData.CURRENT_USER_ID
+    ): List<UserSummary> {
+        val cleanQuery = query.trim().removePrefix("@")
+        if (cleanQuery.isBlank()) return emptyList()
+
+        return getAllUserSummaries(userId)
+            .filter { it.name.startsWith(cleanQuery, ignoreCase = true) }
+    }
+
     fun isFriend(userId: String, otherUserId: String): Boolean =
         MockClosifyData.isFriend(userId, otherUserId)
 
