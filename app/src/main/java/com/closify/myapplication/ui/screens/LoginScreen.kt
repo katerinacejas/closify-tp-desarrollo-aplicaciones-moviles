@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.closify.myapplication.ui.components.ClosifyButton
-import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.components.ClosifyTextField
+import com.closify.myapplication.ui.screens.auth.AuthBrandHeader
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.LoginEvent
 import com.closify.myapplication.ui.viewmodel.LoginViewModel
@@ -42,6 +42,7 @@ import com.closify.myapplication.ui.viewmodel.LoginViewModel
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
     viewModel: LoginViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,6 +72,7 @@ fun LoginScreen(
             onEmailChange = { viewModel.onEvent(LoginEvent.EmailChanged(it)) },
             onPasswordChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
             onSubmit = { viewModel.onEvent(LoginEvent.Submit) },
+            onForgotPasswordClick = onNavigateToForgotPassword,
             onNavigateToRegister = {
                 viewModel.onEvent(LoginEvent.ClearErrors)
                 onNavigateToRegister()
@@ -90,6 +92,7 @@ private fun LoginContent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -97,42 +100,23 @@ private fun LoginContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 36.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        AuthBrandHeader()
 
-        ClosifyLogo(size = 96.dp)
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(54.dp))
 
         Text(
-            text = "Closify",
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = "Redescubrí tu closet, simplificá tu día",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(36.dp))
-
-        Text(
-            text = "¡Bienvenido!",
+            text = "\u00A1Bienvenido!",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(52.dp))
 
         ClosifyTextField(
             value = email,
@@ -146,15 +130,15 @@ private fun LoginContent(
         ClosifyTextField(
             value = password,
             onValueChange = onPasswordChange,
-            placeholder = "Contraseña",
+            placeholder = "Contrase\u00F1a",
             isPassword = true,
             error = passwordError
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(62.dp))
 
         ClosifyButton(
-            text = "Iniciar Sesión",
+            text = "Iniciar Sesi\u00F3n",
             onClick = onSubmit,
             isLoading = isLoading
         )
@@ -162,9 +146,24 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
+            text = "\u00BFOlvidaste tu contrase\u00F1a?",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                onForgotPasswordClick()
+            }
+        )
+
+        Spacer(modifier = Modifier.height(92.dp))
+
+        Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append("¿No tenés cuenta? ")
+                    append("\u00BFNo ten\u00E9s cuenta? ")
                 }
                 withStyle(
                     SpanStyle(
@@ -193,7 +192,8 @@ private fun LoginScreenPreview() {
     ClosifyTheme {
         LoginScreen(
             onLoginSuccess = {},
-            onNavigateToRegister = {}
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {}
         )
     }
 }

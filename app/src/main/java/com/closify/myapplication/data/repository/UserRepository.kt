@@ -63,6 +63,11 @@ class UserRepository {
         return MockClosifyData.isUsernameAvailable(username)
     }
 
+    suspend fun requestPasswordRecovery(email: String): Result<Unit> {
+        delay(500)
+        return Result.success(Unit)
+    }
+
     fun updateCurrentUserProfile(
         fullName: String,
         username: String,
