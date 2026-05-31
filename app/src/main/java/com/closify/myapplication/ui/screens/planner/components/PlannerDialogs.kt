@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -68,7 +69,7 @@ internal fun EditPlannedGarmentsDialog(
             Column(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
-                Box(modifier = Modifier.fillMaxWidth().height(42.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp)) {
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -141,7 +142,7 @@ internal fun PlannedOutfitDialog(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(modifier = Modifier.fillMaxWidth().height(42.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp)) {
                     IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterStart)) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
