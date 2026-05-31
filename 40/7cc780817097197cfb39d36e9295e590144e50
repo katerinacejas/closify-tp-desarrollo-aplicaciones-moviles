@@ -1,0 +1,27 @@
+app/src/main/java/com/closify/myapplication/ui/screens/planner/PlannerContent.kt
+  s_f319fd003c2854::t_5f1bac2bb74715 219-220
+app/src/main/java/com/closify/myapplication/ui/screens/planner/components/PlannerDialogs.kt
+  s_f319fd003c2854::t_6306845263e280 42
+  s_f319fd003c2854::t_ed0225f3b5a58f 156-157
+app/src/main/java/com/closify/myapplication/domain/usecase/GenerateOutfitsUseCase.kt
+  s_f319fd003c2854::t_e2bd60867e6ae5 4
+  s_f319fd003c2854::t_42b8fcb3c912a3 45,57
+app/src/main/java/com/closify/myapplication/ui/screens/addgarment/AddGarmentContent.kt
+  s_f319fd003c2854::t_ff9a07ce7ac3df 130-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "407cc780817097197cfb39d36e9295e590144e50",
+  "prompts": {},
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
