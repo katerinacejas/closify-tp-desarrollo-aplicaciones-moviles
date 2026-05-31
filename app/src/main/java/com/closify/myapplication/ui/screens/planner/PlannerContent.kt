@@ -216,7 +216,8 @@ private fun PlannerOutfitSelectionContent(
                 text = uiState.selectedDate.toSpanishTitle(),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
             val forecast = uiState.selectedForecast
             if (forecast == null) {

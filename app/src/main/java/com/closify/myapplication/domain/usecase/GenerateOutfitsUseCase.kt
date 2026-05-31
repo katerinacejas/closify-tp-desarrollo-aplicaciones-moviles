@@ -1,6 +1,7 @@
 package com.closify.myapplication.domain.usecase
 
 import com.closify.myapplication.data.repository.GarmentRepository
+import java.util.UUID
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.Outfit
@@ -30,7 +31,6 @@ class GenerateOutfitsUseCase(
         val dresses    = filtered.filter { it.category == GarmentCategory.FULL_BODY }
 
         val outfits = mutableListOf<Outfit>()
-        var idCounter = 1
 
         val needsOuterwear = weather == WeatherCondition.COLD || weather == WeatherCondition.WINDY
         val outwearOptions = if (needsOuterwear && outerwear.isNotEmpty()) outerwear else listOf(null)
@@ -42,7 +42,7 @@ class GenerateOutfitsUseCase(
                     for (outer in outwearOptions) {
                         val garments = mutableListOf(top, bottom, shoe)
                         outer?.let { garments.add(it) }
-                        outfits.add(Outfit(id = "outfit_${idCounter++}", garments = garments))
+                        outfits.add(Outfit(id = UUID.randomUUID().toString(), garments = garments))
                     }
                 }
             }
@@ -54,7 +54,7 @@ class GenerateOutfitsUseCase(
                 for (outer in outwearOptions) {
                     val garments = mutableListOf(dress, shoe)
                     outer?.let { garments.add(it) }
-                    outfits.add(Outfit(id = "outfit_${idCounter++}", garments = garments))
+                    outfits.add(Outfit(id = UUID.randomUUID().toString(), garments = garments))
                 }
             }
         }
