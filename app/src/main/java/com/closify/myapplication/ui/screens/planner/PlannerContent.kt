@@ -79,6 +79,7 @@ fun PlannerContent(
     onEditSelectedPlannedPost: () -> Unit,
     onDeleteSelectedPlannedPost: () -> Unit,
     onDismissSelectedPlannedPost: () -> Unit,
+    onDismissNoFullBodyDialog: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     uiState.selectedPlannedPost?.let { plannedPost ->
@@ -88,6 +89,15 @@ fun PlannerContent(
             onEditClick = onEditSelectedPlannedPost,
             onDeleteClick = onDeleteSelectedPlannedPost,
             onDismiss = onDismissSelectedPlannedPost
+        )
+    }
+
+    if (uiState.showNoFullBodyDialog) {
+        ClosifyConfirmationDialog(
+            title = "Sin prendas FullBody",
+            subtitle = "No tenés prendas de tipo FullBody en tu guardarropa",
+            buttonText = "Entendido",
+            onDismiss = onDismissNoFullBodyDialog
         )
     }
 

@@ -67,7 +67,7 @@ fun WardrobeScreen(
     onWeatherClick: (WeatherCondition) -> Unit,
     onOccasionClick: (Occasion) -> Unit,
     onGarmentClick: (String) -> Unit,
-    viewModel: WardrobeViewModel = viewModel(),
+    viewModel: WardrobeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

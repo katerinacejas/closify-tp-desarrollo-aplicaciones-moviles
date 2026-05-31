@@ -45,7 +45,8 @@ data class PlannerUiState(
     val plannedPosts: List<OutfitPost> = emptyList(),
     val selectedPlannedPost: OutfitPost? = null,
     val editingPostId: String? = null,
-    val showSavedDialog: Boolean = false
+    val showSavedDialog: Boolean = false,
+    val showNoFullBodyDialog: Boolean = false
 ) {
     val selectedForecast: PlannerForecastDay?
         get() = forecastDays.firstOrNull { it.date == selectedDate && it.weather != WeatherCondition.ANY }
@@ -127,7 +128,15 @@ class PlannerViewModel(
     }
 
     fun onToggleFullBody(enabled: Boolean) {
+        if (enabled && _uiState.value.fullBodyGarments.isEmpty()) {
+            _uiState.value = _uiState.value.copy(showNoFullBodyDialog = true)
+            return
+        }
         _uiState.value = _uiState.value.copy(useFullBody = enabled)
+    }
+
+    fun onDismissNoFullBodyDialog() {
+        _uiState.value = _uiState.value.copy(showNoFullBodyDialog = false)
     }
 
     fun onTopAndOuterwearCentered(garmentId: String) {

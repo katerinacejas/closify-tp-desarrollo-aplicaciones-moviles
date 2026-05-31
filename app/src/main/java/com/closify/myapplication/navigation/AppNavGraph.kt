@@ -37,9 +37,11 @@ import com.closify.myapplication.ui.screens.settings.SettingsScreen
 import com.closify.myapplication.ui.screens.wardrobe.GarmentDetailScreen
 import com.closify.myapplication.ui.screens.wardrobe.WardrobeDetailScreen
 import com.closify.myapplication.ui.screens.wardrobe.WardrobeScreen
+import com.closify.myapplication.ui.viewmodel.WardrobeViewModel
 import com.closify.myapplication.ui.viewmodel.CameraViewModel
 
 private const val CAMERA_FLOW_ROUTE = "camera_flow"
+private const val WARDROBE_FLOW_ROUTE = "wardrobe_flow"
 
 @Composable
 fun AppNavGraph(
@@ -109,65 +111,85 @@ fun AppNavGraph(
             }
 
             // — Wardrobe —
-            composable(Screen.Wardrobe.route) {
-                WardrobeScreen(
-                    onCategoryClick = { category ->
-                        navController.navigate("${Screen.Wardrobe.route}/category/${category.name}")
-                    },
-                    onWeatherClick = { weather ->
-                        navController.navigate("${Screen.Wardrobe.route}/weather/${weather.name}")
-                    },
-                    onOccasionClick = { occasion ->
-                        navController.navigate("${Screen.Wardrobe.route}/occasion/${occasion.name}")
-                    },
-                    onGarmentClick = { garmentId ->
-                        navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
-                    }
-                )
-            }
+            navigation(
+                startDestination = Screen.Wardrobe.route,
+                route = WARDROBE_FLOW_ROUTE
+            ) {
+                composable(Screen.Wardrobe.route) { entry ->
+                    val parentEntry = remember(entry) { navController.getBackStackEntry(WARDROBE_FLOW_ROUTE) }
+                    val wardrobeViewModel: WardrobeViewModel = viewModel(parentEntry)
+                    WardrobeScreen(
+                        viewModel = wardrobeViewModel,
+                        onCategoryClick = { category ->
+                            navController.navigate("${Screen.Wardrobe.route}/category/${category.name}")
+                        },
+                        onWeatherClick = { weather ->
+                            navController.navigate("${Screen.Wardrobe.route}/weather/${weather.name}")
+                        },
+                        onOccasionClick = { occasion ->
+                            navController.navigate("${Screen.Wardrobe.route}/occasion/${occasion.name}")
+                        },
+                        onGarmentClick = { garmentId ->
+                            navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
+                        }
+                    )
+                }
 
-            composable("${Screen.Wardrobe.route}/category/{categoryName}") { backStackEntry ->
-                val categoryName = backStackEntry.arguments?.getString("categoryName")
-                val category = categoryName?.let { GarmentCategory.valueOf(it) } ?: GarmentCategory.TOP
-                WardrobeDetailScreen(
-                    category = category,
-                    onBack = { navController.popBackStack() },
-                    onGarmentClick = { garmentId ->
-                        navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
-                    }
-                )
-            }
+                composable("${Screen.Wardrobe.route}/category/{categoryName}") { entry ->
+                    val categoryName = entry.arguments?.getString("categoryName")
+                    val category = categoryName?.let { GarmentCategory.valueOf(it) } ?: GarmentCategory.TOP
+                    val parentEntry = remember(entry) { navController.getBackStackEntry(WARDROBE_FLOW_ROUTE) }
+                    val wardrobeViewModel: WardrobeViewModel = viewModel(parentEntry)
+                    WardrobeDetailScreen(
+                        viewModel = wardrobeViewModel,
+                        category = category,
+                        onBack = { navController.popBackStack() },
+                        onGarmentClick = { garmentId ->
+                            navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
+                        }
+                    )
+                }
 
-            composable("${Screen.Wardrobe.route}/weather/{weatherName}") { backStackEntry ->
-                val weatherName = backStackEntry.arguments?.getString("weatherName")
-                val weather = weatherName?.let { WeatherCondition.valueOf(it) } ?: WeatherCondition.HOT
-                WardrobeDetailScreen(
-                    weather = weather,
-                    onBack = { navController.popBackStack() },
-                    onGarmentClick = { garmentId ->
-                        navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
-                    }
-                )
-            }
+                composable("${Screen.Wardrobe.route}/weather/{weatherName}") { entry ->
+                    val weatherName = entry.arguments?.getString("weatherName")
+                    val weather = weatherName?.let { WeatherCondition.valueOf(it) } ?: WeatherCondition.HOT
+                    val parentEntry = remember(entry) { navController.getBackStackEntry(WARDROBE_FLOW_ROUTE) }
+                    val wardrobeViewModel: WardrobeViewModel = viewModel(parentEntry)
+                    WardrobeDetailScreen(
+                        viewModel = wardrobeViewModel,
+                        weather = weather,
+                        onBack = { navController.popBackStack() },
+                        onGarmentClick = { garmentId ->
+                            navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
+                        }
+                    )
+                }
 
-            composable("${Screen.Wardrobe.route}/occasion/{occasionName}") { backStackEntry ->
-                val occasionName = backStackEntry.arguments?.getString("occasionName")
-                val occasion = occasionName?.let { Occasion.valueOf(it) } ?: Occasion.CASUAL
-                WardrobeDetailScreen(
-                    occasion = occasion,
-                    onBack = { navController.popBackStack() },
-                    onGarmentClick = { garmentId ->
-                        navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
-                    }
-                )
-            }
+                composable("${Screen.Wardrobe.route}/occasion/{occasionName}") { entry ->
+                    val occasionName = entry.arguments?.getString("occasionName")
+                    val occasion = occasionName?.let { Occasion.valueOf(it) } ?: Occasion.CASUAL
+                    val parentEntry = remember(entry) { navController.getBackStackEntry(WARDROBE_FLOW_ROUTE) }
+                    val wardrobeViewModel: WardrobeViewModel = viewModel(parentEntry)
+                    WardrobeDetailScreen(
+                        viewModel = wardrobeViewModel,
+                        occasion = occasion,
+                        onBack = { navController.popBackStack() },
+                        onGarmentClick = { garmentId ->
+                            navController.navigate("${Screen.Wardrobe.route}/detail/$garmentId")
+                        }
+                    )
+                }
 
-            composable("${Screen.Wardrobe.route}/detail/{garmentId}") { backStackEntry ->
-                val garmentId = backStackEntry.arguments?.getString("garmentId") ?: ""
-                GarmentDetailScreen(
-                    garmentId = garmentId,
-                    onBack = { navController.popBackStack() }
-                )
+                composable("${Screen.Wardrobe.route}/detail/{garmentId}") { entry ->
+                    val garmentId = entry.arguments?.getString("garmentId") ?: ""
+                    val parentEntry = remember(entry) { navController.getBackStackEntry(WARDROBE_FLOW_ROUTE) }
+                    val wardrobeViewModel: WardrobeViewModel = viewModel(parentEntry)
+                    GarmentDetailScreen(
+                        viewModel = wardrobeViewModel,
+                        garmentId = garmentId,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
 
             composable(Screen.Friends.route) {
