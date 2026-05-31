@@ -3,7 +3,6 @@ package com.closify.myapplication.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
@@ -11,10 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-import java.util.UUID
 
 enum class ClassifyStep { BASIC, OCCASION, SAVED }
 
@@ -41,7 +36,8 @@ sealed interface ClassifyGarmentEvent {
 
 class ClassifyGarmentViewModel(
     imageUri: String,
-    private val garmentRepository: GarmentRepository = GarmentRepository.instance
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClassifyGarmentUiState(imageUri = imageUri))
@@ -88,19 +84,14 @@ class ClassifyGarmentViewModel(
 
     private fun save() {
         val state = _uiState.value
-        val garment = Garment(
-            id = UUID.randomUUID().toString(),
-            ownerUserId = UserRepository.instance.currentUserId,
+        garmentRepository.createGarment(
+            ownerUserId = userRepository.currentUserId,
             name = state.name.trim(),
-            category = state.selectedCategory!!,
+            category = requireNotNull(state.selectedCategory),
             imageUrl = state.imageUri,
-            suitableWeather = state.selectedWeathers.ifEmpty { setOf(WeatherCondition.ANY) },
-            suitableOccasions = state.selectedOccasions.ifEmpty { setOf(Occasion.ANY) },
-            createdAt = LocalDate.now().format(
-                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
-            )
+            suitableWeather = state.selectedWeathers,
+            suitableOccasions = state.selectedOccasions
         )
-        garmentRepository.addGarment(garment)
         _uiState.update { it.copy(step = ClassifyStep.SAVED) }
     }
 }

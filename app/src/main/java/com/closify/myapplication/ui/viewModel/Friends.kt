@@ -2,10 +2,9 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.NotificationRepository
+import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.domain.model.Comment
-import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +38,7 @@ data class FriendsUiState(
 
 class FriendsViewModel(
     private val socialRepository: SocialRepository = SocialRepository.instance,
+    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
@@ -48,7 +48,6 @@ class FriendsViewModel(
     )
     val uiState: StateFlow<FriendsUiState> = _uiState.asStateFlow()
     private var friendIds: Set<String> = emptySet()
-    private var allPosts: List<OutfitPost> = emptyList()
 
     init {
         loadFeed()
@@ -61,30 +60,24 @@ class FriendsViewModel(
     private fun loadFeed() {
         val user = userRepository.getCurrentUserOrDefault().toSummary()
         friendIds = socialRepository.getFriends(user.id).map { it.id }.toSet()
-        val allUserIds = socialRepository.getAllUserSummaries(user.id).map { it.id }.toSet()
-        allPosts = socialRepository.getPostsByAuthors(allUserIds)
         _uiState.value = _uiState.value.copy(
             currentUser = user,
             friendsCount = friendIds.size,
-            posts = buildFeedPosts(),
+            posts = outfitPostRepository.getPostsByAuthors(friendIds),
             hasUnreadNotifications = notificationRepository.getUnreadCount(user.id) > 0
         )
     }
 
     fun onSearchQueryChange(query: String) {
         val currentState = _uiState.value
-        val cleanQuery = query.trim().removePrefix("@")
-        val allResults = if (cleanQuery.isBlank()) {
-            emptyList()
-        } else {
-            socialRepository.getAllUserSummaries(currentState.currentUser.id)
-                .filter { it.name.startsWith(cleanQuery, ignoreCase = true) }
-                .map { user ->
-                    FriendSearchResult(
-                        user = user,
-                        relationshipStatus = relationshipStatusFor(user.id)
-                    )
-                }
+        val allResults = socialRepository.searchUserSummariesByName(
+            query = query,
+            userId = currentState.currentUser.id
+        ).map { user ->
+            FriendSearchResult(
+                user = user,
+                relationshipStatus = relationshipStatusFor(user.id)
+            )
         }
 
         _uiState.value = currentState.copy(
@@ -111,7 +104,7 @@ class FriendsViewModel(
 
         _uiState.value = currentState.copy(
             friendsCount = friendIds.size,
-            posts = buildFeedPosts(),
+            posts = outfitPostRepository.getPostsByAuthors(friendIds),
             friendSearchResults = updatedSearchResults.filter { it.isFriend },
             otherSearchResults = updatedSearchResults.filterNot { it.isFriend }
         )
@@ -124,70 +117,36 @@ class FriendsViewModel(
     }
 
     fun onLikeClick(postId: String) {
-        val currentState = _uiState.value
-        val currentUser = currentState.currentUser
+        val updatedPost = outfitPostRepository.toggleLike(
+            postId = postId,
+            user = _uiState.value.currentUser
+        ) ?: return
 
-        fun OutfitPost.toggleLike(): OutfitPost {
-            val alreadyLiked = likedBy.any { it.user.id == currentUser.id }
-            val myLike = Like(
-                id = "like_${currentUser.id}_$id",
-                user = currentUser,
-                createdAt = socialRepository.currentDateLabel()
-            )
-
-            return copy(
-                likedBy = if (alreadyLiked) {
-                    likedBy.filterNot { it.user.id == currentUser.id }
-                } else {
-                    listOf(myLike) + likedBy
-                }
-            )
-        }
-
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post ->
-                if (post.id == postId) post.toggleLike() else post
-            }
-        )
-        allPosts = allPosts.map { post ->
-            if (post.id == postId) post.toggleLike() else post
-        }
+        replacePost(updatedPost)
     }
 
     fun onSendComment(postId: String) {
         val text = _uiState.value.commentDrafts[postId].orEmpty()
-        val cleanText = text.trim()
-        if (cleanText.isBlank()) return
-
         val currentState = _uiState.value
-        val currentUser = currentState.currentUser
-
-        fun OutfitPost.addComment(): OutfitPost = copy(
-            comments = comments + Comment(
-                id = "comment_${currentUser.id}_${id}_${comments.size + 1}",
-                user = currentUser,
-                text = cleanText,
-                createdAt = socialRepository.currentDateLabel()
-            )
-        )
+        val updatedPost = outfitPostRepository.addComment(
+            postId = postId,
+            user = currentState.currentUser,
+            text = text
+        ) ?: return
 
         _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post ->
-                if (post.id == postId) {
-                    post.addComment()
-                } else {
-                    post
-                }
-            },
+            posts = currentState.posts.map { post -> if (post.id == postId) updatedPost else post },
             commentDrafts = currentState.commentDrafts - postId
         )
-        allPosts = allPosts.map { post ->
-            if (post.id == postId) post.addComment() else post
-        }
     }
 
-    private fun buildFeedPosts(): List<OutfitPost> =
-        socialRepository.sortPostsNewestFirst(allPosts.filter { it.author.id in friendIds })
+    private fun replacePost(updatedPost: OutfitPost) {
+        _uiState.value = _uiState.value.copy(
+            posts = _uiState.value.posts.map { post ->
+                if (post.id == updatedPost.id) updatedPost else post
+            }
+        )
+    }
 
     private fun relationshipStatusFor(userId: String): FriendRelationshipStatus {
         val currentUserId = _uiState.value.currentUser.id

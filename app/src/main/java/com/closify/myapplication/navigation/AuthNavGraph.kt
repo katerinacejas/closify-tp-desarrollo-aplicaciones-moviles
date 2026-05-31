@@ -5,8 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.closify.myapplication.ui.screens.ForgotPasswordScreen
 import com.closify.myapplication.ui.screens.LoginScreen
 import com.closify.myapplication.ui.screens.OnboardingScreen
+import com.closify.myapplication.ui.screens.PasswordRecoverySentScreen
 import com.closify.myapplication.ui.screens.register.RegisterScreen
 
 @Composable
@@ -36,6 +38,33 @@ fun AuthNavGraph(
                 onLoginSuccess = onLoginSuccess,
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                }
+            )
+        }
+
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(
+                onBack = { navController.popBackStack() },
+                onRecoverySent = {
+                    navController.navigate(Screen.PasswordRecoverySent.route)
+                }
+            )
+        }
+
+        composable(Screen.PasswordRecoverySent.route) {
+            PasswordRecoverySentScreen(
+                onBack = { navController.popBackStack() },
+                onGoToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Login.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onResend = {
+                    navController.popBackStack(Screen.ForgotPassword.route, inclusive = false)
                 }
             )
         }

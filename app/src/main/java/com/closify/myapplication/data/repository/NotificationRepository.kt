@@ -1,7 +1,9 @@
 package com.closify.myapplication.data.repository
 
 import com.closify.myapplication.domain.model.Notification
+import com.closify.myapplication.domain.model.NotificationType
 import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.UserSummary
 
 class NotificationRepository {
 
@@ -21,8 +23,32 @@ class NotificationRepository {
         MockClosifyData.markNotificationsAsRead(userId)
     }
 
-    fun getPost(postId: String): OutfitPost? =
-        MockClosifyData.outfitPosts.firstOrNull { it.id == postId }
+    fun createPostLikeNotification(post: OutfitPost, sender: UserSummary): Notification? {
+        if (post.author.id == sender.id) return null
+
+        return MockClosifyData.addNotification(
+            receiver = post.author,
+            sender = sender,
+            type = NotificationType.POST_LIKE,
+            postId = post.id
+        )
+    }
+
+    fun createPostCommentNotification(
+        post: OutfitPost,
+        commentId: String,
+        sender: UserSummary
+    ): Notification? {
+        if (post.author.id == sender.id) return null
+
+        return MockClosifyData.addNotification(
+            receiver = post.author,
+            sender = sender,
+            type = NotificationType.POST_COMMENT,
+            postId = post.id,
+            commentId = commentId
+        )
+    }
 
     private fun String.toNotificationOrder(): Int {
         if (this == "ahora") return 0

@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.OutfitPost
@@ -397,7 +398,9 @@ private fun FriendsContentPreview() {
             uiState = FriendsUiState(
                 currentUser = user,
                 friendsCount = SocialRepository.instance.getFriends(userId).size,
-                posts = SocialRepository.instance.getFriendsFeed(userId)
+                posts = OutfitPostRepository.instance.getPostsByAuthors(
+                    SocialRepository.instance.getFriends(userId).map { it.id }.toSet()
+                )
             ),
             onSearchQueryChange = {},
             onNotificationsClick = {},

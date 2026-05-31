@@ -47,7 +47,7 @@ import com.closify.myapplication.ui.screens.planner.components.PlannedOutfitDial
 import com.closify.myapplication.ui.screens.planner.components.WeatherInfoRow
 import com.closify.myapplication.ui.screens.planner.components.toSpanishTitle
 import com.closify.myapplication.ui.theme.ClosifyTheme
-import com.closify.myapplication.ui.viewmodel.PlannerForecastDay
+import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.ui.viewmodel.PlannerStep
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
 import java.time.LocalDate

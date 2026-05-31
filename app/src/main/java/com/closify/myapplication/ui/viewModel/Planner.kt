@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
+import com.closify.myapplication.data.repository.WeatherRepository
 import com.closify.myapplication.domain.model.Garment
-import com.closify.myapplication.domain.model.GarmentCategory
-import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
+import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,13 +24,6 @@ enum class PlannerStep {
     OUTFIT_SELECTION,
     PLANNING_REVIEW
 }
-
-data class PlannerForecastDay(
-    val date: LocalDate,
-    val weather: WeatherCondition,
-    val temperature: Int,
-    val label: String
-)
 
 data class PlannerUiState(
     val step: PlannerStep = PlannerStep.DATE_SELECTION,
@@ -77,6 +70,7 @@ data class PlannerUiState(
 class PlannerViewModel(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
+    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
@@ -103,7 +97,8 @@ class PlannerViewModel(
     fun onDateSelected(date: LocalDate) {
         if (date.isBefore(today)) return
 
-        val plannedPost = _uiState.value.plannedPosts.firstOrNull { it.plannedDate == date.toSpanishTitle() }
+        val currentUserId = userRepository.getCurrentUserOrDefault().id
+        val plannedPost = outfitRepository.getPlannedPostByDate(currentUserId, date.toSpanishTitle())
         _uiState.value = _uiState.value.copy(
             selectedDate = date,
             visibleMonth = YearMonth.from(date),
@@ -205,31 +200,15 @@ class PlannerViewModel(
         if (state.plannedGarments.isEmpty()) return
 
         val userId = userRepository.getCurrentUserOrDefault().id
-        val outfit = Outfit(
-            id = state.editingPostId?.let { "outfit_$it" } ?: "planned_outfit_${System.currentTimeMillis()}",
-            garments = state.plannedGarments,
-            ownerUserId = userId,
-            name = state.plannedOutfitTitle.ifBlank { null },
-            createdAt = today.toSpanishTitle()
-        )
         val plannedDate = state.selectedDate.toSpanishTitle()
-
-        if (state.editingPostId == null) {
-            outfitRepository.savePlannedOutfitPost(
-                userId = userId,
-                title = state.plannedOutfitTitle,
-                outfit = outfit,
-                plannedDate = plannedDate,
-                createdAt = today.toSpanishTitle()
-            )
-        } else {
-            outfitRepository.updatePlannedOutfitPost(
-                postId = state.editingPostId,
-                title = state.plannedOutfitTitle,
-                outfit = outfit,
-                plannedDate = plannedDate
-            )
-        }
+        outfitRepository.savePlanning(
+            userId = userId,
+            title = state.plannedOutfitTitle,
+            garments = state.plannedGarments,
+            plannedDate = plannedDate,
+            createdAt = today.toSpanishTitle(),
+            editingPostId = state.editingPostId
+        )
 
         _uiState.value = state.copy(
             plannedPosts = outfitRepository.getPlannedPosts(userId),
@@ -249,29 +228,22 @@ class PlannerViewModel(
 
     private fun buildInitialState(): PlannerUiState {
         val userId = userRepository.getCurrentUserOrDefault().id
-        val garments = garmentRepository.getAllByUserId(userId)
+        val garmentGroups = garmentRepository.getPlannerGroups(userId)
         val plannedPosts = outfitRepository.getPlannedPosts(userId)
-
-        val topAndOuterwear = garments.filter {
-            it.category == GarmentCategory.TOP || it.category == GarmentCategory.OUTERWEAR
-        }
-        val bottoms = garments.filter { it.category == GarmentCategory.BOTTOM }
-        val footwear = garments.filter { it.category == GarmentCategory.FOOTWEAR }
-        val fullBody = garments.filter { it.category == GarmentCategory.FULL_BODY }
 
         return PlannerUiState(
             selectedDate = today,
             visibleMonth = YearMonth.from(today),
             dateInput = today.format(PlannerDateFormatter),
-            forecastDays = buildMockForecast(today),
-            topAndOuterwearGarments = topAndOuterwear,
-            bottomGarments = bottoms,
-            footwearGarments = footwear,
-            fullBodyGarments = fullBody,
-            selectedTopAndOuterwearGarmentId = defaultSelectedId(topAndOuterwear),
-            selectedBottomGarmentId = defaultSelectedId(bottoms),
-            selectedFootwearGarmentId = defaultSelectedId(footwear),
-            selectedFullBodyGarmentId = defaultSelectedId(fullBody),
+            forecastDays = weatherRepository.getPlannerForecast(today),
+            topAndOuterwearGarments = garmentGroups.topAndOuterwear,
+            bottomGarments = garmentGroups.bottoms,
+            footwearGarments = garmentGroups.footwear,
+            fullBodyGarments = garmentGroups.fullBody,
+            selectedTopAndOuterwearGarmentId = defaultSelectedId(garmentGroups.topAndOuterwear),
+            selectedBottomGarmentId = defaultSelectedId(garmentGroups.bottoms),
+            selectedFootwearGarmentId = defaultSelectedId(garmentGroups.footwear),
+            selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody),
             plannedPosts = plannedPosts
         )
     }
@@ -299,27 +271,6 @@ class PlannerViewModel(
                 ?.id
                 ?: selectedFullBodyGarmentId
         )
-    }
-
-    private fun buildMockForecast(startDate: LocalDate): List<PlannerForecastDay> {
-        val weatherByOffset = listOf(
-            WeatherCondition.HOT to (32 to "Caluroso"),
-            WeatherCondition.HOT to (30 to "Caluroso"),
-            WeatherCondition.HOT to (29 to "Caluroso"),
-            WeatherCondition.MILD to (20 to "Templado"),
-            WeatherCondition.MILD to (21 to "Templado"),
-            WeatherCondition.COLD to (12 to "Lluvioso"),
-            WeatherCondition.WINDY to (16 to "Ventoso")
-        )
-
-        return weatherByOffset.mapIndexed { index, forecast ->
-            PlannerForecastDay(
-                date = startDate.plusDays(index.toLong()),
-                weather = forecast.first,
-                temperature = forecast.second.first,
-                label = forecast.second.second
-            )
-        }
     }
 
     private fun parseDateOrNull(value: String): LocalDate? =
