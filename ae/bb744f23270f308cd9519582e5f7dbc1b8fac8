@@ -1,0 +1,25 @@
+app/src/main/java/com/closify/myapplication/ui/components/BottomNavBar.kt
+  s_f319fd003c2854::t_d7ee8d971632a9 4,7,9
+  s_f319fd003c2854::t_130a3984ceebea 48-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "aebb744f23270f308cd9519582e5f7dbc1b8fac8",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_f319fd003c2854": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6922e0da-b259-40b0-9a6a-be11aee6d91e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
