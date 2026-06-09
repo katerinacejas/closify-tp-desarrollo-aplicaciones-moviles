@@ -2,6 +2,8 @@ package com.closify.myapplication.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -93,25 +95,17 @@ fun OutfitPostCard(
             ) {
                 post.outfit.garments.forEach { garment ->
                     val context = LocalContext.current
-                    val resName = garment.imageUrl.substringAfterLast("/")
-                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) {
-                        Image(
-                            painter = painterResource(id = resId),
-                            contentDescription = garment.name,
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .padding(4.dp)
-                        )
-                    }
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(garment.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = garment.name,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                    )
                 }
             }
 

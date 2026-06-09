@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -67,7 +69,7 @@ internal fun EditPlannedGarmentsDialog(
             Column(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
-                Box(modifier = Modifier.fillMaxWidth().height(42.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp)) {
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -140,7 +142,7 @@ internal fun PlannedOutfitDialog(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(modifier = Modifier.fillMaxWidth().height(42.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().heightIn(min = 42.dp)) {
                     IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterStart)) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -152,7 +154,8 @@ internal fun PlannedOutfitDialog(
                         text = post.plannedDate.orEmpty(),
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.align(Alignment.Center)
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(0.7f)
                     )
                 }
 

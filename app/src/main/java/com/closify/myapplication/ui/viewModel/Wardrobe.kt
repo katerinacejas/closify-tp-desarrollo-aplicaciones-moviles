@@ -44,6 +44,8 @@ class WardrobeViewModel(
         loadGarments()
     }
 
+    fun refresh() = loadGarments()
+
     private fun loadGarments() {
         _uiState.update {
             it.copy(
@@ -104,11 +106,14 @@ class WardrobeViewModel(
         garmentRepository.deleteGarment(id)
         _uiState.update { state ->
             state.copy(
+                allGarments = garmentRepository.getAllByUserId(),
                 filteredGarments = state.filteredGarments.filterNot { it.id == id },
+                categoryCounts = garmentRepository.getCategoryCounts(),
+                weatherCounts = garmentRepository.getWeatherCounts(),
+                occasionCounts = garmentRepository.getOccasionCounts(),
                 selectedGarment = null
             )
         }
-        loadGarments()
     }
 
     private fun filterGarments() {

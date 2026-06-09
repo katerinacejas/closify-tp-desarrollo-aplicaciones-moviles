@@ -33,6 +33,7 @@ fun PlannerScreen(
         onSavedDialogContinue = viewModel::onSavedDialogContinue,
         onEditSelectedPlannedPost = viewModel::onEditSelectedPlannedPost,
         onDeleteSelectedPlannedPost = viewModel::onDeleteSelectedPlannedPost,
-        onDismissSelectedPlannedPost = viewModel::onDismissSelectedPlannedPost
+        onDismissSelectedPlannedPost = viewModel::onDismissSelectedPlannedPost,
+        onDismissNoFullBodyDialog = viewModel::onDismissNoFullBodyDialog
     )
 }

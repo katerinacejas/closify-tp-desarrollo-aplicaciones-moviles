@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -89,7 +90,7 @@ fun AddGarmentContent(
         DashedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp)
+                .heightIn(min = 220.dp)
                 .clickable { onCardClick() }
         ) {
             Column(
@@ -127,7 +128,8 @@ fun AddGarmentContent(
                     text = "Tene en cuenta una iluminación adecuada",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
