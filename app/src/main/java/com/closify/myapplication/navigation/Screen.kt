@@ -29,6 +29,7 @@ sealed class Screen(val route: String) {
     data object Wardrobe : Screen("wardrobe")
     data object Friends : Screen("friends")
     data object Camera : Screen("camera")
+    data object CameraPreview : Screen("camera_preview")
     data object Calendar : Screen("calendar")
     data object Profile : Screen("profile")
     data object Notifications : Screen("notifications")

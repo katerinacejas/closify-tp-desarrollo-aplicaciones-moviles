@@ -36,6 +36,7 @@ import com.closify.myapplication.ui.screens.savefavorites.SaveFavoritesScreen
 import com.closify.myapplication.ui.screens.settings.SettingsScreen
 import com.closify.myapplication.ui.screens.wardrobe.GarmentDetailScreen
 import com.closify.myapplication.ui.screens.wardrobe.WardrobeDetailScreen
+import com.closify.myapplication.ui.screens.camera.CameraScreen
 import com.closify.myapplication.ui.screens.wardrobe.WardrobeScreen
 import com.closify.myapplication.ui.viewmodel.WardrobeViewModel
 import com.closify.myapplication.ui.viewmodel.CameraViewModel
@@ -231,7 +232,24 @@ fun AppNavGraph(
                         viewModel = cameraViewModel,
                         onNavigateToClassify = {
                             navController.navigate(Screen.ClassifyGarment.route)
+                        },
+                        onNavigateToCameraPreview = {
+                            navController.navigate(Screen.CameraPreview.route)
                         }
+                    )
+                }
+
+                composable(Screen.CameraPreview.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(CAMERA_FLOW_ROUTE)
+                    }
+                    val cameraViewModel: CameraViewModel = viewModel(parentEntry)
+                    CameraScreen(
+                        viewModel = cameraViewModel,
+                        onNavigateToClassify = {
+                            navController.navigate(Screen.ClassifyGarment.route)
+                        },
+                        onBack = { navController.popBackStack() }
                     )
                 }
 
