@@ -1,0 +1,47 @@
+.gitignore
+  s_ef187569660cfa::t_f48b39af22cf2b 15-17
+app/src/main/java/com/closify/myapplication/ui/viewModel/Profile.kt
+  s_ef187569660cfa::t_4c8580aa889a34 47-49
+app/src/main/java/com/closify/myapplication/data/repository/ProfileRepository.kt
+  s_ef187569660cfa::t_197b3a614c19dc 32-34
+app/src/main/java/com/closify/myapplication/data/repository/UserRepository.kt
+  s_ef187569660cfa::t_b54c16685d67dc 3-5,7-14,16,19-32,35-44,46,48-56,65-66,68-69,81-88,92-93,97-102,111-113,117,121-131,133,135-137,139-169
+gradle/libs.versions.toml
+  s_ef187569660cfa::t_be0f54c86a0cf9 49
+  h_e38f44ce52ca59 17-18,48,54
+  s_ef187569660cfa::t_cea23ee6b68044 19
+build.gradle.kts
+  h_e38f44ce52ca59 5
+app/src/main/java/com/closify/myapplication/ui/viewModel/SecurityViewModel.kt
+  s_ef187569660cfa::t_921486742e86a9 4,9,33-35,67-84
+app/build.gradle.kts
+  h_e38f44ce52ca59 4,58
+  s_ef187569660cfa::t_a91fe72c128805 59
+app/src/main/java/com/closify/myapplication/ui/viewModel/Main.kt
+  s_ef187569660cfa::t_03c1242a4fe231 4,11,22
+app/src/main/java/com/closify/myapplication/ClosifyApplication.kt
+  s_ef187569660cfa::t_50873d63dc5bed 1-11
+app/src/main/AndroidManifest.xml
+  s_ef187569660cfa::t_9040d6ee9dfcb6 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "156037a67cc2ee8bd851b8f8850778112d72f54f",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
