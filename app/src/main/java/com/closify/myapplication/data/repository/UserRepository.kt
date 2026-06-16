@@ -1,22 +1,59 @@
 package com.closify.myapplication.data.repository
 
+import android.content.Context
+import android.content.SharedPreferences
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.User
-import kotlinx.coroutines.delay
+import com.closify.myapplication.domain.model.UserProfile
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.tasks.await
 
-class UserRepository {
+class UserRepository private constructor(context: Context) {
 
     companion object {
-        val instance = UserRepository()
+        @Volatile private var _instance: UserRepository? = null
+
+        fun initialize(context: Context) {
+            if (_instance == null) {
+                synchronized(this) {
+                    if (_instance == null) {
+                        _instance = UserRepository(context.applicationContext)
+                    }
+                }
+            }
+        }
+
+        val instance: UserRepository
+            get() = _instance ?: error("UserRepository.initialize(context) no fue llamado.")
     }
 
-    var currentUserId: String = ""
-        private set
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("closify_profiles", Context.MODE_PRIVATE)
 
-    var currentUsername: String = ""
-        private set
+    val currentUserId: String
+        get() = auth.currentUser?.uid ?: ""
 
-    fun getCurrentUser(): User? =
-        MockClosifyData.authUserById(currentUserId) ?: MockClosifyData.userById(currentUserId)
+    val currentUsername: String
+        get() = auth.currentUser?.uid
+            ?.let { prefs.getString("${it}_username", "") } ?: ""
+
+    fun isLoggedIn(): Boolean = auth.currentUser != null
+
+    fun getCurrentUser(): User? {
+        val firebaseUser = auth.currentUser ?: return null
+        val profile = loadProfile(firebaseUser.uid) ?: return null
+        return User(
+            id = firebaseUser.uid,
+            email = firebaseUser.email ?: "",
+            profile = profile
+        )
+    }
 
     fun getCurrentUserOrDefault(): User =
         getCurrentUser() ?: MockClosifyData.currentUser
@@ -25,14 +62,11 @@ class UserRepository {
         MockClosifyData.authUserById(userId) ?: MockClosifyData.userById(userId)
 
     suspend fun login(email: String, password: String): Result<Unit> {
-        delay(1000)
-        val user = MockClosifyData.findAuthUser(email, password)
-        return if (user != null) {
-            currentUserId = user.id
-            currentUsername = user.username
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
             Result.success(Unit)
-        } else {
-            Result.failure(Exception("Credenciales incorrectas."))
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
         }
     }
 
@@ -44,28 +78,28 @@ class UserRepository {
         birthDate: String,
         bio: String
     ): Result<Unit> {
-        delay(1000)
-        val user = MockClosifyData.registerAuthUser(
-            email = email,
-            password = password,
-            username = username,
-            fullName = fullName,
-            birthDate = birthDate,
-            bio = bio
-        )
-        currentUserId = user.id
-        currentUsername = user.username
-        return Result.success(Unit)
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val uid = result.user?.uid ?: throw Exception("No se pudo crear el usuario.")
+            saveProfile(uid, username, fullName, birthDate, bio)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
+        }
     }
 
     suspend fun isUsernameAvailable(username: String): Boolean {
-        delay(300)
-        return MockClosifyData.isUsernameAvailable(username)
+        // TODO: verificar contra Firestore cuando esté integrado
+        return true
     }
 
     suspend fun requestPasswordRecovery(email: String): Result<Unit> {
-        delay(500)
-        return Result.success(Unit)
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
+        }
     }
 
     fun updateCurrentUserProfile(
@@ -74,35 +108,64 @@ class UserRepository {
         birthDate: String,
         bio: String
     ): Result<Unit> {
-        val updatedUser = MockClosifyData.updateUserProfile(
-            userId = currentUserId,
-            fullName = fullName,
-            username = username,
-            birthDate = birthDate,
-            bio = bio
-        ) ?: return Result.failure(Exception("No se pudo actualizar el perfil."))
-
-        currentUsername = updatedUser.username
+        val uid = auth.currentUser?.uid
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        saveProfile(uid, username, fullName, birthDate, bio)
         return Result.success(Unit)
     }
 
-    fun changeCurrentUserPassword(
+    suspend fun changeCurrentUserPassword(
         currentPassword: String,
         newPassword: String
     ): Result<Unit> {
-        if (currentUserId.isBlank()) {
-            return Result.failure(Exception("No hay un usuario logueado."))
-        }
-
-        if (!MockClosifyData.isCurrentPassword(currentUserId, currentPassword)) {
-            return Result.failure(Exception("La contraseña actual no es correcta."))
-        }
-
-        val updated = MockClosifyData.updateAuthUserPassword(currentUserId, newPassword)
-        return if (updated) {
+        val user = auth.currentUser
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        val email = user.email
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        return try {
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+            user.reauthenticate(credential).await()
+            user.updatePassword(newPassword).await()
             Result.success(Unit)
-        } else {
-            Result.failure(Exception("No se pudo actualizar la contraseña."))
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
         }
+    }
+
+    fun logout() {
+        auth.signOut()
+    }
+
+    private fun saveProfile(uid: String, username: String, fullName: String, birthDate: String, bio: String) {
+        prefs.edit()
+            .putString("${uid}_username", normalizeUsername(username))
+            .putString("${uid}_fullName", fullName.trim())
+            .putString("${uid}_birthDate", birthDate)
+            .putString("${uid}_bio", bio.trim())
+            .apply()
+    }
+
+    private fun loadProfile(uid: String): UserProfile? {
+        val username = prefs.getString("${uid}_username", null) ?: return null
+        return UserProfile(
+            id = uid,
+            fullName = prefs.getString("${uid}_fullName", "") ?: "",
+            username = username,
+            birthDate = prefs.getString("${uid}_birthDate", "") ?: "",
+            bio = prefs.getString("${uid}_bio", "") ?: "",
+            avatarImageResId = R.drawable.avatar_default,
+            bannerImageResId = R.drawable.banner_default
+        )
+    }
+
+    private fun normalizeUsername(username: String): String =
+        username.trim().let { if (it.startsWith("@")) it else "@$it" }
+
+    private fun mapAuthError(e: Exception): String = when (e) {
+        is FirebaseAuthInvalidUserException -> "No existe una cuenta con ese email."
+        is FirebaseAuthInvalidCredentialsException -> "El email o la contraseña son incorrectos."
+        is FirebaseAuthUserCollisionException -> "Ya existe una cuenta con ese email."
+        is FirebaseAuthWeakPasswordException -> "La contraseña es muy débil."
+        else -> e.message ?: "Ocurrió un error inesperado."
     }
 }

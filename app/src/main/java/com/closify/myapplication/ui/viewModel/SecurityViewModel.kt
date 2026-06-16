@@ -1,10 +1,12 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SecurityViewModel(
     private val userRepository: UserRepository = UserRepository.instance
@@ -27,6 +29,9 @@ class SecurityViewModel(
 
     private val _confirmError = MutableStateFlow<String?>(null)
     val confirmError: StateFlow<String?> = _confirmError.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
@@ -59,20 +64,24 @@ class SecurityViewModel(
             return
         }
 
-        userRepository.changeCurrentUserPassword(
-            currentPassword = _currentPassword.value,
-            newPassword = _newPassword.value
-        ).onSuccess {
-            _currentPassword.value = ""
-            _newPassword.value = ""
-            _confirmPassword.value = ""
-            _currentPasswordError.value = null
-            _passwordError.value = null
-            _confirmError.value = null
-            _successMessage.value = "Contraseña actualizada correctamente."
-        }.onFailure { error ->
-            _currentPasswordError.value = error.message
-            _successMessage.value = null
+        viewModelScope.launch {
+            _isLoading.value = true
+            userRepository.changeCurrentUserPassword(
+                currentPassword = _currentPassword.value,
+                newPassword = _newPassword.value
+            ).onSuccess {
+                _currentPassword.value = ""
+                _newPassword.value = ""
+                _confirmPassword.value = ""
+                _currentPasswordError.value = null
+                _passwordError.value = null
+                _confirmError.value = null
+                _successMessage.value = "Contraseña actualizada correctamente."
+            }.onFailure { error ->
+                _currentPasswordError.value = error.message
+                _successMessage.value = null
+            }
+            _isLoading.value = false
         }
     }
 

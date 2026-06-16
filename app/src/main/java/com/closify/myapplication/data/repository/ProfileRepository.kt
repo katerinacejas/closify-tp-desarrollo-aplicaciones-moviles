@@ -29,7 +29,9 @@ class ProfileRepository(
     }
 
     fun getProfile(userId: String = MockClosifyData.CURRENT_USER_ID): UserProfile =
-        requireNotNull(MockClosifyData.userById(userId)).profile
+        MockClosifyData.userById(userId)?.profile
+            ?: UserRepository.instance.getCurrentUser()?.profile
+            ?: MockClosifyData.currentUser.profile
 
     fun getUserProfile(userId: String): UserProfile? =
         MockClosifyData.userById(userId)?.profile
