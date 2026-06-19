@@ -44,8 +44,9 @@ class ProfileViewModel(
     }
 
     fun refreshProfile() {
-        val userId = userRepository.getCurrentUserOrDefault().id
-        val profile = profileRepository.getProfile(userId)
+        val user = userRepository.getCurrentUserOrDefault()
+        val userId = user.id
+        val profile = user.profile
         val friends = socialRepository.getFriends(userId)
         val posts = outfitPostRepository.getPostsByUser(userId)
         val stats = profileRepository.getProfileStats(userId)
