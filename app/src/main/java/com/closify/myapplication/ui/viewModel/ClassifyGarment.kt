@@ -1,15 +1,22 @@
 package com.closify.myapplication.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.data.remote.RemoveBgService
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 enum class ClassifyStep { BASIC, OCCASION, SAVED }
 
@@ -21,7 +28,9 @@ data class ClassifyGarmentUiState(
     val selectedOccasions: Set<Occasion> = emptySet(),
     val nameError: String? = null,
     val categoryError: String? = null,
-    val step: ClassifyStep = ClassifyStep.BASIC
+    val step: ClassifyStep = ClassifyStep.BASIC,
+    val isRemovingBackground: Boolean = false,
+    val removeBgError: String? = null
 )
 
 sealed interface ClassifyGarmentEvent {
@@ -32,10 +41,12 @@ sealed interface ClassifyGarmentEvent {
     data object Continue : ClassifyGarmentEvent
     data object Save : ClassifyGarmentEvent
     data object Back : ClassifyGarmentEvent
+    data object DismissRemoveBgError : ClassifyGarmentEvent
 }
 
 class ClassifyGarmentViewModel(
     imageUri: String,
+    private val context: Context,
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
@@ -43,16 +54,75 @@ class ClassifyGarmentViewModel(
     private val _uiState = MutableStateFlow(ClassifyGarmentUiState(imageUri = imageUri))
     val uiState: StateFlow<ClassifyGarmentUiState> = _uiState.asStateFlow()
 
+    init {
+        removeBackground(imageUri)
+    }
+
     fun onEvent(event: ClassifyGarmentEvent) {
         when (event) {
-            is ClassifyGarmentEvent.NameChanged    -> _uiState.update { it.copy(name = event.value, nameError = null) }
-            is ClassifyGarmentEvent.SelectCategory -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
-            is ClassifyGarmentEvent.ToggleWeather  -> toggleWeather(event.weather)
-            is ClassifyGarmentEvent.ToggleOccasion -> toggleOccasion(event.occasion)
-            is ClassifyGarmentEvent.Continue       -> validateAndAdvance()
-            is ClassifyGarmentEvent.Save           -> save()
-            is ClassifyGarmentEvent.Back           -> goBack()
+            is ClassifyGarmentEvent.NameChanged       -> _uiState.update { it.copy(name = event.value, nameError = null) }
+            is ClassifyGarmentEvent.SelectCategory    -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
+            is ClassifyGarmentEvent.ToggleWeather     -> toggleWeather(event.weather)
+            is ClassifyGarmentEvent.ToggleOccasion    -> toggleOccasion(event.occasion)
+            is ClassifyGarmentEvent.Continue          -> validateAndAdvance()
+            is ClassifyGarmentEvent.Save              -> save()
+            is ClassifyGarmentEvent.Back              -> goBack()
+            is ClassifyGarmentEvent.DismissRemoveBgError -> _uiState.update { it.copy(removeBgError = null) }
         }
+    }
+
+    private fun removeBackground(imageUri: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRemovingBackground = true) }
+            try {
+                val file = withContext(Dispatchers.IO) {
+                    uriToFile(imageUri)
+                } ?: run {
+                    _uiState.update { it.copy(isRemovingBackground = false) }
+                    return@launch
+                }
+
+                RemoveBgService.removeBackground(file)
+                    .onSuccess { pngBytes ->
+                        val outputFile = withContext(Dispatchers.IO) {
+                            val out = File(context.cacheDir, "removebg_${System.currentTimeMillis()}.png")
+                            out.writeBytes(pngBytes)
+                            out
+                        }
+                        _uiState.update {
+                            it.copy(
+                                imageUri = android.net.Uri.fromFile(outputFile).toString(),
+                                isRemovingBackground = false
+                            )
+                        }
+                    }
+                    .onFailure {
+                        // Si falla, muestra la imagen original sin bloquear al usuario
+                        _uiState.update {
+                            it.copy(
+                                isRemovingBackground = false,
+                                removeBgError = "No se pudo eliminar el fondo. Se usará la imagen original."
+                            )
+                        }
+                    }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isRemovingBackground = false,
+                        removeBgError = "No se pudo eliminar el fondo. Se usará la imagen original."
+                    )
+                }
+            }
+        }
+    }
+
+    private fun uriToFile(uriString: String): File? {
+        return try {
+            val uri = android.net.Uri.parse(uriString)
+            val path = uri.path ?: return null
+            val file = File(path)
+            if (file.exists()) file else null
+        } catch (e: Exception) { null }
     }
 
     private fun toggleWeather(weather: WeatherCondition) {

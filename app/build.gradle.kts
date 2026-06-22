@@ -18,6 +18,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val removeBgKey = project.rootProject.file("local.properties")
+            .readLines()
+            .firstOrNull { it.startsWith("REMOVE_BG_API_KEY=") }
+            ?.substringAfter("=") ?: ""
+        buildConfigField("String", "REMOVE_BG_API_KEY", "\"$removeBgKey\"")
     }
 
     buildTypes {
@@ -38,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -64,6 +71,8 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.room:room-ktx:2.7.1")
     kapt("androidx.room:room-compiler:2.7.1")
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.scalars)
     implementation(libs.material)
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)

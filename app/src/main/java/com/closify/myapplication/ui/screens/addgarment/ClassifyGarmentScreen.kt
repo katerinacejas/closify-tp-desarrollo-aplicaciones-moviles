@@ -1,11 +1,23 @@
 package com.closify.myapplication.ui.screens.addgarment
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,16 +31,17 @@ import com.closify.myapplication.ui.viewmodel.ClassifyStep
 fun ClassifyGarmentScreen(
     imageUri: String,
     onBack: () -> Unit,
-    onSaved: () -> Unit,
-    viewModel: ClassifyGarmentViewModel = viewModel(
+    onSaved: () -> Unit
+) {
+    val context = LocalContext.current
+    val viewModel: ClassifyGarmentViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ClassifyGarmentViewModel(imageUri) as T
+                return ClassifyGarmentViewModel(imageUri, context) as T
             }
         }
     )
-) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -66,6 +79,25 @@ fun ClassifyGarmentScreen(
                 imageUri = uiState.imageUri,
                 onDismiss = onSaved
             )
+        }
+
+        if (uiState.isRemovingBackground) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color.White)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Procesando imagen...",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
     }
 }
