@@ -1,10 +1,12 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -13,6 +15,14 @@ class MainViewModel : ViewModel() {
 
     var hasLoggedOutOnce = false
         private set
+
+    init {
+        if (UserRepository.instance.isLoggedIn()) {
+            viewModelScope.launch {
+                UserRepository.instance.restoreSession()
+            }
+        }
+    }
 
     fun onLoginSuccess() {
         _isLoggedIn.value = true
