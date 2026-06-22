@@ -33,12 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
@@ -56,8 +58,9 @@ fun SaveFavoritesScreen(
 
     if (uiState.showSavedDialog) {
         ClosifyConfirmationDialog(
-            title = "¡Outfits guardados!",
-            subtitle = "Podés verlos en tu perfil",
+            title = stringResource(R.string.save_favorites_dialog_title),
+            subtitle = stringResource(R.string.save_favorites_dialog_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = {
                 viewModel.onEvent(SaveFavoritesEvent.DismissDialog)
                 onSaved()
@@ -71,7 +74,7 @@ fun SaveFavoritesScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Guardar favoritos",
+                        text = stringResource(R.string.save_favorites_title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -80,7 +83,7 @@ fun SaveFavoritesScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -111,7 +114,7 @@ fun SaveFavoritesScreen(
             }
 
             ClosifyButton(
-                text = "Guardar",
+                text = stringResource(R.string.planner_save),
                 onClick = { viewModel.onEvent(SaveFavoritesEvent.Save) },
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -139,7 +142,7 @@ private fun SaveFavoriteOutfitCard(
                 onValueChange = { if (it.length <= 100) onNameChange(it) },
                 placeholder = {
                     Text(
-                        text = "Titulo del outfit favorito",
+                        text = stringResource(R.string.save_favorites_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

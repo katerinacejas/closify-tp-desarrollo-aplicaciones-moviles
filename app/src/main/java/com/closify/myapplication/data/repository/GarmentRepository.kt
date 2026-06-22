@@ -43,7 +43,7 @@ class GarmentRepository {
             suitableWeather = suitableWeather.ifEmpty { setOf(WeatherCondition.ANY) },
             suitableOccasions = suitableOccasions.ifEmpty { setOf(Occasion.ANY) },
             createdAt = LocalDate.now().format(
-                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
             )
         )
         addGarment(garment)

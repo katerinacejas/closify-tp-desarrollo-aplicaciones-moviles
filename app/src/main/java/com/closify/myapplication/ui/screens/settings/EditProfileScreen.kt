@@ -36,12 +36,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.components.ClosifyTopBar
@@ -86,7 +88,7 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Editar Perfil",
+                text = stringResource(R.string.edit_profile_title),
                 style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp),
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth(),
@@ -95,35 +97,35 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Nombre", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.edit_profile_name_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = uiState.fullName,
                 onValueChange = viewModel::onNameChange,
-                placeholder = "Tu nombre",
+                placeholder = stringResource(R.string.edit_profile_name_placeholder),
                 error = uiState.fullNameError
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Usuario", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.edit_profile_username_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = uiState.username,
                 onValueChange = viewModel::onUsernameChange,
-                placeholder = "@usuario",
+                placeholder = stringResource(R.string.edit_profile_username_placeholder),
                 error = uiState.usernameError
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Algo sobre ti..", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.edit_profile_bio_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             Box {
                 ClosifyTextField(
                     value = uiState.bio,
                     onValueChange = viewModel::onBioChange,
-                    placeholder = "Contanos algo sobre vos...",
+                    placeholder = stringResource(R.string.edit_profile_bio_placeholder),
                     minLines = 3,
                     maxLines = 3,
                     singleLine = false
@@ -140,11 +142,12 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(text = "Fecha de nacimiento", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.edit_profile_birthdate_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
 
             val dateFormatter = remember { DateTimeFormatter.ofPattern("dd / MM / yyyy") }
-            val birthdateText = birthdate?.format(dateFormatter) ?: uiState.birthDate.ifBlank { "dd / mm / aaaa" }
+            val placeholderBirthdate = stringResource(R.string.edit_profile_birthdate_placeholder)
+            val birthdateText = birthdate?.format(dateFormatter) ?: uiState.birthDate.ifBlank { placeholderBirthdate }
 
             OutlinedCard(
                 onClick = { showDatePicker = true },
@@ -184,7 +187,7 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ClosifyButton(
-                text = "Guardar Cambios",
+                text = stringResource(R.string.edit_profile_save_button),
                 onClick = viewModel::saveChanges
             )
 
@@ -207,10 +210,10 @@ fun EditProfileScreen(
                             viewModel.onBirthDateChange(date.toSpanishBirthDate())
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.common_ok)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                    TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.common_cancel)) }
                 }
             ) {
                 DatePicker(state = datePickerState)

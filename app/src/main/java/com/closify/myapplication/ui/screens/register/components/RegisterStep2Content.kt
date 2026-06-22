@@ -17,7 +17,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyLogo
 
@@ -53,7 +55,7 @@ fun RegisterStep2Content(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Contanos de vos",
+            text = stringResource(R.string.register_title_2),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -61,7 +63,7 @@ fun RegisterStep2Content(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "¡Queremos conocerte! Ya casi sos parte de Closify",
+            text = stringResource(R.string.register_subtitle_2),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -71,14 +73,14 @@ fun RegisterStep2Content(
         com.closify.myapplication.ui.components.ClosifyTextField(
             value = name,
             onValueChange = onNameChange,
-            placeholder = "Nombre",
+            placeholder = stringResource(R.string.register_name_placeholder),
             error = nameError
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Fecha de nacimiento",
+            text = stringResource(R.string.edit_profile_birthdate_label),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -103,7 +105,7 @@ fun RegisterStep2Content(
                 onValueChange = { if (it.length <= 140) onBioChange(it) },
                 placeholder = {
                     Text(
-                        text = "Biografía",
+                        text = stringResource(R.string.register_bio_placeholder),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -147,7 +149,7 @@ fun RegisterStep2Content(
         Spacer(modifier = Modifier.height(28.dp))
 
         ClosifyButton(
-            text = "Continuar",
+            text = stringResource(R.string.btn_continue),
             onClick = onSubmit,
             isLoading = isLoading
         )

@@ -37,11 +37,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -127,40 +129,40 @@ fun FilterTitle(category: GarmentCategory?, weather: WeatherCondition?, occasion
     val secondary = MaterialTheme.colorScheme.secondary
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
 
-    val (icon, color, label) = when {
+    val (icon, color, labelResId) = when {
         category != null -> {
             val (i, c, l) = when (category) {
-                GarmentCategory.TOP      -> Triple(Icons.Default.ArrowUpward,         primary,          "Superior")
-                GarmentCategory.BOTTOM   -> Triple(Icons.Default.ArrowDownward,        primary,          "Inferior")
-                GarmentCategory.FOOTWEAR -> Triple(Icons.Default.RadioButtonUnchecked, secondary,        "Calzado")
-                GarmentCategory.OUTERWEAR -> Triple(Icons.Default.CheckBoxOutlineBlank, secondary,       "Abrigo")
-                GarmentCategory.FULL_BODY -> Triple(Icons.Default.Person,              primary,          "FullBody")
+                GarmentCategory.TOP      -> Triple(Icons.Default.ArrowUpward,         primary,          R.string.category_top)
+                GarmentCategory.BOTTOM   -> Triple(Icons.Default.ArrowDownward,        primary,          R.string.category_bottom)
+                GarmentCategory.FOOTWEAR -> Triple(Icons.Default.RadioButtonUnchecked, secondary,        R.string.category_footwear)
+                GarmentCategory.OUTERWEAR -> Triple(Icons.Default.CheckBoxOutlineBlank, secondary,       R.string.category_outerwear)
+                GarmentCategory.FULL_BODY -> Triple(Icons.Default.Person,              primary,          R.string.category_full_body)
             }
-            Triple(i, c, "Estante: $l")
+            Triple(i, c, l)
         }
         weather != null -> {
             val (i, c, l) = when (weather) {
-                WeatherCondition.HOT   -> Triple(Icons.Default.WbSunny,      primary,          "Calor")
-                WeatherCondition.COLD  -> Triple(Icons.Default.AcUnit,        primary,          "Frío")
-                WeatherCondition.WINDY -> Triple(Icons.Default.Air,           primary,          "Ventoso")
-                WeatherCondition.MILD  -> Triple(Icons.Default.WbCloudy,      primary,          "Templado")
-                WeatherCondition.ANY   -> Triple(Icons.Default.AllInclusive,  primary,          "Indistinto")
+                WeatherCondition.HOT   -> Triple(Icons.Default.WbSunny,      primary,          R.string.weather_hot)
+                WeatherCondition.COLD  -> Triple(Icons.Default.AcUnit,        primary,          R.string.weather_cold)
+                WeatherCondition.WINDY -> Triple(Icons.Default.Air,           primary,          R.string.weather_windy)
+                WeatherCondition.MILD  -> Triple(Icons.Default.WbCloudy,      primary,          R.string.weather_mild)
+                WeatherCondition.ANY   -> Triple(Icons.Default.AllInclusive,  primary,          R.string.weather_any)
             }
-            Triple(i, c, "Estante: $l")
+            Triple(i, c, l)
         }
         occasion != null -> {
             val (i, c, l) = when (occasion) {
-                Occasion.PARTY    -> Triple(Icons.Default.NightsStay, primary,   "Fiesta")
-                Occasion.WORK     -> Triple(Icons.Default.Work,        primary,   "Trabajo")
-                Occasion.CASUAL   -> Triple(Icons.Default.Explore,     primary,   "Paseo")
-                Occasion.ACADEMIC -> Triple(Icons.Default.Bookmark,    primary,   "Académico")
-                Occasion.CHILL    -> Triple(Icons.Default.MusicNote,   primary,   "Chill")
-                Occasion.ELEGANT  -> Triple(Icons.Default.Sell,        primary,   "Elegante")
-                Occasion.ANY      -> Triple(Icons.Default.Hexagon,     primary,   "Indistinto")
+                Occasion.PARTY    -> Triple(Icons.Default.NightsStay, primary,   R.string.occasion_party)
+                Occasion.WORK     -> Triple(Icons.Default.Work,        primary,   R.string.occasion_work)
+                Occasion.CASUAL   -> Triple(Icons.Default.Explore,     primary,   R.string.occasion_casual)
+                Occasion.ACADEMIC -> Triple(Icons.Default.Bookmark,    primary,   R.string.occasion_academic)
+                Occasion.CHILL    -> Triple(Icons.Default.MusicNote,   primary,   R.string.occasion_chill)
+                Occasion.ELEGANT  -> Triple(Icons.Default.Sell,        primary,   R.string.occasion_elegant)
+                Occasion.ANY      -> Triple(Icons.Default.Hexagon,     primary,   R.string.occasion_any)
             }
-            Triple(i, c, "Estante: $l")
+            Triple(i, c, l)
         }
-        else -> Triple(Icons.Default.AllInclusive, onSurfaceVariant, "Estante")
+        else -> Triple(Icons.Default.AllInclusive, onSurfaceVariant, R.string.wardrobe_shelf_default)
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -172,7 +174,11 @@ fun FilterTitle(category: GarmentCategory?, weather: WeatherCondition?, occasion
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text = label,
+            text = if (category != null || weather != null || occasion != null) {
+                stringResource(R.string.wardrobe_shelf_prefix, stringResource(labelResId))
+            } else {
+                stringResource(labelResId)
+            },
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground

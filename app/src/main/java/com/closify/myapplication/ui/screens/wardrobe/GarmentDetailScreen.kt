@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -133,12 +135,12 @@ fun GarmentDetailContent(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     Text(
-                        text = "Prenda",
+                        text = stringResource(R.string.garment_detail_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -182,9 +184,9 @@ fun GarmentDetailContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                DetailSection(title = "Tipo de prenda") {
+                DetailSection(title = stringResource(R.string.garment_detail_type)) {
                     SelectableChip(
-                        label = getCategoryLabel(garment.category),
+                        label = stringResource(getCategoryLabelRes(garment.category)),
                         selected = true,
                         onClick = {}
                     )
@@ -192,14 +194,14 @@ fun GarmentDetailContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                DetailSection(title = "Clima ideal para usarla") {
+                DetailSection(title = stringResource(R.string.garment_detail_weather)) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         garment.suitableWeather.filter { it != WeatherCondition.ANY }.forEach { weather ->
                             SelectableChip(
-                                label = getWeatherLabel(weather),
+                                label = stringResource(getWeatherLabelRes(weather)),
                                 selected = true,
                                 onClick = {}
                             )
@@ -209,14 +211,14 @@ fun GarmentDetailContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                DetailSection(title = "Ocasion ideal para usarla") {
+                DetailSection(title = stringResource(R.string.garment_detail_occasion)) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         garment.suitableOccasions.filter { it != Occasion.ANY }.forEach { occasion ->
                             SelectableChip(
-                                label = getOccasionLabel(occasion),
+                                label = stringResource(getOccasionLabelRes(occasion)),
                                 selected = true,
                                 onClick = {}
                             )
@@ -227,7 +229,7 @@ fun GarmentDetailContent(
                 Spacer(modifier = Modifier.height(40.dp))
 
                 ClosifyButton(
-                    text = "Eliminar prenda",
+                    text = stringResource(R.string.garment_detail_delete),
                     onClick = onDelete,
                     modifier = Modifier.fillMaxWidth(0.6f)
                 )
@@ -252,30 +254,30 @@ fun DetailSection(
     }
 }
 
-private fun getCategoryLabel(category: GarmentCategory): String = when (category) {
-    GarmentCategory.TOP -> "Superior"
-    GarmentCategory.BOTTOM -> "Inferior"
-    GarmentCategory.FOOTWEAR -> "Calzado"
-    GarmentCategory.OUTERWEAR -> "Abrigo"
-    GarmentCategory.FULL_BODY -> "FullBody"
+private fun getCategoryLabelRes(category: GarmentCategory): Int = when (category) {
+    GarmentCategory.TOP -> R.string.category_top
+    GarmentCategory.BOTTOM -> R.string.category_bottom
+    GarmentCategory.FOOTWEAR -> R.string.category_footwear
+    GarmentCategory.OUTERWEAR -> R.string.category_outerwear
+    GarmentCategory.FULL_BODY -> R.string.category_full_body
 }
 
-private fun getWeatherLabel(weather: WeatherCondition): String = when (weather) {
-    WeatherCondition.HOT -> "Calor"
-    WeatherCondition.COLD -> "Frío"
-    WeatherCondition.WINDY -> "Ventoso"
-    WeatherCondition.MILD -> "Templado"
-    WeatherCondition.ANY -> "Indistinto"
+private fun getWeatherLabelRes(weather: WeatherCondition): Int = when (weather) {
+    WeatherCondition.HOT -> R.string.weather_hot
+    WeatherCondition.COLD -> R.string.weather_cold
+    WeatherCondition.WINDY -> R.string.weather_windy
+    WeatherCondition.MILD -> R.string.weather_mild
+    WeatherCondition.ANY -> R.string.weather_any
 }
 
-private fun getOccasionLabel(occasion: Occasion): String = when (occasion) {
-    Occasion.WORK -> "Trabajo"
-    Occasion.ACADEMIC -> "Académico"
-    Occasion.CASUAL -> "Paseo"
-    Occasion.PARTY -> "Fiesta"
-    Occasion.CHILL -> "Chill"
-    Occasion.ELEGANT -> "Elegante"
-    Occasion.ANY -> "Indistinto"
+private fun getOccasionLabelRes(occasion: Occasion): Int = when (occasion) {
+    Occasion.WORK -> R.string.occasion_work
+    Occasion.ACADEMIC -> R.string.occasion_academic
+    Occasion.CASUAL -> R.string.occasion_casual
+    Occasion.PARTY -> R.string.occasion_party
+    Occasion.CHILL -> R.string.occasion_chill
+    Occasion.ELEGANT -> R.string.occasion_elegant
+    Occasion.ANY -> R.string.occasion_any
 }
 
 @Preview(showSystemUi = true)

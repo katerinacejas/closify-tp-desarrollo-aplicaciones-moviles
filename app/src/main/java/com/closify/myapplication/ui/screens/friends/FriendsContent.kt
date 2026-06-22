@@ -40,10 +40,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -79,7 +81,7 @@ fun FriendsContent(
     if (selectedLikesPost != null) {
         SocialLikesDialog(
             likes = selectedLikesPost.likedBy,
-            emptyMessage = "Este outfit aun no tiene ningun me gusta\nDale me gusta y muestrale lo cool que quedo!",
+            emptyMessage = stringResource(R.string.friends_likes_empty),
             onUserClick = { userId ->
                 selectedLikesPostId = null
                 onUserClick(userId)
@@ -91,7 +93,7 @@ fun FriendsContent(
     if (selectedCommentsPost != null) {
         SocialCommentsDialog(
             comments = selectedCommentsPost.comments,
-            emptyMessage = "Este outfit aun no tiene ningun comentario\nComentale que tal quedo su look!",
+            emptyMessage = stringResource(R.string.friends_comments_empty),
             commentValue = uiState.commentDrafts[selectedCommentsPost.id].orEmpty(),
             onCommentValueChange = { value ->
                 onCommentDraftChange(selectedCommentsPost.id, value)
@@ -135,16 +137,16 @@ fun FriendsContent(
 
             uiState.friendsCount == 0 -> item {
                 EmptyFriendsState(
-                    title = "Aun no tenes amigos agregados para ver sus posteos de outfits favoritos o planificados",
-                    subtitle = "Escribe el nombre de un amigo en la barra de busqueda y enviale una solicitud de amistad",
+                    title = stringResource(R.string.friends_empty_title),
+                    subtitle = stringResource(R.string.friends_empty_subtitle),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
             }
 
             uiState.posts.isEmpty() -> item {
                 EmptyFriendsState(
-                    title = "Aun ningun amigo compartio su outfit",
-                    subtitle = "Cuando compartan sus looks, lo veras aqui",
+                    title = stringResource(R.string.friends_no_posts_title),
+                    subtitle = stringResource(R.string.friends_no_posts_subtitle),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
             }
@@ -204,7 +206,7 @@ private fun FriendsSearchResults(
         ) {
             if (friends.isNotEmpty()) {
                 Text(
-                    text = "Mis amigos",
+                    text = stringResource(R.string.friends_my_friends),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -229,7 +231,7 @@ private fun FriendsSearchResults(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 Text(
-                    text = "Quiza estas buscando a...",
+                    text = stringResource(R.string.friends_suggestions),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth(),
@@ -259,9 +261,9 @@ private fun SearchUserRow(
     val isPending = relationshipStatus == FriendRelationshipStatus.OUTGOING_PENDING
     val isFriend = relationshipStatus == FriendRelationshipStatus.FRIEND
     val actionText = when (relationshipStatus) {
-        FriendRelationshipStatus.FRIEND -> "Eliminar"
-        FriendRelationshipStatus.OUTGOING_PENDING -> "Pendiente"
-        FriendRelationshipStatus.NONE -> "Agregar"
+        FriendRelationshipStatus.FRIEND -> stringResource(R.string.friends_action_remove)
+        FriendRelationshipStatus.OUTGOING_PENDING -> stringResource(R.string.friends_action_pending)
+        FriendRelationshipStatus.NONE -> stringResource(R.string.friends_action_add)
     }
 
     Row(
@@ -334,7 +336,7 @@ private fun EmptyFriendsState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Amigos",
+            text = stringResource(R.string.profile_friends_title),
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)

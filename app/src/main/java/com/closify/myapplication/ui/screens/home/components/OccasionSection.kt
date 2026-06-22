@@ -6,18 +6,20 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.ui.components.SelectableChip
 
 private val occasionOptions = listOf(
-    Occasion.WORK     to "Trabajo",
-    Occasion.ACADEMIC to "Académico",
-    Occasion.CASUAL   to "Paseo",
-    Occasion.PARTY    to "Fiesta",
-    Occasion.CHILL    to "Chill",
-    Occasion.ELEGANT  to "Elegante",
-    Occasion.ANY      to "Indistinto"
+    Occasion.WORK     to R.string.occasion_work,
+    Occasion.ACADEMIC to R.string.occasion_academic,
+    Occasion.CASUAL   to R.string.occasion_casual,
+    Occasion.PARTY    to R.string.occasion_party,
+    Occasion.CHILL    to R.string.occasion_chill,
+    Occasion.ELEGANT  to R.string.occasion_elegant,
+    Occasion.ANY      to R.string.occasion_any
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -26,15 +28,15 @@ fun OccasionSection(
     selectedOccasion: Occasion?,
     onOccasionSelected: (Occasion) -> Unit
 ) {
-    SectionCard(title = "OCASIÓN") {
+    SectionCard(title = stringResource(R.string.home_occasion_title)) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            occasionOptions.forEach { (occasion, label) ->
+            occasionOptions.forEach { (occasion, labelRes) ->
                 SelectableChip(
-                    label = label,
+                    label = stringResource(labelRes),
                     selected = selectedOccasion == occasion,
                     onClick = { onOccasionSelected(occasion) }
                 )

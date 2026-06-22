@@ -27,10 +27,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.screens.home.components.AutoManualToggle
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.CameraEvent
@@ -52,7 +54,7 @@ fun AddGarmentContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Nueva prenda",
+            text = stringResource(R.string.add_garment_title),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
@@ -61,7 +63,7 @@ fun AddGarmentContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Utiliza la camara o subí una foto de tu prenda\npara guardarla en tu guardarropas",
+            text = stringResource(R.string.add_garment_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -79,8 +81,8 @@ fun AddGarmentContent(
                     )
                 )
             },
-            labelAuto = "CAMARA",
-            labelManual = "SUBIR DE LA GALERIA",
+            labelAuto = stringResource(R.string.add_garment_toggle_camera),
+            labelManual = stringResource(R.string.add_garment_toggle_gallery),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -114,9 +116,9 @@ fun AddGarmentContent(
 
                 Text(
                     text = if (selectedMode == CameraMode.GALLERY)
-                        "Adjuntá una prenda de tu galeria"
+                        stringResource(R.string.add_garment_action_gallery)
                     else
-                        "Captura tu prenda",
+                        stringResource(R.string.add_garment_action_camera),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
@@ -125,7 +127,7 @@ fun AddGarmentContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Tene en cuenta una iluminación adecuada",
+                    text = stringResource(R.string.add_garment_lighting_tip),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
