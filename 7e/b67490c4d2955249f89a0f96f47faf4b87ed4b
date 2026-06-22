@@ -1,0 +1,55 @@
+build.gradle.kts
+  h_e38f44ce52ca59 4,6
+app/src/main/java/com/closify/myapplication/ui/viewModel/Profile.kt
+  s_ef187569660cfa::t_2c47a9e2b59ba1 5,15-17,47-51,55-60
+gradle/libs.versions.toml
+  h_e38f44ce52ca59 59,61
+  s_ef187569660cfa::t_298d1073ef8133 19,21
+  s_ef187569660cfa::t_4faf96cc8b6947 51,53-55
+app/src/main/java/com/closify/myapplication/data/local/dao/UserDao.kt
+  s_ef187569660cfa::t_7e707738186715 1-22
+app/src/main/java/com/closify/myapplication/ui/viewModel/Main.kt
+  h_e38f44ce52ca59 22
+  s_ef187569660cfa::t_5b69a1b0834cfa 4,9,19-21,23-25
+app/src/main/java/com/closify/myapplication/data/local/mapper/UserMapper.kt
+  s_ef187569660cfa::t_b9d9f8766f31e8 1-55
+app/src/main/java/com/closify/myapplication/data/repository/UserRepository.kt
+  s_ef187569660cfa::t_6e50f2691534f7 4-8,16,25-27,48-50,56,68-72,74-78,81-83,101-118,130-140,161-170,172-174,176,178,205-207,211-213,215
+  s_ef187569660cfa::t_4e0c83b751f722 17-19,23
+  s_ef187569660cfa::t_5b5815eecf3578 120-122
+  s_ef187569660cfa::t_0ee674f46d4790 175,177
+  s_ef187569660cfa::t_6bf5dc17f5532a 73,119,160,171,202,214
+  s_ef187569660cfa::t_9507485327e554 53-54,57,61,63
+  s_ef187569660cfa::t_c460b59d7a4e82 20-22
+  s_ef187569660cfa::t_10366f200c18a2 51
+  s_ef187569660cfa::t_80b699a4067317 208-210
+gradle.properties
+  s_ef187569660cfa::t_9ddf2a872cc723 15-17
+app/src/main/java/com/closify/myapplication/data/local/AppDatabase.kt
+  s_ef187569660cfa::t_6cc7418dcb3789 1-27
+app/build.gradle.kts
+  h_e38f44ce52ca59 5-6,33-34,36-37,60,62-64
+app/src/main/java/com/closify/myapplication/data/local/entity/UserEntity.kt
+  s_ef187569660cfa::t_ddc101c576b4b7 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "7eb67490c4d2955249f89a0f96f47faf4b87ed4b",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
