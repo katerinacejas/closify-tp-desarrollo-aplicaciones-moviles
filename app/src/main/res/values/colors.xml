@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Colores XML de Closify.
+    En Compose usamos los tokens semánticos de ClosifyTheme (Color.kt).
+    Estos valores XML se usan para: notificaciones, adaptive icons, splash screen.
+-->
+<resources>
+    <color name="closify_primary">#7C3AED</color>
+    <color name="closify_primary_light">#B9A7F7</color>
+    <color name="closify_background">#FFF7FB</color>
+    <color name="closify_background_dark">#17111F</color>
+</resources>

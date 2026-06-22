@@ -1,0 +1,49 @@
+<!--
+  ~ Copyright (C) 2026 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="51dp"
+    android:height="50dp"
+    android:viewportWidth="51"
+    android:viewportHeight="50">
+  <path
+      android:strokeWidth="1"
+      android:pathData="M8,12.303L43,12.303A3.5,3.5 0,0 1,46.5 15.803L46.5,37.803A3.5,3.5 0,0 1,43 41.303L8,41.303A3.5,3.5 0,0 1,4.5 37.803L4.5,15.803A3.5,3.5 0,0 1,8 12.303z"
+      android:fillColor="#ffffff"
+      android:strokeColor="#B9A7F7"/>
+  <path
+      android:pathData="M31.404,5.835L34.404,9.335L36,12.224H28.832H15.5L17.261,8.724L19.761,5.224L31.404,5.835Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M20,5.316L30.85,5.316L31.5,5.316"
+      android:fillColor="#00000000"
+      android:strokeColor="#B9A7F7"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M15.5,11.803L19.817,5.409M36,11.803L31.5,5.409"
+      android:fillColor="#00000000"
+      android:strokeColor="#B9A7F7"
+      android:strokeLineCap="round"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M25.5,27.303m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0"
+      android:fillColor="#B9A7F7"
+      android:strokeColor="#B9A7F7"/>
+  <path
+      android:pathData="M19.5,8.303C19.5,7.475 20.172,6.803 21,6.803H30C30.828,6.803 31.5,7.475 31.5,8.303C31.5,9.132 30.828,9.803 30,9.803H21C20.172,9.803 19.5,9.132 19.5,8.303Z"
+      android:fillColor="#B9A7F7"/>
+</vector>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Closify</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Tu estilo, organizado</string>
+    <string name="onboarding_1_description">Sacá fotos de tus prendas, guardalas en estantes y encontrá todo tu guardarropa desde un solo lugar.</string>
+
+    <string name="onboarding_2_title">Outfits para cada momento</string>
+    <string name="onboarding_2_description">Generá combinaciones según el clima, la ocasión y tus planes. También podés guardar favoritos y planificar qué usar cada día.</string>
+
+    <string name="onboarding_3_title">Inspírate con tus amigos</string>
+    <string name="onboarding_3_description">Publicá tus outfits en tu perfil, mirá los looks de tus amigos y comenten ideas para inspirarse entre ustedes.</string>
+
+    <!-- Buttons -->
+    <string name="btn_continue">Continuar</string>
+    <string name="btn_start">Comenzar</string>
+</resources>
