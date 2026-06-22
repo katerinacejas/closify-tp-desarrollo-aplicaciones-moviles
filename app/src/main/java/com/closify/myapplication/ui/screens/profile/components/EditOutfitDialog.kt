@@ -19,10 +19,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 
 private const val MaxOutfitTitleLength = 100
 
@@ -37,7 +39,7 @@ fun EditOutfitDialog(
     var title by remember(initialTitle) { mutableStateOf(initialTitle.orEmpty()) }
 
     ProfileDialogScaffold(
-        title = "Editar Outfit",
+        title = stringResource(R.string.profile_edit_title),
         onDismiss = onDismiss,
         modifier = modifier,
         contentTopSpacing = 18.dp,
@@ -55,7 +57,7 @@ fun EditOutfitDialog(
                 .height(76.dp),
             placeholder = {
                 Text(
-                    text = "Titulo del outfit",
+                    text = stringResource(R.string.profile_edit_placeholder),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -99,7 +101,7 @@ fun EditOutfitDialog(
                 )
             ) {
                 Text(
-                    text = "Eliminar",
+                    text = stringResource(R.string.profile_delete_title),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -116,7 +118,7 @@ fun EditOutfitDialog(
                 )
             ) {
                 Text(
-                    text = "Guardar cambios",
+                    text = stringResource(R.string.edit_profile_save_button),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

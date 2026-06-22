@@ -11,8 +11,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.UserSummary
 
 @Composable
@@ -24,7 +26,7 @@ fun ProfileFriendsDialog(
     modifier: Modifier = Modifier
 ) {
     SocialDialogScaffold(
-        title = "Mis amigos",
+        title = stringResource(R.string.profile_friends_my_friends),
         onDismiss = onDismiss,
         modifier = modifier,
         contentTopSpacing = 8.dp
@@ -51,7 +53,7 @@ fun ProfileFriendsDialog(
                                 modifier = Modifier.height(34.dp)
                             ) {
                                 Text(
-                                    text = "Eliminar",
+                                    text = stringResource(R.string.common_delete),
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                                 )
                             }

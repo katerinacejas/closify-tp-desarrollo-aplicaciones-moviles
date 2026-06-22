@@ -12,7 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import com.closify.myapplication.R
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -44,15 +46,15 @@ fun HomeContent(
 ) {
     when (dialog) {
         HomeDialog.NO_GARMENTS -> ClosifyConfirmationDialog(
-            title = "Tu guardarropa está vacío",
-            subtitle = "Agrega prendas en tu guardarropa\npara poder generar outfits",
-            buttonText = "Continuar",
+            title = stringResource(R.string.dialog_no_garments_title),
+            subtitle = stringResource(R.string.dialog_no_garments_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = { onEvent(HomeEvent.DismissDialog) }
         )
         HomeDialog.NO_COMBINATIONS -> ClosifyConfirmationDialog(
-            title = "Sin combinaciones posibles",
-            subtitle = "No encontramos prendas que combinen\ncon el clima y ocasión que elegiste",
-            buttonText = "Continuar",
+            title = stringResource(R.string.dialog_no_combinations_title),
+            subtitle = stringResource(R.string.dialog_no_combinations_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = { onEvent(HomeEvent.DismissDialog) }
         )
         null -> Unit
@@ -74,7 +76,7 @@ fun HomeContent(
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
-                    append("BUEN DÍA")
+                    append(stringResource(R.string.home_good_morning))
                     if (username.isNotEmpty()) append(", ${username.removePrefix("@").uppercase()}")
                 }
             },
@@ -86,7 +88,7 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "¿Qué outfit preferís hoy?",
+            text = stringResource(R.string.home_what_outfit),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -113,7 +115,7 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         ClosifyButton(
-            text = "Generar outfits",
+            text = stringResource(R.string.home_generate_button),
             onClick = { onEvent(HomeEvent.GenerateOutfits) },
             enabled = isGenerateEnabled
         )

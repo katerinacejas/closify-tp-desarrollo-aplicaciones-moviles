@@ -43,12 +43,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
@@ -115,7 +117,7 @@ fun WardrobeContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Guardarropas",
+                text = stringResource(R.string.wardrobe_title),
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -125,7 +127,7 @@ fun WardrobeContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Explorá tus prendas en estantes de tu guardarropa según tipo, clima u ocasión",
+                text = stringResource(R.string.wardrobe_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -139,25 +141,25 @@ fun WardrobeContent(
                 horizontalArrangement = Arrangement.Center
             ) {
                 SelectableChip(
-                    label = "Tipo",
+                    label = stringResource(R.string.wardrobe_filter_type),
                     selected = uiState.selectedFilter == WardrobeFilter.TYPE,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.TYPE)) }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
-                    label = "Clima",
+                    label = stringResource(R.string.wardrobe_filter_weather),
                     selected = uiState.selectedFilter == WardrobeFilter.WEATHER,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.WEATHER)) }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
-                    label = "Ocasión",
+                    label = stringResource(R.string.wardrobe_filter_occasion),
                     selected = uiState.selectedFilter == WardrobeFilter.OCCASION,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.OCCASION)) }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
-                    label = "Todo",
+                    label = stringResource(R.string.wardrobe_filter_all),
                     selected = uiState.selectedFilter == WardrobeFilter.ALL,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.ALL)) }
                 )
@@ -172,12 +174,12 @@ fun WardrobeContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Todo tu guardarropas",
+                        text = stringResource(R.string.wardrobe_all_title),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Total ${uiState.allGarments.size} prendas",
+                        text = stringResource(R.string.wardrobe_total_count, uiState.allGarments.size),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -191,10 +193,10 @@ fun WardrobeContent(
                 )
             } else {
                 val shelfTitle = when (uiState.selectedFilter) {
-                    WardrobeFilter.TYPE -> "Estantes por tipo de prenda"
-                    WardrobeFilter.WEATHER -> "Estantes por clima"
-                    WardrobeFilter.OCCASION -> "Estantes por ocasión"
-                    else -> "Estantes"
+                    WardrobeFilter.TYPE -> stringResource(R.string.wardrobe_shelf_type)
+                    WardrobeFilter.WEATHER -> stringResource(R.string.wardrobe_shelf_weather)
+                    WardrobeFilter.OCCASION -> stringResource(R.string.wardrobe_shelf_occasion)
+                    else -> stringResource(R.string.wardrobe_shelf_default)
                 }
 
                 Text(
@@ -240,18 +242,18 @@ fun ShelfList(
     onCategoryClick: (GarmentCategory) -> Unit
 ) {
     val items = listOf(
-        GarmentCategory.TOP to "Superior",
-        GarmentCategory.BOTTOM to "Inferior",
-        GarmentCategory.FOOTWEAR to "Calzado",
-        GarmentCategory.OUTERWEAR to "Abrigo",
-        GarmentCategory.FULL_BODY to "FullBody"
+        GarmentCategory.TOP to R.string.category_top,
+        GarmentCategory.BOTTOM to R.string.category_bottom,
+        GarmentCategory.FOOTWEAR to R.string.category_footwear,
+        GarmentCategory.OUTERWEAR to R.string.category_outerwear,
+        GarmentCategory.FULL_BODY to R.string.category_full_body
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items.forEach { (category, label) ->
+        items.forEach { (category, labelRes) ->
             ShelfCard(
                 icon = getCategoryIcon(category),
-                label = label,
+                label = stringResource(labelRes),
                 count = categoryCounts[category] ?: 0,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 onClick = { onCategoryClick(category) }
@@ -266,18 +268,18 @@ fun WeatherShelfList(
     onWeatherClick: (WeatherCondition) -> Unit
 ) {
     val items = listOf(
-        WeatherCondition.HOT to "Calor",
-        WeatherCondition.COLD to "Frío",
-        WeatherCondition.WINDY to "Ventoso",
-        WeatherCondition.MILD to "Templado",
-        WeatherCondition.ANY to "Indistinto"
+        WeatherCondition.HOT to R.string.weather_hot,
+        WeatherCondition.COLD to R.string.weather_cold,
+        WeatherCondition.WINDY to R.string.weather_windy,
+        WeatherCondition.MILD to R.string.weather_mild,
+        WeatherCondition.ANY to R.string.weather_any
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items.forEach { (condition, label) ->
+        items.forEach { (condition, labelRes) ->
             ShelfCard(
                 icon = getWeatherIcon(condition),
-                label = label,
+                label = stringResource(labelRes),
                 count = weatherCounts[condition] ?: 0,
                 color = if (condition == WeatherCondition.ANY) {
                     MaterialTheme.colorScheme.primary
@@ -296,20 +298,20 @@ fun OccasionShelfList(
     onOccasionClick: (Occasion) -> Unit
 ) {
     val items = listOf(
-        Occasion.PARTY to "Fiesta",
-        Occasion.WORK to "Trabajo",
-        Occasion.CASUAL to "Paseo",
-        Occasion.ACADEMIC to "Académico",
-        Occasion.CHILL to "Chill",
-        Occasion.ELEGANT to "Elegante",
-        Occasion.ANY to "Indistinto"
+        Occasion.PARTY to R.string.occasion_party,
+        Occasion.WORK to R.string.occasion_work,
+        Occasion.CASUAL to R.string.occasion_casual,
+        Occasion.ACADEMIC to R.string.occasion_academic,
+        Occasion.CHILL to R.string.occasion_chill,
+        Occasion.ELEGANT to R.string.occasion_elegant,
+        Occasion.ANY to R.string.occasion_any
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items.forEach { (occasion, label) ->
+        items.forEach { (occasion, labelRes) ->
             ShelfCard(
                 icon = getOccasionIcon(occasion),
-                label = label,
+                label = stringResource(labelRes),
                 count = occasionCounts[occasion] ?: 0,
                 color = if (occasion == Occasion.ANY) {
                     MaterialTheme.colorScheme.primary
@@ -356,7 +358,7 @@ fun ShelfCard(
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "$count prendas",
+                text = stringResource(R.string.wardrobe_garments_count, count),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

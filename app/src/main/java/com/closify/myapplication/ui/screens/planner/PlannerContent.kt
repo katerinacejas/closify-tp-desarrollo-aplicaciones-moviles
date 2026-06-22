@@ -26,10 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -94,17 +96,18 @@ fun PlannerContent(
 
     if (uiState.showNoFullBodyDialog) {
         ClosifyConfirmationDialog(
-            title = "Sin prendas FullBody",
-            subtitle = "No tenés prendas de tipo FullBody en tu guardarropa",
-            buttonText = "Entendido",
+            title = stringResource(R.string.planner_full_body_dialog_title),
+            subtitle = stringResource(R.string.planner_full_body_dialog_subtitle),
+            buttonText = stringResource(R.string.planner_button_got_it),
             onDismiss = onDismissNoFullBodyDialog
         )
     }
 
     if (uiState.showSavedDialog) {
         ClosifyConfirmationDialog(
-            title = "¡Outfit guardado!",
-            subtitle = "Podés verlo en tu calendario y en tus\npost de outfits planificados",
+            title = stringResource(R.string.planner_saved_dialog_title),
+            subtitle = stringResource(R.string.planner_saved_dialog_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = onSavedDialogContinue
         )
     }
@@ -162,13 +165,13 @@ private fun PlannerDateSelectionContent(
             ) {
                 Spacer(modifier = Modifier.height(42.dp))
                 Text(
-                    text = "Planificador",
+                    text = stringResource(R.string.planner_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Selecciona una fecha para ver el pronóstico\ny arma el outfit perfecto antes de salir",
+                    text = stringResource(R.string.planner_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -223,7 +226,7 @@ private fun PlannerOutfitSelectionContent(
             if (forecast == null) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Aún no tenemos información del clima para\nel día seleccionado",
+                    text = stringResource(R.string.planner_no_forecast),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -270,7 +273,7 @@ private fun PlannerOutfitSelectionContent(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                 modifier = Modifier.width(156.dp).height(40.dp)
             ) {
-                Text(text = "Continuar", style = MaterialTheme.typography.labelLarge)
+                Text(text = stringResource(R.string.btn_continue), style = MaterialTheme.typography.labelLarge)
             }
         }
     }
@@ -307,12 +310,12 @@ private fun PlannerReviewContent(
         ) {
             Spacer(modifier = Modifier.height(18.dp))
             Text(
-                text = "Editar planificación",
+                text = stringResource(R.string.planner_edit_title),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(14.dp))
-            Text(text = "Tu outfit para este día", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
+            Text(text = stringResource(R.string.planner_your_outfit), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(10.dp))
             PlannedGarmentsCard(garments = uiState.plannedGarments, onEditClick = { showEditGarmentsDialog = true })
             Spacer(modifier = Modifier.height(22.dp))
@@ -332,7 +335,7 @@ private fun PlannerReviewContent(
                 contentPadding = PaddingValues(horizontal = 8.dp),
                 modifier = Modifier.weight(1f).height(40.dp)
             ) {
-                Text(text = "Añadir mas prendas", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
+                Text(text = stringResource(R.string.planner_add_garments), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
             }
             Button(
                 onClick = onSavePlanning,
@@ -340,7 +343,7 @@ private fun PlannerReviewContent(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                 modifier = Modifier.weight(1f).height(40.dp)
             ) {
-                Text(text = "Guardar", style = MaterialTheme.typography.labelLarge)
+                Text(text = stringResource(R.string.planner_save), style = MaterialTheme.typography.labelLarge)
             }
         }
     }

@@ -11,12 +11,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val appearanceRepository = AppearanceRepository.getInstance(application)
 
     val isDarkMode: StateFlow<Boolean> = appearanceRepository.isDarkMode
+    val language: StateFlow<String> = appearanceRepository.language
 
-    private val _fontScale = MutableStateFlow(1f) // 0f, 1f, 2f, 3f para los 4 niveles
+    private val _fontScale = MutableStateFlow(1f)
     val fontScale: StateFlow<Float> = _fontScale.asStateFlow()
-
-    private val _language = MutableStateFlow("ENGLISH")
-    val language: StateFlow<String> = _language.asStateFlow()
 
     fun toggleDarkMode(enabled: Boolean) {
         appearanceRepository.setDarkMode(enabled)
@@ -26,7 +24,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         _fontScale.value = scale
     }
 
-    fun updateLanguage(lang: String) {
-        _language.value = lang
+    fun updateLanguage(code: String) {
+        appearanceRepository.setLanguage(code)
     }
 }

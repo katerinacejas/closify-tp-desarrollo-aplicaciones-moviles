@@ -23,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.ui.screens.profile.components.ProfileDialogScaffold
 
@@ -44,7 +46,7 @@ fun DeleteGarmentDialog(
     onDismiss: () -> Unit
 ) {
     ProfileDialogScaffold(
-        title = "Eliminar",
+        title = stringResource(R.string.common_delete),
         onDismiss = onDismiss,
         heightFraction = null,
         contentTopSpacing = 24.dp
@@ -78,7 +80,7 @@ fun DeleteGarmentDialog(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "¿Estás seguro de eliminar esta prenda de tu guardarropa?",
+                text = stringResource(R.string.wardrobe_delete_confirmation),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -87,7 +89,7 @@ fun DeleteGarmentDialog(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Esta acción no se puede deshacer.",
+                text = stringResource(R.string.profile_delete_warning),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -112,7 +114,7 @@ fun DeleteGarmentDialog(
                     )
                 ) {
                     Text(
-                        text = "Cancelar",
+                        text = stringResource(R.string.common_cancel),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -130,7 +132,7 @@ fun DeleteGarmentDialog(
                     )
                 ) {
                     Text(
-                        text = "Eliminar",
+                        text = stringResource(R.string.common_delete),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )

@@ -14,4 +14,292 @@
     <!-- Buttons -->
     <string name="btn_continue">Continuar</string>
     <string name="btn_start">Comenzar</string>
+    <string name="btn_logout">Cerrar sesión</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_section_general">GENERAL</string>
+    <string name="settings_dark_mode">Modo Oscuro</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_edit_profile">Editar Perfil</string>
+    <string name="settings_security">Seguridad</string>
+    <string name="settings_lang_es">ESPAÑOL</string>
+    <string name="settings_lang_en">ENGLISH</string>
+
+    <!-- Login -->
+    <string name="login_welcome">¡Bienvenido!</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Contraseña</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_no_account">¿No tenés cuenta? </string>
+    <string name="login_register">Registrate</string>
+    <string name="login_error_invalid_email">El email debe ser válido.</string>
+    <string name="login_error_empty_password">La contraseña no puede estar vacía.</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Editar Perfil</string>
+    <string name="edit_profile_name_label">Nombre</string>
+    <string name="edit_profile_name_placeholder">Tu nombre</string>
+    <string name="edit_profile_username_label">Usuario</string>
+    <string name="edit_profile_username_placeholder">\@usuario</string>
+    <string name="edit_profile_bio_label">Algo sobre ti..</string>
+    <string name="edit_profile_bio_placeholder">Contanos algo sobre vos...</string>
+    <string name="edit_profile_birthdate_label">Fecha de nacimiento</string>
+    <string name="edit_profile_birthdate_placeholder">dd / mm / aaaa</string>
+    <string name="edit_profile_save_button">Guardar Cambios</string>
+
+    <!-- Security -->
+    <string name="security_title">Seguridad</string>
+    <string name="security_current_password_label">Contraseña actual</string>
+    <string name="security_new_password_label">Nueva contraseña</string>
+    <string name="security_confirm_password_label">Confirma la contraseña</string>
+    <string name="security_change_button">Cambiar Contraseña</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_password_title">Restablecer contraseña</string>
+    <string name="forgot_password_description">Ingresá el email con el que te registraste\ny te enviaremos instrucciones para\nrestablecer tu contraseña.</string>
+    <string name="forgot_password_button">Recuperar cuenta</string>
+    <string name="forgot_password_sent_title">Revisá tu correo</string>
+    <string name="forgot_password_sent_description">Si existe una cuenta asociada a ese email,\nte enviaremos un enlace para\nrestablecer tu contraseña.</string>
+    <string name="forgot_password_sent_login_button">Volver al inicio de sesión</string>
+    <string name="forgot_password_resend_prompt">¿No recibiste el correo? </string>
+    <string name="forgot_password_resend_button">Reenviar</string>
+    <string name="forgot_password_back_desc">Volver</string>
+
+    <!-- Home -->
+    <string name="home_good_morning">BUEN DÍA</string>
+    <string name="home_what_outfit">¿Qué outfit preferís hoy?</string>
+    <string name="home_generate_button">Generar outfits</string>
+    <string name="home_weather_title">CLIMA</string>
+    <string name="home_occasion_title">OCASIÓN</string>
+    <string name="home_toggle_auto">AUTOMÁTICO</string>
+    <string name="home_toggle_manual">MANUAL</string>
+
+    <!-- Weather Conditions -->
+    <string name="weather_hot">Calor</string>
+    <string name="weather_cold">Frío</string>
+    <string name="weather_windy">Ventoso</string>
+    <string name="weather_mild">Templado</string>
+    <string name="weather_any">Indistinto</string>
+    <string name="weather_hot_long">Caluroso</string>
+    <string name="weather_rainy">Lluvioso</string>
+
+    <!-- Occasions -->
+    <string name="occasion_work">Trabajo</string>
+    <string name="occasion_academic">Académico</string>
+    <string name="occasion_casual">Paseo</string>
+    <string name="occasion_party">Fiesta</string>
+    <string name="occasion_chill">Chill</string>
+    <string name="occasion_elegant">Elegante</string>
+    <string name="occasion_any">Indistinto</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_no_garments_title">Tu guardarropa está vacío</string>
+    <string name="dialog_no_garments_subtitle">Agrega prendas en tu guardarropa\npara poder generar outfits</string>
+    <string name="dialog_no_combinations_title">Sin combinaciones posibles</string>
+    <string name="dialog_no_combinations_subtitle">No encontramos prendas que combinen\ncon el clima y ocasión que elegiste</string>
+
+    <!-- Wardrobe -->
+    <string name="wardrobe_title">Guardarropas</string>
+    <string name="wardrobe_description">Explorá tus prendas en estantes de tu guardarropa según tipo, clima u ocasión</string>
+    <string name="wardrobe_filter_type">Tipo</string>
+    <string name="wardrobe_filter_weather">Clima</string>
+    <string name="wardrobe_filter_occasion">Ocasión</string>
+    <string name="wardrobe_filter_all">Todo</string>
+    <string name="wardrobe_all_title">Todo tu guardarropas</string>
+    <string name="wardrobe_total_count">Total %1$d prendas</string>
+    <string name="wardrobe_shelf_type">Estantes por tipo de prenda</string>
+    <string name="wardrobe_shelf_weather">Estantes por clima</string>
+    <string name="wardrobe_shelf_occasion">Estantes por ocasión</string>
+    <string name="wardrobe_shelf_default">Estantes</string>
+    <string name="wardrobe_garments_count">%1$d prendas</string>
+    <string name="wardrobe_shelf_prefix">Estante: %1$s</string>
+    <string name="wardrobe_delete_confirmation">¿Estás seguro de eliminar esta prenda de tu guardarropa?</string>
+
+    <!-- Categories -->
+    <string name="category_top">Superior</string>
+    <string name="category_bottom">Inferior</string>
+    <string name="category_footwear">Calzado</string>
+    <string name="category_outerwear">Abrigo</string>
+    <string name="category_full_body">FullBody</string>
+
+    <!-- Profile -->
+    <string name="profile_delete_title">Eliminar</string>
+    <string name="profile_delete_confirmation">¿Estás seguro de eliminar este outfit de tu perfil?</string>
+    <string name="profile_delete_warning">Esta acción no se puede deshacer.</string>
+    <string name="profile_edit_title">Editar descripción</string>
+    <string name="profile_edit_outfit_title">Editar Outfit</string>
+    <string name="profile_edit_placeholder">Escribí una descripción para tu outfit...</string>
+    <string name="profile_edit_save">Guardar</string>
+    <string name="profile_stats_garments">prendas</string>
+    <string name="profile_stats_wardrobe_usage">guardarropa en uso</string>
+    <string name="profile_stats_favorites">outfit fav</string>
+    <string name="profile_stats_planned">outfits planificados</string>
+    <string name="profile_friends_title">Amigos</string>
+    <string name="profile_friends_my_friends">Mis amigos</string>
+    <string name="profile_likes_title">Me gusta</string>
+    <string name="profile_comments_title">Comentarios</string>
+    <string name="profile_birth_date">Fecha de nacimiento: %1$s</string>
+    <string name="profile_friends_count"> %1$d amigos</string>
+    <string name="profile_banner_desc">Banner de perfil</string>
+    <string name="profile_avatar_desc">Foto de perfil</string>
+
+    <!-- Post -->
+    <string name="post_likes_count"> %1$d me gustas</string>
+    <string name="post_comments_count"> %1$d comentarios</string>
+    <string name="post_favorite_date">Añadido a favoritos el: %1$s</string>
+    <string name="post_planned_date">Planificado para el día: %1$s</string>
+    <string name="post_liked_at">Dio me gusta el %1$s</string>
+    <string name="post_commented_at">Comentó el %1$s</string>
+    <string name="post_comment_placeholder">Escribí un comentario...</string>
+    <string name="post_send_comment">Enviar comentario</string>
+
+    <!-- Friends -->
+    <string name="friends_likes_empty">Este outfit aún no tiene ningún me gusta\n¡Dale me gusta y mostrale lo cool que quedó!</string>
+    <string name="friends_comments_empty">Este outfit aún no tiene ningún comentario\n¡Comentale qué tal quedó su look!</string>
+    <string name="friends_my_friends">Mis amigos</string>
+    <string name="friends_suggestions">Quizá estás buscando a...</string>
+    <string name="friends_action_remove">Eliminar</string>
+    <string name="friends_action_pending">Pendiente</string>
+    <string name="friends_action_add">Agregar</string>
+    <string name="friends_empty_title">Aun no tenés amigos agregados para ver sus posteos de outfits favoritos o planificados</string>
+    <string name="friends_empty_subtitle">Escribí el nombre de un amigo en la barra de búsqueda y enviale una solicitud de amistad</string>
+    <string name="friends_no_posts_title">Aun ningún amigo compartió su outfit</string>
+    <string name="friends_no_posts_subtitle">Cuando compartan sus looks, lo verás aquí</string>
+
+    <!-- Planner -->
+    <string name="planner_title">Planificador</string>
+    <string name="planner_description">Seleccioná una fecha para ver el pronóstico\ny armá el outfit perfecto antes de salir</string>
+    <string name="planner_no_forecast">Aún no tenemos información del clima para\nel día seleccionado</string>
+    <string name="planner_edit_title">Editar planificación</string>
+    <string name="planner_your_outfit">Tu outfit para este día</string>
+    <string name="planner_add_garments">Añadir más prendas</string>
+    <string name="planner_save">Guardar</string>
+    <string name="planner_full_body_dialog_title">Sin prendas FullBody</string>
+    <string name="planner_full_body_dialog_subtitle">No tenés prendas de tipo FullBody en tu guardarropa</string>
+    <string name="planner_saved_dialog_title">¡Outfit guardado!</string>
+    <string name="planner_saved_dialog_subtitle">Podés verlo en tu calendario y en tus\npost de outfits planificados</string>
+    <string name="planner_button_got_it">Entendido</string>
+    <string name="planner_date_label">Fecha</string>
+    <string name="planner_date_format">%1$d de %2$s de %3$d</string>
+    <string name="planner_edit_garments">Editar prendas</string>
+    <string name="planner_garments_title">Título</string>
+    <string name="planner_delete_planning">Eliminar planificación</string>
+    <string name="planner_remove_garment">Quitar prenda</string>
+    <string name="planner_will_be_planned_for">Se planificará para el día:</string>
+    <string name="planner_title_placeholder">Título del outfit planificado</string>
+    <string name="planner_no_weather_info">Aún no tenemos información del clima para ese día seleccionado</string>
+
+    <!-- Week Days -->
+    <string name="week_sun">D</string>
+    <string name="week_mon">L</string>
+    <string name="week_tue">M</string>
+    <string name="week_wed">Mi</string>
+    <string name="week_thu">J</string>
+    <string name="week_fri">V</string>
+    <string name="week_sat">S</string>
+
+    <!-- Months -->
+    <string name="month_1">enero</string>
+    <string name="month_2">febrero</string>
+    <string name="month_3">marzo</string>
+    <string name="month_4">abril</string>
+    <string name="month_5">mayo</string>
+    <string name="month_6">junio</string>
+    <string name="month_7">julio</string>
+    <string name="month_8">agosto</string>
+    <string name="month_9">septiembre</string>
+    <string name="month_10">octubre</string>
+    <string name="month_11">noviembre</string>
+    <string name="month_12">diciembre</string>
+
+    <!-- Notifications -->
+    <string name="notifications_empty_title">Aún no tenés ninguna notificación</string>
+    <string name="notifications_empty_subtitle">¡Interactuá con tus amigos para disfrutar de\nsus outfits!</string>
+    <string name="notifications_search_users">Buscar usuarios</string>
+    <string name="notifications_msg_like">Indicó que le gusta tu outfit favorito</string>
+    <string name="notifications_msg_comment">Comentó sobre tu outfit favorito</string>
+    <string name="notifications_msg_request">Te envió una solicitud de amistad</string>
+    <string name="notifications_msg_accepted">Aceptó tu solicitud de amistad</string>
+    <string name="notifications_action_reject">Rechazar</string>
+    <string name="notifications_action_rejected">Rechazado</string>
+    <string name="notifications_action_accept">Aceptar</string>
+    <string name="notifications_action_accepted">Aceptada</string>
+
+    <!-- Camera -->
+    <string name="camera_permission_required">Se necesita acceso a la cámara para capturar tu prenda</string>
+    <string name="camera_grant_permission">Conceder permiso</string>
+
+    <!-- Classify Garment -->
+    <string name="classify_name_placeholder">Nombre de la prenda</string>
+    <string name="classify_type_title">TIPO DE PRENDA</string>
+    <string name="classify_weather_title">¿EN QUÉ CLIMA LA USARÍAS?</string>
+    <string name="classify_occasion_title">¿EN QUÉ OCASIÓN LA USARÍAS?</string>
+    <string name="classify_save_garment">Guardar prenda</string>
+
+    <!-- Outfit Result -->
+    <string name="outfit_result_title">¿Cuál preferís usar?</string>
+    <string name="outfit_result_subtitle">Seleccioná los outfits que más te gusten para guardarlos en tu lista fav!</string>
+
+    <!-- Public Profile -->
+    <string name="public_profile_friend_request">¡%1$s quiere ser tu amigo!</string>
+    <string name="public_profile_private_info">Solo sus amigos tienen acceso a los outfits favoritos compartidos y el perfil completo de %1$s.</string>
+    <string name="public_profile_accept_prompt">Pulsa el botón \"Aceptar\" para ser su amigo</string>
+    <string name="public_profile_not_friend">No eres amigo de %1$s</string>
+    <string name="public_profile_add_prompt">Pulsa el botón \"Agregar\" para enviar una solicitud de amistad</string>
+
+    <!-- Save Favorites -->
+    <string name="save_favorites_title">Guardar favoritos</string>
+    <string name="save_favorites_dialog_title">¡Outfits guardados!</string>
+    <string name="save_favorites_dialog_subtitle">Podés verlos en tu perfil</string>
+    <string name="save_favorites_placeholder">Título del outfit favorito</string>
+
+    <!-- Register -->
+    <string name="register_title_1">Unite a Closify</string>
+    <string name="register_subtitle_1">Redescubrí tu closet, simplificá tu día</string>
+    <string name="register_username_placeholder">\@Usuario</string>
+    <string name="register_confirm_password_placeholder">Confirmar Contraseña</string>
+    <string name="register_button">Registrarse</string>
+    <string name="register_already_have_account">¿Ya tenés una cuenta? </string>
+    <string name="register_title_2">Contanos de vos</string>
+    <string name="register_subtitle_2">¡Queremos conocerte! Ya casi sos parte de Closify</string>
+    <string name="register_name_placeholder">Nombre</string>
+    <string name="register_bio_placeholder">Biografía</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_wardrobe">Guardarropa</string>
+    <string name="nav_friends">Amigos</string>
+    <string name="nav_camera">Cámara</string>
+    <string name="nav_calendar">Calendario</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Garment Detail -->
+    <string name="garment_detail_title">Prenda</string>
+    <string name="garment_detail_type">Tipo de prenda</string>
+    <string name="garment_detail_weather">Clima ideal para usarla</string>
+    <string name="garment_detail_occasion">Ocasión ideal para usarla</string>
+    <string name="garment_detail_delete">Eliminar prenda</string>
+
+    <!-- Add Garment -->
+    <string name="add_garment_title">Nueva prenda</string>
+    <string name="add_garment_description">Utilizá la cámara o subí una foto de tu prenda\npara guardarla en tu guardarropa</string>
+    <string name="add_garment_toggle_camera">CÁMARA</string>
+    <string name="add_garment_toggle_gallery">SUBIR DE LA GALERÍA</string>
+    <string name="add_garment_action_gallery">Adjuntá una prenda de tu galería</string>
+    <string name="add_garment_action_camera">Capturá tu prenda</string>
+    <string name="add_garment_lighting_tip">Tené en cuenta una iluminación adecuada</string>
+
+    <!-- Common -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_back">Volver</string>
+    <string name="common_search">Buscar</string>
+    <string name="common_edit">Editar</string>
+    <string name="common_like">Me gusta</string>
+    <string name="common_comments">Comentarios</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_hide_password">Ocultar contraseña</string>
+    <string name="common_show_password">Mostrar contraseña</string>
 </resources>

@@ -19,12 +19,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.components.ClosifyTopBar
@@ -65,7 +67,7 @@ fun SecurityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Seguridad",
+                text = stringResource(R.string.security_title),
                 style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp),
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth(),
@@ -74,36 +76,36 @@ fun SecurityScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(text = "Contraseña actual", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.security_current_password_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = currentPassword,
                 onValueChange = viewModel::onCurrentPasswordChange,
-                placeholder = "Contraseña actual",
+                placeholder = stringResource(R.string.security_current_password_label),
                 isPassword = true,
                 error = currentPasswordError
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Nueva contraseña", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.security_new_password_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = newPassword,
                 onValueChange = viewModel::onNewPasswordChange,
-                placeholder = "Nueva contraseña",
+                placeholder = stringResource(R.string.security_new_password_label),
                 isPassword = true,
                 error = passwordError
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Confirma la contraseña", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = stringResource(R.string.security_confirm_password_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
             ClosifyTextField(
                 value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                placeholder = "Confirma la contraseña",
+                placeholder = stringResource(R.string.security_confirm_password_label),
                 isPassword = true,
                 error = confirmError
             )
@@ -122,7 +124,7 @@ fun SecurityScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             ClosifyButton(
-                text = "Cambiar Contraseña",
+                text = stringResource(R.string.security_change_button),
                 onClick = viewModel::changePassword
             )
 

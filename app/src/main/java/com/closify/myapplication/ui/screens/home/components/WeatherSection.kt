@@ -11,16 +11,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.SelectableChip
 
 private val weatherOptions = listOf(
-    WeatherCondition.HOT   to "Calor",
-    WeatherCondition.COLD  to "Frío",
-    WeatherCondition.WINDY to "Ventoso",
-    WeatherCondition.MILD  to "Templado",
-    WeatherCondition.ANY   to "Indistinto"
+    WeatherCondition.HOT   to R.string.weather_hot,
+    WeatherCondition.COLD  to R.string.weather_cold,
+    WeatherCondition.WINDY to R.string.weather_windy,
+    WeatherCondition.MILD  to R.string.weather_mild,
+    WeatherCondition.ANY   to R.string.weather_any
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -32,11 +34,13 @@ fun WeatherSection(
     onWeatherSelected: (WeatherCondition) -> Unit,
     onToggleAuto: (Boolean) -> Unit
 ) {
-    SectionCard(title = "CLIMA") {
+    SectionCard(title = stringResource(R.string.home_weather_title)) {
 
         AutoManualToggle(
             isAuto = isAutoWeather,
-            onToggle = onToggleAuto
+            onToggle = onToggleAuto,
+            labelAuto = stringResource(R.string.home_toggle_auto),
+            labelManual = stringResource(R.string.home_toggle_manual)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -52,9 +56,9 @@ fun WeatherSection(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                weatherOptions.forEach { (condition, label) ->
+                weatherOptions.forEach { (condition, labelRes) ->
                     SelectableChip(
-                        label = label,
+                        label = stringResource(labelRes),
                         selected = selectedWeather == condition,
                         onClick = { onWeatherSelected(condition) },
                         enabled = !isAutoWeather

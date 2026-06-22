@@ -18,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.domain.model.PlannerForecastDay
 
@@ -34,8 +36,17 @@ internal fun WeatherInfoRow(
     ) {
         WeatherIcon(weather = forecast.weather, modifier = Modifier.size(28.dp))
         Spacer(modifier = Modifier.width(8.dp))
+
+        val weatherLabelResId = when (forecast.weather) {
+            WeatherCondition.HOT -> R.string.weather_hot_long
+            WeatherCondition.COLD -> R.string.weather_rainy
+            WeatherCondition.WINDY -> R.string.weather_windy
+            WeatherCondition.MILD -> R.string.weather_mild
+            else -> R.string.weather_any
+        }
+
         Text(
-            text = "${forecast.temperature}° ${forecast.label}",
+            text = "${forecast.temperature}° ${stringResource(weatherLabelResId)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

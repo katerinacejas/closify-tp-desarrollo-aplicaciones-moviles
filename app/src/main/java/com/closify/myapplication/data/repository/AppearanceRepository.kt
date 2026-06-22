@@ -16,6 +16,11 @@ class AppearanceRepository private constructor(context: Context) {
     )
     val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
 
+    private val _language = MutableStateFlow(
+        preferences.getString(KEY_LANGUAGE, "es") ?: "es"
+    )
+    val language: StateFlow<String> = _language.asStateFlow()
+
     fun setDarkMode(enabled: Boolean) {
         preferences.edit()
             .putBoolean(KEY_DARK_MODE, enabled)
@@ -23,9 +28,17 @@ class AppearanceRepository private constructor(context: Context) {
         _isDarkMode.value = enabled
     }
 
+    fun setLanguage(lang: String) {
+        preferences.edit()
+            .putString(KEY_LANGUAGE, lang)
+            .apply()
+        _language.value = lang
+    }
+
     companion object {
         private const val PREFERENCES_NAME = "closify_appearance_preferences"
         private const val KEY_DARK_MODE = "dark_mode_enabled"
+        private const val KEY_LANGUAGE = "language_code"
 
         @Volatile
         private var instance: AppearanceRepository? = null
