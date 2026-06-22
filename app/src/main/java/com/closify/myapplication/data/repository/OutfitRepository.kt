@@ -36,7 +36,7 @@ class OutfitRepository(
     fun saveFavorites(outfits: List<Outfit>) {
         val author = UserRepository.instance.getCurrentUserOrDefault().toSummary()
         val createdAt = LocalDate.now().format(
-            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
         )
         outfits.forEach { outfit ->
             if (_favoriteOutfits.none { it.id == outfit.id }) {

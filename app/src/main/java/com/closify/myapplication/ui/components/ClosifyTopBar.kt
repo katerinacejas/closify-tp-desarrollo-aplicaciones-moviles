@@ -25,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.theme.ClosifyTheme
 
 @Composable
@@ -59,7 +61,7 @@ fun ClosifyTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
+                        contentDescription = stringResource(R.string.common_back),
                         tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(23.dp)
                     )
@@ -129,7 +131,7 @@ fun ClosifyTopBarSearchField(
 
                 Icon(
                     imageVector = Icons.Rounded.Search,
-                    contentDescription = "Buscar",
+                    contentDescription = stringResource(R.string.common_search),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )

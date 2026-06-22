@@ -37,8 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
 
@@ -82,7 +84,7 @@ fun OutfitPostCard(
                 )
             }
             Text(
-                text = post.dateLabel,
+                text = post.getDateLabel(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -120,7 +122,7 @@ fun OutfitPostCard(
                     IconButton(onClick = onLikeClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = if (isLikedByCurrentUser) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                            contentDescription = "Me gusta",
+                            contentDescription = stringResource(R.string.common_like),
                             modifier = Modifier.size(22.dp),
                             tint = if (isLikedByCurrentUser) {
                                 MaterialTheme.colorScheme.secondary
@@ -131,7 +133,7 @@ fun OutfitPostCard(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${post.likesCount} me gustas",
+                        text = stringResource(R.string.post_likes_count, post.likesCount),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.clickable(
@@ -146,14 +148,14 @@ fun OutfitPostCard(
                     IconButton(onClick = onCommentsClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = Icons.Rounded.ChatBubbleOutline,
-                            contentDescription = "Comentarios",
+                            contentDescription = stringResource(R.string.common_comments),
                             modifier = Modifier.size(21.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${post.commentsCount} comentarios",
+                        text = stringResource(R.string.post_comments_count, post.commentsCount),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.clickable(
@@ -168,7 +170,7 @@ fun OutfitPostCard(
                     IconButton(onClick = onEditClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = Icons.Rounded.Edit,
-                            contentDescription = "Editar",
+                            contentDescription = stringResource(R.string.common_edit),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f),
                             modifier = Modifier.size(20.dp)
                         )
@@ -231,8 +233,8 @@ private fun OutfitPostAuthor(
     }
 }
 
-private val OutfitPost.dateLabel: String
-    get() = when (type) {
-        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $createdAt"
-        OutfitPostType.PLANNED -> "Planificado para el dia: ${plannedDate ?: createdAt}"
-    }
+@Composable
+fun OutfitPost.getDateLabel(): String = when (type) {
+    OutfitPostType.FAVORITE -> stringResource(R.string.post_favorite_date, createdAt)
+    OutfitPostType.PLANNED -> stringResource(R.string.post_planned_date, plannedDate ?: createdAt)
+}

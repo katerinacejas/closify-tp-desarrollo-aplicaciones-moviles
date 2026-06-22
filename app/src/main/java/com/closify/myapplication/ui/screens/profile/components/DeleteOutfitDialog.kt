@@ -12,9 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 
 @Composable
 fun DeleteOutfitDialog(
@@ -24,14 +26,14 @@ fun DeleteOutfitDialog(
     modifier: Modifier = Modifier
 ) {
     ProfileDialogScaffold(
-        title = "Eliminar",
+        title = stringResource(R.string.profile_delete_title),
         onDismiss = onDismiss,
         modifier = modifier,
         contentTopSpacing = 24.dp,
         heightFraction = null
     ) {
         Text(
-            text = "Estas seguro de eliminar este outfit de tu perfil?",
+            text = stringResource(R.string.profile_delete_confirmation),
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
@@ -39,7 +41,7 @@ fun DeleteOutfitDialog(
         )
 
         Text(
-            text = "Esta accion no se puede deshacer.",
+            text = stringResource(R.string.profile_delete_warning),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 14.dp),
@@ -66,7 +68,7 @@ fun DeleteOutfitDialog(
                 )
             ) {
                 Text(
-                    text = "Cancelar",
+                    text = stringResource(R.string.common_cancel),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -83,7 +85,7 @@ fun DeleteOutfitDialog(
                 )
             ) {
                 Text(
-                    text = "Eliminar",
+                    text = stringResource(R.string.profile_delete_title),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

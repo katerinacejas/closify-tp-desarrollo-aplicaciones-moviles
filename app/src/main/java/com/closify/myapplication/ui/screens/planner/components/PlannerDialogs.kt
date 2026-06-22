@@ -39,11 +39,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.PlannerForecastDay
@@ -76,12 +78,12 @@ internal fun EditPlannedGarmentsDialog(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Text(
-                        text = "Editar prendas",
+                        text = stringResource(R.string.planner_edit_garments),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.align(Alignment.Center)
@@ -113,7 +115,7 @@ internal fun EditPlannedGarmentsDialog(
                     ),
                     modifier = Modifier.align(Alignment.CenterHorizontally).width(172.dp).height(40.dp)
                 ) {
-                    Text(text = "Guardar", style = MaterialTheme.typography.labelLarge)
+                    Text(text = stringResource(R.string.profile_edit_save), style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
@@ -146,7 +148,7 @@ internal fun PlannedOutfitDialog(
                     IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterStart)) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -163,7 +165,7 @@ internal fun PlannedOutfitDialog(
 
                 if (forecast == null) {
                     Text(
-                        text = "Aún no tenemos información del clima para\nel día seleccionado",
+                        text = stringResource(R.string.planner_no_forecast),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -174,7 +176,7 @@ internal fun PlannedOutfitDialog(
                 Spacer(modifier = Modifier.height(22.dp))
 
                 Text(
-                    text = "Tu outfit planificado para este día",
+                    text = stringResource(R.string.planner_your_outfit),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth()
@@ -190,7 +192,7 @@ internal fun PlannedOutfitDialog(
                         .padding(horizontal = 18.dp, vertical = 14.dp)
                 ) {
                     Column {
-                        Text(text = "Titulo", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = stringResource(R.string.planner_garments_title), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(text = post.title.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
@@ -209,7 +211,7 @@ internal fun PlannedOutfitDialog(
                         }
                     }
                     IconButton(onClick = onEditClick, modifier = Modifier.align(Alignment.TopEnd).size(34.dp)) {
-                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = "Editar planificación", tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f))
+                        Icon(imageVector = Icons.Rounded.Edit, contentDescription = stringResource(R.string.common_edit), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f))
                     }
                 }
 
@@ -222,7 +224,7 @@ internal fun PlannedOutfitDialog(
                     contentPadding = PaddingValues(horizontal = 12.dp),
                     modifier = Modifier.width(190.dp).height(44.dp)
                 ) {
-                    Text(text = "Eliminar planificación", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
+                    Text(text = stringResource(R.string.planner_delete_planning), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
                 }
             }
         }
@@ -243,7 +245,7 @@ internal fun EditableGarmentBox(
     ) {
         PlannerGarmentImage(garment = garment, alpha = 1f, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
         IconButton(onClick = onRemove, modifier = Modifier.align(Alignment.TopEnd).size(28.dp)) {
-            Icon(imageVector = Icons.Rounded.Close, contentDescription = "Quitar prenda", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+            Icon(imageVector = Icons.Rounded.Close, contentDescription = stringResource(R.string.planner_remove_garment), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
         }
     }
 }
