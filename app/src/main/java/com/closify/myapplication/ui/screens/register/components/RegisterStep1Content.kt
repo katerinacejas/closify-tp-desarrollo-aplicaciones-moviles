@@ -84,6 +84,35 @@ fun RegisterStep1Content(
             textAlign = TextAlign.Center
         )
 
+        // --- PRUEBA DE VISIBILIDAD: CHECKBOX AQUÍ ARRIBA ---
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = acceptedTerms,
+                onCheckedChange = onTermsToggle,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.outline
+                )
+            )
+            Text(
+                text = buildAnnotatedString {
+                    append("Acepto los ")
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                        append("Términos y Condiciones")
+                    }
+                    append(" de uso.")
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { showTermsDialog = true }
+            )
+        }
+        // ---------------------------------------------------
+
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
@@ -131,36 +160,6 @@ fun RegisterStep1Content(
             isPassword = true,
             error = confirmPasswordError
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = acceptedTerms,
-                onCheckedChange = onTermsToggle,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    uncheckedColor = MaterialTheme.colorScheme.outline
-                )
-            )
-            Text(
-                text = buildAnnotatedString {
-                    append("Acepto los ")
-                    pushStringAnnotation(tag = "terms", annotation = "terms")
-                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                        append("Términos y Condiciones")
-                    }
-                    pop()
-                    append(" de uso.")
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.clickable { showTermsDialog = true }
-            )
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
