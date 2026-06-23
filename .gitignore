@@ -12,6 +12,9 @@
 # ── Configuración local (no versionar) ────────────────────────────────────────
 local.properties
 
+# ── Firebase (contiene API keys, no versionar) ────────────────────────────────
+google-services.json
+
 # ── Keystore y firma (NUNCA versionar) ────────────────────────────────────────
 *.jks
 *.keystore

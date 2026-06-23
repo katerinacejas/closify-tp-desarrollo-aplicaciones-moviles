@@ -13,12 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.theme.ClosifyTheme
@@ -123,7 +125,7 @@ private fun SettingsMenu(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Configuración",
+                text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp
@@ -143,13 +145,13 @@ private fun SettingsMenu(
             Spacer(modifier = Modifier.height(20.dp))
 
             SettingsActionButton(
-                text = "Editar Perfil", 
+                text = stringResource(R.string.settings_edit_profile), 
                 onClick = onNavigateToEditProfile,
                 fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(12.dp))
             SettingsActionButton(
-                text = "Seguridad", 
+                text = stringResource(R.string.settings_security), 
                 onClick = onNavigateToSecurity,
                 fontSize = 18.sp
             )
@@ -167,7 +169,7 @@ private fun SettingsMenu(
                 )
             ) {
                 Text(
-                    text = "Cerrar sesión",
+                    text = stringResource(R.string.btn_logout),
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -200,7 +202,7 @@ fun GeneralSettingsCard(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "GENERAL",
+                text = stringResource(R.string.settings_section_general),
                 style = MaterialTheme.typography.labelLarge.copy(
                     letterSpacing = 1.sp,
                     fontSize = 12.sp
@@ -217,7 +219,7 @@ fun GeneralSettingsCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Modo Oscuro", 
+                    text = stringResource(R.string.settings_dark_mode), 
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -236,7 +238,7 @@ fun GeneralSettingsCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Idioma", 
+                text = stringResource(R.string.settings_language), 
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -248,15 +250,19 @@ fun GeneralSettingsCard(
 
 @Composable
 fun LanguageSelector(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
+    val languages = listOf(
+        "es" to R.string.settings_lang_es,
+        "en" to R.string.settings_lang_en
+    )
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        listOf("ESPAÑOL", "ENGLISH").forEach { lang ->
+        languages.forEach { (code, stringRes) ->
             SelectableChip(
-                label = lang,
-                selected = selectedLanguage == lang,
-                onClick = { onLanguageSelected(lang) },
+                label = stringResource(stringRes),
+                selected = selectedLanguage == code,
+                onClick = { onLanguageSelected(code) },
                 modifier = Modifier.weight(1f)
             )
         }

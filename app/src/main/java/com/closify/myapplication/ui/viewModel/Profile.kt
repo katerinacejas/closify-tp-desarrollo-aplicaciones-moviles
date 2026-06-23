@@ -2,15 +2,20 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.UserSummary
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 data class ProfileUiState(
     val userId: String = "",
@@ -40,12 +45,22 @@ class ProfileViewModel(
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
-        refreshProfile()
+        // Observa el usuario logueado — se actualiza cuando restoreSession() termina
+        userRepository.currentUser
+            .filterNotNull()
+            .onEach { user -> loadProfile(user.id) }
+            .launchIn(viewModelScope)
     }
 
     fun refreshProfile() {
-        val userId = userRepository.getCurrentUserOrDefault().id
-        val profile = profileRepository.getProfile(userId)
+        val userId = userRepository.getCurrentUser()?.id ?: return
+        loadProfile(userId)
+    }
+
+    private fun loadProfile(userId: String) {
+        viewModelScope.launch {
+        val user = userRepository.getCurrentUser() ?: return@launch
+        val profile = user.profile
         val friends = socialRepository.getFriends(userId)
         val posts = outfitPostRepository.getPostsByUser(userId)
         val stats = profileRepository.getProfileStats(userId)
@@ -66,6 +81,7 @@ class ProfileViewModel(
             friends = friends,
             posts = posts
         )
+        }
     }
 
     fun onLikeClick(postId: String) {

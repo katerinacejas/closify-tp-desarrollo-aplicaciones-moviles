@@ -22,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.ui.components.SelectableChip
 import com.closify.myapplication.ui.screens.addgarment.components.ClassifyGarmentHeader
@@ -31,13 +33,13 @@ import com.closify.myapplication.ui.viewmodel.ClassifyGarmentEvent
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentUiState
 
 private val occasionOptions = listOf(
-    Occasion.PARTY    to "Fiesta",
-    Occasion.WORK     to "Trabajo",
-    Occasion.CASUAL   to "Paseo",
-    Occasion.ACADEMIC to "Académico",
-    Occasion.CHILL    to "Chill",
-    Occasion.ELEGANT  to "Elegante",
-    Occasion.ANY      to "Indistinto"
+    Occasion.PARTY    to R.string.occasion_party,
+    Occasion.WORK     to R.string.occasion_work,
+    Occasion.CASUAL   to R.string.occasion_casual,
+    Occasion.ACADEMIC to R.string.occasion_academic,
+    Occasion.CHILL    to R.string.occasion_chill,
+    Occasion.ELEGANT  to R.string.occasion_elegant,
+    Occasion.ANY      to R.string.occasion_any
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -65,7 +67,7 @@ fun ClassifyGarmentStep2Content(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "¿EN QUÉ OCASIÓN LA USARÍAS?",
+                    text = stringResource(R.string.classify_occasion_title),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -74,9 +76,9 @@ fun ClassifyGarmentStep2Content(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    occasionOptions.forEach { (occasion, label) ->
+                    occasionOptions.forEach { (occasion, labelRes) ->
                         SelectableChip(
-                            label = label,
+                            label = stringResource(labelRes),
                             selected = occasion in uiState.selectedOccasions,
                             onClick = { onEvent(ClassifyGarmentEvent.ToggleOccasion(occasion)) }
                         )
@@ -103,7 +105,7 @@ fun ClassifyGarmentStep2Content(
                     .height(42.dp)
             ) {
                 Text(
-                    text = "Cancelar",
+                    text = stringResource(R.string.common_cancel),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -120,7 +122,7 @@ fun ClassifyGarmentStep2Content(
                     .height(42.dp)
             ) {
                 Text(
-                    text = "Guardar prenda",
+                    text = stringResource(R.string.classify_save_garment),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

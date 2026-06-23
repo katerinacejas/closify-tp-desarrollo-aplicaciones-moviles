@@ -20,6 +20,7 @@ import com.closify.myapplication.ui.components.ClosifyTopBar
 @Composable
 fun AddGarmentScreen(
     onNavigateToClassify: () -> Unit,
+    onNavigateToCameraPreview: () -> Unit = {},
     viewModel: CameraViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -47,7 +48,7 @@ fun AddGarmentScreen(
                     CameraMode.GALLERY -> galleryLauncher.launch(
                         PickVisualMediaRequest(PickVisualMedia.ImageOnly)
                     )
-                    CameraMode.CAMERA -> { /* TODO: implementar cámara */ }
+                    CameraMode.CAMERA -> onNavigateToCameraPreview()
                 }
             },
             modifier = Modifier.padding(innerPadding)

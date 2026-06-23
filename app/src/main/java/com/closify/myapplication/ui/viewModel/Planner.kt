@@ -1,7 +1,10 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.GarmentRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository
@@ -45,7 +48,8 @@ data class PlannerUiState(
     val plannedPosts: List<OutfitPost> = emptyList(),
     val selectedPlannedPost: OutfitPost? = null,
     val editingPostId: String? = null,
-    val showSavedDialog: Boolean = false
+    val showSavedDialog: Boolean = false,
+    val showNoFullBodyDialog: Boolean = false
 ) {
     val selectedForecast: PlannerForecastDay?
         get() = forecastDays.firstOrNull { it.date == selectedDate && it.weather != WeatherCondition.ANY }
@@ -76,8 +80,18 @@ class PlannerViewModel(
 
     private val today: LocalDate = LocalDate.now()
 
-    private val _uiState = MutableStateFlow(buildInitialState())
+    private val _uiState = MutableStateFlow(PlannerUiState(
+        selectedDate = today,
+        visibleMonth = java.time.YearMonth.from(today),
+        dateInput = today.format(PlannerDateFormatter),
+        forecastDays = weatherRepository.getPlannerForecast(today),
+        plannedPosts = outfitRepository.getPlannedPosts(userRepository.getCurrentUserOrDefault().id)
+    ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
+
+    init {
+        loadGarments()
+    }
 
     fun onDateInputChange(value: String) {
         val sanitizedValue = value.toDateInputFormat()
@@ -127,7 +141,15 @@ class PlannerViewModel(
     }
 
     fun onToggleFullBody(enabled: Boolean) {
+        if (enabled && _uiState.value.fullBodyGarments.isEmpty()) {
+            _uiState.value = _uiState.value.copy(showNoFullBodyDialog = true)
+            return
+        }
         _uiState.value = _uiState.value.copy(useFullBody = enabled)
+    }
+
+    fun onDismissNoFullBodyDialog() {
+        _uiState.value = _uiState.value.copy(showNoFullBodyDialog = false)
     }
 
     fun onTopAndOuterwearCentered(garmentId: String) {
@@ -226,26 +248,23 @@ class PlannerViewModel(
         )
     }
 
-    private fun buildInitialState(): PlannerUiState {
-        val userId = userRepository.getCurrentUserOrDefault().id
-        val garmentGroups = garmentRepository.getPlannerGroups(userId)
-        val plannedPosts = outfitRepository.getPlannedPosts(userId)
-
-        return PlannerUiState(
-            selectedDate = today,
-            visibleMonth = YearMonth.from(today),
-            dateInput = today.format(PlannerDateFormatter),
-            forecastDays = weatherRepository.getPlannerForecast(today),
-            topAndOuterwearGarments = garmentGroups.topAndOuterwear,
-            bottomGarments = garmentGroups.bottoms,
-            footwearGarments = garmentGroups.footwear,
-            fullBodyGarments = garmentGroups.fullBody,
-            selectedTopAndOuterwearGarmentId = defaultSelectedId(garmentGroups.topAndOuterwear),
-            selectedBottomGarmentId = defaultSelectedId(garmentGroups.bottoms),
-            selectedFootwearGarmentId = defaultSelectedId(garmentGroups.footwear),
-            selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody),
-            plannedPosts = plannedPosts
-        )
+    private fun loadGarments() {
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId.ifEmpty { userRepository.getCurrentUserOrDefault().id }
+            val garmentGroups = garmentRepository.getPlannerGroups(userId)
+            _uiState.update {
+                it.copy(
+                    topAndOuterwearGarments = garmentGroups.topAndOuterwear,
+                    bottomGarments = garmentGroups.bottoms,
+                    footwearGarments = garmentGroups.footwear,
+                    fullBodyGarments = garmentGroups.fullBody,
+                    selectedTopAndOuterwearGarmentId = defaultSelectedId(garmentGroups.topAndOuterwear),
+                    selectedBottomGarmentId = defaultSelectedId(garmentGroups.bottoms),
+                    selectedFootwearGarmentId = defaultSelectedId(garmentGroups.footwear),
+                    selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody)
+                )
+            }
+        }
     }
 
     private fun defaultSelectedId(garments: List<Garment>): String? =

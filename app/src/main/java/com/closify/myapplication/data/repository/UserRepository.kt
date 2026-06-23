@@ -1,38 +1,89 @@
 package com.closify.myapplication.data.repository
 
+import android.content.Context
+import com.closify.myapplication.data.local.AppDatabase
+import com.closify.myapplication.data.local.mapper.toDomain
+import com.closify.myapplication.data.local.mapper.toEntity
+import com.closify.myapplication.data.local.mapper.toFirestoreMap
+import com.closify.myapplication.data.local.mapper.toUserEntity
 import com.closify.myapplication.domain.model.User
-import kotlinx.coroutines.delay
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-class UserRepository {
+class UserRepository private constructor(context: Context) {
 
     companion object {
-        val instance = UserRepository()
+        @Volatile private var _instance: UserRepository? = null
+
+        fun initialize(context: Context) {
+            if (_instance == null) {
+                synchronized(this) {
+                    if (_instance == null) {
+                        _instance = UserRepository(context.applicationContext)
+                    }
+                }
+            }
+        }
+
+        val instance: UserRepository
+            get() = _instance ?: error("UserRepository.initialize(context) no fue llamado.")
     }
 
-    var currentUserId: String = ""
-        private set
+    private val auth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val userDao = AppDatabase.getInstance(context).userDao()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    var currentUsername: String = ""
-        private set
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
-    fun getCurrentUser(): User? =
-        MockClosifyData.authUserById(currentUserId) ?: MockClosifyData.userById(currentUserId)
+    val currentUserId: String get() = auth.currentUser?.uid ?: ""
+    val currentUsername: String get() = _currentUser.value?.profile?.username ?: ""
 
-    fun getCurrentUserOrDefault(): User =
-        getCurrentUser() ?: MockClosifyData.currentUser
+    fun isLoggedIn(): Boolean = auth.currentUser != null
+
+    fun getCurrentUser(): User? = _currentUser.value
+
+    fun getCurrentUserOrDefault(): User = _currentUser.value ?: MockClosifyData.currentUser
 
     fun getUserById(userId: String): User? =
         MockClosifyData.authUserById(userId) ?: MockClosifyData.userById(userId)
 
-    suspend fun login(email: String, password: String): Result<Unit> {
-        delay(1000)
-        val user = MockClosifyData.findAuthUser(email, password)
-        return if (user != null) {
-            currentUserId = user.id
-            currentUsername = user.username
-            Result.success(Unit)
+    // Restaura la sesión al abrir la app si ya había un usuario logueado
+    suspend fun restoreSession() {
+        val uid = auth.currentUser?.uid ?: return
+        val entity = userDao.getById(uid)
+        if (entity != null) {
+            _currentUser.value = entity.toDomain()
         } else {
-            Result.failure(Exception("Credenciales incorrectas."))
+            fetchAndCacheFromFirestore(uid)
+        }
+    }
+
+    suspend fun login(email: String, password: String): Result<Unit> {
+        return try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val uid = result.user?.uid ?: throw Exception("No se pudo obtener el usuario.")
+            fetchAndCacheFromFirestore(uid)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
         }
     }
 
@@ -44,28 +95,58 @@ class UserRepository {
         birthDate: String,
         bio: String
     ): Result<Unit> {
-        delay(1000)
-        val user = MockClosifyData.registerAuthUser(
-            email = email,
-            password = password,
-            username = username,
-            fullName = fullName,
-            birthDate = birthDate,
-            bio = bio
-        )
-        currentUserId = user.id
-        currentUsername = user.username
-        return Result.success(Unit)
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val uid = result.user?.uid ?: throw Exception("No se pudo crear el usuario.")
+            val createdAt = LocalDate.now().format(
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+            )
+            val user = User(
+                id = uid,
+                email = email,
+                profile = com.closify.myapplication.domain.model.UserProfile(
+                    id = uid,
+                    fullName = fullName.trim(),
+                    username = normalizeUsername(username),
+                    birthDate = birthDate,
+                    bio = bio.trim(),
+                    avatarImageResId = com.closify.myapplication.R.drawable.avatar_default,
+                    bannerImageResId = com.closify.myapplication.R.drawable.banner_default
+                ),
+                createdAt = createdAt
+            )
+            userDao.upsert(user.toEntity())
+            _currentUser.value = user
+            scope.launch {
+                firestore.collection("users").document(uid).set(user.toFirestoreMap()).await()
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
+        }
     }
 
     suspend fun isUsernameAvailable(username: String): Boolean {
-        delay(300)
-        return MockClosifyData.isUsernameAvailable(username)
+        return try {
+            val normalized = normalizeUsername(username)
+            val snapshot = firestore.collection("users")
+                .whereEqualTo("username", normalized)
+                .limit(1)
+                .get()
+                .await()
+            snapshot.isEmpty
+        } catch (e: Exception) {
+            true
+        }
     }
 
     suspend fun requestPasswordRecovery(email: String): Result<Unit> {
-        delay(500)
-        return Result.success(Unit)
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
+        }
     }
 
     fun updateCurrentUserProfile(
@@ -74,35 +155,74 @@ class UserRepository {
         birthDate: String,
         bio: String
     ): Result<Unit> {
-        val updatedUser = MockClosifyData.updateUserProfile(
-            userId = currentUserId,
-            fullName = fullName,
-            username = username,
-            birthDate = birthDate,
-            bio = bio
-        ) ?: return Result.failure(Exception("No se pudo actualizar el perfil."))
+        val uid = auth.currentUser?.uid
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        val current = _currentUser.value
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
 
-        currentUsername = updatedUser.username
+        val updated = current.copy(
+            profile = current.profile.copy(
+                fullName = fullName.trim(),
+                username = normalizeUsername(username),
+                birthDate = birthDate,
+                bio = bio.trim()
+            )
+        )
+        _currentUser.value = updated
+
+        val entity = updated.toEntity()
+        val firestoreMap = updated.toFirestoreMap()
+        scope.launch {
+            userDao.upsert(entity)
+            firestore.collection("users").document(uid).update(firestoreMap).await()
+        }
         return Result.success(Unit)
     }
 
-    fun changeCurrentUserPassword(
+    suspend fun changeCurrentUserPassword(
         currentPassword: String,
         newPassword: String
     ): Result<Unit> {
-        if (currentUserId.isBlank()) {
-            return Result.failure(Exception("No hay un usuario logueado."))
-        }
-
-        if (!MockClosifyData.isCurrentPassword(currentUserId, currentPassword)) {
-            return Result.failure(Exception("La contraseña actual no es correcta."))
-        }
-
-        val updated = MockClosifyData.updateAuthUserPassword(currentUserId, newPassword)
-        return if (updated) {
+        val user = auth.currentUser
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        val email = user.email
+            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        return try {
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+            user.reauthenticate(credential).await()
+            user.updatePassword(newPassword).await()
             Result.success(Unit)
-        } else {
-            Result.failure(Exception("No se pudo actualizar la contraseña."))
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
         }
+    }
+
+    fun logout() {
+        auth.signOut()
+        _currentUser.value = null
+    }
+
+    private suspend fun fetchAndCacheFromFirestore(uid: String) {
+        try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            val entity = doc.toUserEntity() ?: return
+            userDao.upsert(entity)
+            _currentUser.value = entity.toDomain()
+        } catch (e: Exception) {
+            // Sin conexión — intenta desde Room
+            val entity = userDao.getById(uid)
+            if (entity != null) _currentUser.value = entity.toDomain()
+        }
+    }
+
+    private fun normalizeUsername(username: String): String =
+        username.trim().let { if (it.startsWith("@")) it else "@$it" }
+
+    private fun mapAuthError(e: Exception): String = when (e) {
+        is FirebaseAuthInvalidUserException -> "No existe una cuenta con ese email."
+        is FirebaseAuthInvalidCredentialsException -> "El email o la contraseña son incorrectos."
+        is FirebaseAuthUserCollisionException -> "Ya existe una cuenta con ese email."
+        is FirebaseAuthWeakPasswordException -> "La contraseña es muy débil."
+        else -> e.message ?: "Ocurrió un error inesperado."
     }
 }
