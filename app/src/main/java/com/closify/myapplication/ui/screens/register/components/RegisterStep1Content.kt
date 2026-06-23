@@ -3,12 +3,16 @@ package com.closify.myapplication.ui.screens.register.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,10 +41,12 @@ fun RegisterStep1Content(
     passwordError: String?,
     confirmPasswordError: String?,
     isLoading: Boolean,
+    acceptedTerms: Boolean,
     onUsernameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
+    onTermsToggle: (Boolean) -> Unit,
     onNext: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
@@ -113,7 +119,36 @@ fun RegisterStep1Content(
             error = confirmPasswordError
         )
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = acceptedTerms,
+                onCheckedChange = onTermsToggle,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.outline
+                )
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = buildAnnotatedString {
+                    append("Acepto los ")
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                        append("Términos y Condiciones")
+                    }
+                    append(" de uso.")
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { onTermsToggle(!acceptedTerms) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         ClosifyButton(
             text = "Registrarse",

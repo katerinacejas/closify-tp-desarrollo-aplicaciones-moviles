@@ -66,10 +66,12 @@ fun RegisterScreen(
                 passwordError = uiState.passwordError,
                 confirmPasswordError = uiState.confirmPasswordError,
                 isLoading = uiState.isLoading,
+                acceptedTerms = uiState.acceptedTerms,
                 onUsernameChange = { viewModel.onEvent(RegisterEvent.UsernameChanged(it)) },
                 onEmailChange = { viewModel.onEvent(RegisterEvent.EmailChanged(it)) },
                 onPasswordChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
                 onConfirmPasswordChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
+                onTermsToggle = { viewModel.onEvent(RegisterEvent.TermsToggled(it)) },
                 onNext = { viewModel.onEvent(RegisterEvent.NextStep) },
                 onNavigateToLogin = onNavigateToLogin,
                 modifier = Modifier.padding(innerPadding)
