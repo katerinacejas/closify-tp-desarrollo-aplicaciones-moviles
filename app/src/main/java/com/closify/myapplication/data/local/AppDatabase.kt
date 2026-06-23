@@ -4,13 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.closify.myapplication.data.local.dao.GarmentDao
+import com.closify.myapplication.data.local.dao.OutfitDao
 import com.closify.myapplication.data.local.dao.UserDao
+import com.closify.myapplication.data.local.entity.GarmentEntity
+import com.closify.myapplication.data.local.entity.OutfitEntity
 import com.closify.myapplication.data.local.entity.UserEntity
 
-@Database(entities = [UserEntity::class], version = 1)
+@Database(entities = [UserEntity::class, GarmentEntity::class, OutfitEntity::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun garmentDao(): GarmentDao
+    abstract fun outfitDao(): OutfitDao
 
     companion object {
         @Volatile private var instance: AppDatabase? = null
@@ -21,7 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "closify_db"
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration().build().also { instance = it }
             }
     }
 }

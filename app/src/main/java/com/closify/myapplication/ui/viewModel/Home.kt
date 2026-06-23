@@ -110,22 +110,22 @@ class HomeViewModel(
         val state = _uiState.value
         val weather = state.selectedWeather ?: return
         val occasion = state.selectedOccasion ?: return
-
-        if (garmentRepository.getAllByUserId().isEmpty()) {
-            _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
-            return
-        }
-
-        val outfits = generateOutfitsUseCase(weather, occasion)
-
-        if (outfits.isEmpty()) {
-            _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
-            return
-        }
-
-        outfitRepository.currentOutfits = outfits
+        val userId = userRepository.currentUserId
 
         viewModelScope.launch {
+            val allGarments = garmentRepository.getAllByUserId(userId)
+            if (allGarments.isEmpty()) {
+                _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
+                return@launch
+            }
+
+            val outfits = generateOutfitsUseCase(weather, occasion, userId)
+            if (outfits.isEmpty()) {
+                _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
+                return@launch
+            }
+
+            outfitRepository.currentOutfits = outfits
             _navigationEffect.send(HomeNavigationEffect.NavigateToOutfitResult(outfits))
         }
     }

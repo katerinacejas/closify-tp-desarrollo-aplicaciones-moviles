@@ -37,8 +37,8 @@ fun ClassifyGarmentScreen(
             ClosifyTopBar(
                 showBackButton = true,
                 onBackClick = {
-                        if (uiState.step == ClassifyStep.BASIC) onBack()
-                        else viewModel.onEvent(ClassifyGarmentEvent.Back)
+                    if (uiState.step == ClassifyStep.BASIC) onBack()
+                    else viewModel.onEvent(ClassifyGarmentEvent.Back)
                 }
             )
         }

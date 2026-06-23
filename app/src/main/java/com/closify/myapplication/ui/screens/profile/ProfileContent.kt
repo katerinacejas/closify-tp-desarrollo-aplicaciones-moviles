@@ -185,8 +185,6 @@ private fun ProfileContentPreview() {
         val profile = repository.getProfile()
         val friends = socialRepository.getFriends(profile.id)
         val posts = outfitPostRepository.getPostsByUser(profile.id)
-        val garments = repository.getWardrobeGarments()
-
         ProfileContent(
             uiState = ProfileUiState(
                 userId = profile.id,
@@ -195,8 +193,8 @@ private fun ProfileContentPreview() {
                 bio = profile.bio,
                 birthDate = profile.birthDate,
                 friendsCount = friends.size,
-                garmentsCount = garments.size,
-                wardrobeUsagePercentage = repository.getWardrobeUsagePercentage(),
+                garmentsCount = 0,
+                wardrobeUsagePercentage = 0,
                 favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
                 plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
                 bannerImageResId = profile.bannerImageResId,

@@ -18,6 +18,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val removeBgKey = project.rootProject.file("local.properties")
+            .readLines()
+            .firstOrNull { it.startsWith("REMOVE_BG_API_KEY=") }
+            ?.substringAfter("=") ?: ""
+        buildConfigField("String", "REMOVE_BG_API_KEY", "\"$removeBgKey\"")
     }
 
     buildTypes {
@@ -38,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -59,16 +66,24 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.firebase.auth)
-    implementation("com.google.firebase:firebase-firestore:25.1.1")
+    implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.coroutines.play.services)
-    implementation("androidx.room:room-runtime:2.7.1")
-    implementation("androidx.room:room-ktx:2.7.1")
-    kapt("androidx.room:room-compiler:2.7.1")
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.scalars)
     implementation(libs.material)
+    
+    // Jetpack Glance para el Widget
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

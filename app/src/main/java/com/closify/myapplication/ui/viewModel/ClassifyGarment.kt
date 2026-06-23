@@ -1,6 +1,7 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.GarmentCategory
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 enum class ClassifyStep { BASIC, OCCASION, SAVED }
 
@@ -45,13 +47,13 @@ class ClassifyGarmentViewModel(
 
     fun onEvent(event: ClassifyGarmentEvent) {
         when (event) {
-            is ClassifyGarmentEvent.NameChanged    -> _uiState.update { it.copy(name = event.value, nameError = null) }
-            is ClassifyGarmentEvent.SelectCategory -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
-            is ClassifyGarmentEvent.ToggleWeather  -> toggleWeather(event.weather)
-            is ClassifyGarmentEvent.ToggleOccasion -> toggleOccasion(event.occasion)
-            is ClassifyGarmentEvent.Continue       -> validateAndAdvance()
-            is ClassifyGarmentEvent.Save           -> save()
-            is ClassifyGarmentEvent.Back           -> goBack()
+            is ClassifyGarmentEvent.NameChanged       -> _uiState.update { it.copy(name = event.value, nameError = null) }
+            is ClassifyGarmentEvent.SelectCategory    -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
+            is ClassifyGarmentEvent.ToggleWeather     -> toggleWeather(event.weather)
+            is ClassifyGarmentEvent.ToggleOccasion    -> toggleOccasion(event.occasion)
+            is ClassifyGarmentEvent.Continue          -> validateAndAdvance()
+            is ClassifyGarmentEvent.Save              -> save()
+            is ClassifyGarmentEvent.Back              -> goBack()
         }
     }
 
@@ -84,14 +86,16 @@ class ClassifyGarmentViewModel(
 
     private fun save() {
         val state = _uiState.value
-        garmentRepository.createGarment(
-            ownerUserId = userRepository.currentUserId,
-            name = state.name.trim(),
-            category = requireNotNull(state.selectedCategory),
-            imageUrl = state.imageUri,
-            suitableWeather = state.selectedWeathers,
-            suitableOccasions = state.selectedOccasions
-        )
-        _uiState.update { it.copy(step = ClassifyStep.SAVED) }
+        viewModelScope.launch {
+            garmentRepository.createGarment(
+                ownerUserId = userRepository.currentUserId,
+                name = state.name.trim(),
+                category = requireNotNull(state.selectedCategory),
+                imageUrl = state.imageUri,
+                suitableWeather = state.selectedWeathers,
+                suitableOccasions = state.selectedOccasions
+            )
+            _uiState.update { it.copy(step = ClassifyStep.SAVED) }
+        }
     }
 }
