@@ -28,7 +28,7 @@ class ProfileRepository(
         val instance = ProfileRepository()
     }
 
-    fun getProfile(userId: String = MockClosifyData.CURRENT_USER_ID): UserProfile =
+    fun getProfile(userId: String = UserRepository.instance.currentUserId): UserProfile =
         MockClosifyData.userById(userId)?.profile
             ?: UserRepository.instance.getCurrentUser()?.profile
             ?: MockClosifyData.currentUser.profile
@@ -36,16 +36,16 @@ class ProfileRepository(
     fun getUserProfile(userId: String): UserProfile? =
         MockClosifyData.userById(userId)?.profile
 
-    fun getWardrobeGarments(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
+    suspend fun getWardrobeGarments(userId: String = UserRepository.instance.currentUserId): List<Garment> =
         garmentRepository.getAllByUserId(userId)
 
-    fun getWardrobeUsagePercentage(userId: String = MockClosifyData.CURRENT_USER_ID): Int =
-        wardrobeRepository.calculateWardrobeUsagePercentage(outfitPostRepository.getPostsByUser(userId))
+    suspend fun getWardrobeUsagePercentage(userId: String = UserRepository.instance.currentUserId): Int =
+        wardrobeRepository.calculateWardrobeUsagePercentage(outfitPostRepository.getPostsByUser(userId), userId)
 
     fun publicProfileBaseGarmentsCount(): Int =
         MockClosifyData.PUBLIC_PROFILE_BASE_GARMENTS_COUNT
 
-    fun getProfileStats(userId: String = MockClosifyData.CURRENT_USER_ID): ProfileStats {
+    suspend fun getProfileStats(userId: String = UserRepository.instance.currentUserId): ProfileStats {
         val posts = outfitPostRepository.getPostsByUser(userId)
         return ProfileStats(
             garmentsCount = getWardrobeGarments(userId).size,
@@ -55,7 +55,7 @@ class ProfileRepository(
         )
     }
 
-    fun getPublicProfileStats(userId: String): PublicProfileStats {
+    suspend fun getPublicProfileStats(userId: String): PublicProfileStats {
         val posts = outfitPostRepository.getPostsByUser(userId)
         val usedGarments = posts.flatMap { it.outfit.garments }.map { it.id }.toSet()
         val garmentsCount = publicProfileBaseGarmentsCount() + usedGarments.size

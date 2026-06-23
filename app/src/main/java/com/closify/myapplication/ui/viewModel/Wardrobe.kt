@@ -1,7 +1,9 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.GarmentRepository
+import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -9,7 +11,10 @@ import com.closify.myapplication.domain.model.WeatherCondition
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class WardrobeUiState(
     val searchQuery: String = "",
@@ -20,7 +25,7 @@ data class WardrobeUiState(
     val allGarments: List<Garment> = emptyList(),
     val filteredGarments: List<Garment> = emptyList(),
     val selectedGarment: Garment? = null,
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 enum class WardrobeFilter {
@@ -34,91 +39,105 @@ sealed interface WardrobeEvent {
 }
 
 class WardrobeViewModel(
-    private val garmentRepository: GarmentRepository = GarmentRepository.instance
+    private val garmentRepository: GarmentRepository = GarmentRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WardrobeUiState())
     val uiState: StateFlow<WardrobeUiState> = _uiState.asStateFlow()
 
     init {
-        loadGarments()
+        val userId = userRepository.currentUserId
+        garmentRepository.observeGarments(userId)
+            .onEach { garments -> onGarmentsUpdated(garments) }
+            .launchIn(viewModelScope)
+        viewModelScope.launch {
+            garmentRepository.syncFromFirestore(userId)
+        }
     }
 
-    fun refresh() = loadGarments()
+    fun refresh() {
+        val userId = userRepository.currentUserId
+        viewModelScope.launch {
+            garmentRepository.syncFromFirestore(userId)
+        }
+    }
 
-    private fun loadGarments() {
+    private fun onGarmentsUpdated(garments: List<Garment>) {
         _uiState.update {
             it.copy(
-                categoryCounts = garmentRepository.getCategoryCounts(),
-                weatherCounts = garmentRepository.getWeatherCounts(),
-                occasionCounts = garmentRepository.getOccasionCounts(),
-                allGarments = garmentRepository.getAllByUserId()
+                allGarments = garments,
+                categoryCounts = garments.groupBy { g -> g.category }.mapValues { e -> e.value.size },
+                weatherCounts = WeatherCondition.entries.associateWith { w ->
+                    garments.count { g -> w in g.suitableWeather || WeatherCondition.ANY in g.suitableWeather }
+                },
+                occasionCounts = Occasion.entries.associateWith { o ->
+                    garments.count { g -> o in g.suitableOccasions || Occasion.ANY in g.suitableOccasions }
+                }
             )
         }
-
-        if (_uiState.value.selectedFilter == WardrobeFilter.ALL) {
-            filterGarments()
-        }
+        if (_uiState.value.selectedFilter == WardrobeFilter.ALL) filterGarments()
     }
 
     fun onEvent(event: WardrobeEvent) {
         when (event) {
             is WardrobeEvent.SearchQueryChanged -> {
-                _uiState.update {
-                    it.copy(
-                        searchQuery = event.query,
-                        selectedFilter = WardrobeFilter.ALL
-                    )
-                }
+                _uiState.update { it.copy(searchQuery = event.query, selectedFilter = WardrobeFilter.ALL) }
                 filterGarments()
             }
-
             is WardrobeEvent.FilterSelected -> {
                 _uiState.update { it.copy(selectedFilter = event.filter) }
-                if (event.filter == WardrobeFilter.ALL) {
-                    filterGarments()
-                }
+                if (event.filter == WardrobeFilter.ALL) filterGarments()
             }
-
-            is WardrobeEvent.DeleteGarment -> {
-                deleteGarment(event.garmentId)
-            }
+            is WardrobeEvent.DeleteGarment -> deleteGarment(event.garmentId)
         }
     }
 
     fun loadGarmentsByCategory(category: GarmentCategory) {
-        _uiState.update { it.copy(filteredGarments = garmentRepository.getByCategory(category)) }
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            _uiState.update { it.copy(filteredGarments = garmentRepository.getByCategory(category, userId)) }
+        }
     }
 
     fun loadGarmentsByWeather(condition: WeatherCondition) {
-        _uiState.update { it.copy(filteredGarments = garmentRepository.getByWeather(condition)) }
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            _uiState.update { it.copy(filteredGarments = garmentRepository.getByWeather(condition, userId)) }
+        }
     }
 
     fun loadGarmentsByOccasion(occasion: Occasion) {
-        _uiState.update { it.copy(filteredGarments = garmentRepository.getByOccasion(occasion)) }
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            _uiState.update { it.copy(filteredGarments = garmentRepository.getByOccasion(occasion, userId)) }
+        }
     }
 
     fun getGarmentById(id: String) {
-        _uiState.update { it.copy(selectedGarment = garmentRepository.getById(id)) }
+        viewModelScope.launch {
+            _uiState.update { it.copy(selectedGarment = garmentRepository.getById(id)) }
+        }
     }
 
     private fun deleteGarment(id: String) {
-        garmentRepository.deleteGarment(id)
-        _uiState.update { state ->
-            state.copy(
-                allGarments = garmentRepository.getAllByUserId(),
-                filteredGarments = state.filteredGarments.filterNot { it.id == id },
-                categoryCounts = garmentRepository.getCategoryCounts(),
-                weatherCounts = garmentRepository.getWeatherCounts(),
-                occasionCounts = garmentRepository.getOccasionCounts(),
-                selectedGarment = null
-            )
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            garmentRepository.deleteGarment(id, userId)
+            _uiState.update { state ->
+                state.copy(
+                    filteredGarments = state.filteredGarments.filterNot { it.id == id },
+                    selectedGarment = null
+                )
+            }
         }
     }
 
     private fun filterGarments() {
-        _uiState.update {
-            it.copy(filteredGarments = garmentRepository.searchByName(it.searchQuery))
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            val results = garmentRepository.searchByName(_uiState.value.searchQuery, userId)
+            _uiState.update { it.copy(filteredGarments = results) }
         }
     }
 }

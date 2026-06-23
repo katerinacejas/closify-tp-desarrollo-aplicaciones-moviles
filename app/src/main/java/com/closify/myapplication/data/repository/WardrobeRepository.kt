@@ -8,8 +8,8 @@ class WardrobeRepository {
         val instance = WardrobeRepository()
     }
 
-    fun calculateWardrobeUsagePercentage(posts: List<OutfitPost>): Int {
-        val totalGarments = GarmentRepository.instance.getAllByUserId().size
+    suspend fun calculateWardrobeUsagePercentage(posts: List<OutfitPost>, userId: String): Int {
+        val totalGarments = GarmentRepository.instance.getAllByUserId(userId).size
         if (totalGarments == 0) return 0
 
         val usedGarmentIds = posts

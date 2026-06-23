@@ -9,6 +9,7 @@ import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.UserSummary
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,7 +58,8 @@ class ProfileViewModel(
     }
 
     private fun loadProfile(userId: String) {
-        val user = userRepository.getCurrentUser() ?: return
+        viewModelScope.launch {
+        val user = userRepository.getCurrentUser() ?: return@launch
         val profile = user.profile
         val friends = socialRepository.getFriends(userId)
         val posts = outfitPostRepository.getPostsByUser(userId)
@@ -79,6 +81,7 @@ class ProfileViewModel(
             friends = friends,
             posts = posts
         )
+        }
     }
 
     fun onLikeClick(postId: String) {

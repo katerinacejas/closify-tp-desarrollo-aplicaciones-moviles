@@ -1,7 +1,9 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.OutfitPostRepository
+import kotlinx.coroutines.launch
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -52,25 +54,27 @@ class PublicProfileViewModel(
 
     fun refresh() {
         val userId = profileUserId ?: return
-        val currentUser = userRepository.getCurrentUserOrDefault().toSummary()
-        val profile = profileRepository.getUserProfile(userId) ?: return
-        val posts = outfitPostRepository.getPostsByUser(userId)
-        val friends = socialRepository.getFriends(userId)
-        val stats = profileRepository.getPublicProfileStats(userId)
+        viewModelScope.launch {
+            val currentUser = userRepository.getCurrentUserOrDefault().toSummary()
+            val profile = profileRepository.getUserProfile(userId) ?: return@launch
+            val posts = outfitPostRepository.getPostsByUser(userId)
+            val friends = socialRepository.getFriends(userId)
+            val stats = profileRepository.getPublicProfileStats(userId)
 
-        _uiState.value = _uiState.value.copy(
-            currentUser = currentUser,
-            profile = profile,
-            isFriend = socialRepository.isFriend(currentUser.id, userId),
-            hasPendingOutgoingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId) != null,
-            pendingIncomingRequest = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId),
-            friends = friends,
-            garmentsCount = stats.garmentsCount,
-            wardrobeUsagePercentage = stats.wardrobeUsagePercentage,
-            favoriteOutfitsCount = stats.favoriteOutfitsCount,
-            plannedOutfitsCount = stats.plannedOutfitsCount,
-            posts = posts
-        )
+            _uiState.value = _uiState.value.copy(
+                currentUser = currentUser,
+                profile = profile,
+                isFriend = socialRepository.isFriend(currentUser.id, userId),
+                hasPendingOutgoingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId) != null,
+                pendingIncomingRequest = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId),
+                friends = friends,
+                garmentsCount = stats.garmentsCount,
+                wardrobeUsagePercentage = stats.wardrobeUsagePercentage,
+                favoriteOutfitsCount = stats.favoriteOutfitsCount,
+                plannedOutfitsCount = stats.plannedOutfitsCount,
+                posts = posts
+            )
+        }
     }
 
     fun onToggleFriend(userId: String) {

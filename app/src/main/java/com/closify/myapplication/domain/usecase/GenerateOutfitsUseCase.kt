@@ -11,11 +11,12 @@ class GenerateOutfitsUseCase(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance
 ) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         weather: WeatherCondition,
-        occasion: Occasion
+        occasion: Occasion,
+        userId: String
     ): List<Outfit> {
-        val all = garmentRepository.getAllByUserId()
+        val all = garmentRepository.getAllByUserId(userId)
 
         // Filtrá prendas compatibles con clima y ocasión
         // ANY actúa como "comodín" — es compatible con todo

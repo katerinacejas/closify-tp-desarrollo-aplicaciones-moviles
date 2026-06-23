@@ -1,7 +1,9 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.OutfitRepository
+import kotlinx.coroutines.launch
 import com.closify.myapplication.domain.model.Outfit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +43,9 @@ class SaveFavoritesViewModel(
 
     private fun save() {
         val state = _uiState.value
-        outfitRepository.saveFavorites(state.outfits, state.outfitNames)
-        _uiState.update { it.copy(showSavedDialog = true) }
+        viewModelScope.launch {
+            outfitRepository.saveFavorites(state.outfits, state.outfitNames)
+            _uiState.update { it.copy(showSavedDialog = true) }
+        }
     }
 }
