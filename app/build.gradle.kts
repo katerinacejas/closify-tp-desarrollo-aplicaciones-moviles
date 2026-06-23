@@ -55,6 +55,11 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.material)
+    
+    // Jetpack Glance para el Widget
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
