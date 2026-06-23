@@ -1,0 +1,87 @@
+app/src/main/java/com/closify/myapplication/data/repository/ProfileRepository.kt
+  s_ef187569660cfa::t_5c7fc2b055e712 58
+  s_ef187569660cfa::t_9b295745caa370 43
+  s_ef187569660cfa::t_ce71b3303eb23f 31,39,42,48
+app/src/main/java/com/closify/myapplication/ui/screens/addgarment/ClassifyGarmentScreen.kt
+  s_ef187569660cfa::t_e18177e7eee56e 22-23,27,31,40-41
+app/src/main/java/com/closify/myapplication/data/local/dao/GarmentDao.kt
+  s_ef187569660cfa::t_1645554fac042f 1-29
+app/src/main/java/com/closify/myapplication/data/local/mapper/OutfitMapper.kt
+  s_ef187569660cfa::t_fef4210e92452d 1-42
+app/src/main/java/com/closify/myapplication/ui/viewModel/Wardrobe.kt
+  s_ef187569660cfa::t_873d8c6d8669b8 43
+  s_ef187569660cfa::t_93c42b31695d26 4,6,14-15,17,42,50-53,59-61,63-64,66,69-76,79,85,90,92,97-100,104-107,111-114,118-120,124-132,137-140
+  s_ef187569660cfa::t_acca59499d1f40 28
+  s_ef187569660cfa::t_cd1e85152fcc44 54-56,62
+app/src/main/java/com/closify/myapplication/ui/viewModel/Home.kt
+  s_ef187569660cfa::t_1d6cf395bb7d8d 113,115-120,122-126,128
+app/src/main/java/com/closify/myapplication/data/repository/WardrobeRepository.kt
+  s_ef187569660cfa::t_a837e1a493c431 11-12
+app/src/main/java/com/closify/myapplication/data/local/entity/OutfitEntity.kt
+  s_ef187569660cfa::t_1f5c0b87c36e0c 1-13
+app/src/main/java/com/closify/myapplication/ui/viewModel/PublicProfile.kt
+  s_ef187569660cfa::t_81cfc78d087f61 57-62,64-77
+  s_ef187569660cfa::t_d8ca277a5d68df 4,6
+app/src/main/java/com/closify/myapplication/domain/usecase/GenerateOutfitsUseCase.kt
+  s_ef187569660cfa::t_1f6d652397755c 14,16-17,19
+app/src/main/java/com/closify/myapplication/data/local/entity/GarmentEntity.kt
+  s_ef187569660cfa::t_a7abdfa808a6d2 1-16
+app/src/main/java/com/closify/myapplication/ui/screens/profile/ProfileContent.kt
+  s_ef187569660cfa::t_7cfe11233516d5 196-197
+app/src/main/java/com/closify/myapplication/ui/viewModel/SaveFavorites.kt
+  s_ef187569660cfa::t_b54cf5107f3e4f 4,6
+  s_ef187569660cfa::t_e670419aea0c2e 46-49
+app/src/main/java/com/closify/myapplication/ClosifyApplication.kt
+  s_ef187569660cfa::t_df9d58dabafa9e 5
+  s_ef187569660cfa::t_7129b1e8545ddc 12
+  s_ef187569660cfa::t_4a4181b4fd025c 4
+  s_ef187569660cfa::t_30cb27a5b27c46 13
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  s_ef187569660cfa::t_c3d9b7de747e20 26
+  s_ef187569660cfa::t_8ecb8027f2636f 89-99
+app/src/main/java/com/closify/myapplication/data/repository/OutfitRepository.kt
+  s_ef187569660cfa::t_01f7366ede53f6 74,80-82,84-86
+  s_ef187569660cfa::t_d6e210e22b7cac 93-94
+  s_ef187569660cfa::t_c4b2ee98370fb6 3-9,14-19,25-26,31-44,47-50,52-53,70-71,73,83,87-88,103,111-112,114-118,120-127,132-139,144,147,157-159
+  s_ef187569660cfa::t_3858730bb38248 60-69
+app/src/main/java/com/closify/myapplication/data/repository/GarmentRepository.kt
+  s_ef187569660cfa::t_c368798c7bc830 3-8,13-20,33,36-49,52-55,58,70,90-96,100-101,103,106,109,112-113,115-118,122,133-147
+  s_ef187569660cfa::t_981ca3399a7819 56-57,60-67
+app/src/main/java/com/closify/myapplication/data/local/AppDatabase.kt
+  s_ef187569660cfa::t_15371823fe5b60 7,10,18
+  s_ef187569660cfa::t_7ba32aaf5a5308 30
+  s_ef187569660cfa::t_90a37c754e0348 8,11,14,19
+app/src/main/java/com/closify/myapplication/ui/viewModel/Profile.kt
+  s_ef187569660cfa::t_366451bb98baa2 84
+  s_ef187569660cfa::t_b15685fc24e4cd 12
+  s_ef187569660cfa::t_960c48d65c6977 61-62
+app/src/main/java/com/closify/myapplication/data/local/dao/OutfitDao.kt
+  s_ef187569660cfa::t_59fd9976633687 1-29
+app/src/main/java/com/closify/myapplication/data/local/mapper/GarmentMapper.kt
+  s_ef187569660cfa::t_c30308a58ee787 1-61
+app/src/main/java/com/closify/myapplication/ui/viewModel/Planner.kt
+  s_ef187569660cfa::t_bf6e0be3c8beea 251-267
+  s_ef187569660cfa::t_3dbd078e10810f 83-89,92-94
+  s_ef187569660cfa::t_e2750e2d9887e2 4,6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "8430e30af42046dac9f6d39071a4481dc048109b",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
