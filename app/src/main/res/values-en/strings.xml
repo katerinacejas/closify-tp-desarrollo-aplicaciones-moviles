@@ -34,6 +34,7 @@
     <string name="login_forgot_password">Forgot your password?</string>
     <string name="login_no_account">Don\'t have an account? </string>
     <string name="login_register">Register</string>
+    <string name="auth_continue_google">Continue with Google</string>
     <string name="login_error_invalid_email">Email must be valid.</string>
     <string name="login_error_empty_password">Password cannot be empty.</string>
 

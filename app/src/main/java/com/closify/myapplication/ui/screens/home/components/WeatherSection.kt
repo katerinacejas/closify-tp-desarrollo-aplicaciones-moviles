@@ -34,7 +34,7 @@ private val weatherOptions = listOf(
     WeatherCondition.ANY   to R.string.weather_any
 )
 
-private val WeatherOptionsAreaHeight = 92.dp
+private val WeatherOptionsAreaHeight = 120.dp
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -95,6 +95,7 @@ fun WeatherSection(
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
+                    maxItemsInEachRow = 3,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     weatherOptions.forEach { (condition, labelRes) ->

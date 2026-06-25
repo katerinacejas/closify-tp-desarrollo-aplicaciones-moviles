@@ -18,26 +18,26 @@ object AnalyticsEvents {
     fun onboardingCompleted(): AnalyticsEvent =
         AnalyticsEvent("onboarding_completed")
 
-    fun loginSubmitted(): AnalyticsEvent =
-        AnalyticsEvent("login_submitted", mapOf("method" to "email"))
+    fun loginSubmitted(method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("login_submitted", mapOf("method" to method.normalized()))
 
-    fun loginSucceeded(): AnalyticsEvent =
-        AnalyticsEvent("login_success", mapOf("method" to "email"))
+    fun loginSucceeded(method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("login_success", mapOf("method" to method.normalized()))
 
-    fun loginFailed(reason: String?): AnalyticsEvent =
-        AnalyticsEvent("login_failed", mapOf("method" to "email", "reason" to reason.safeReason()))
+    fun loginFailed(reason: String?, method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("login_failed", mapOf("method" to method.normalized(), "reason" to reason.safeReason()))
 
     fun registerStepCompleted(step: Int): AnalyticsEvent =
         AnalyticsEvent("register_step_completed", mapOf("step" to step))
 
-    fun registerSubmitted(): AnalyticsEvent =
-        AnalyticsEvent("register_submitted", mapOf("method" to "email"))
+    fun registerSubmitted(method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("register_submitted", mapOf("method" to method.normalized()))
 
-    fun registerSucceeded(): AnalyticsEvent =
-        AnalyticsEvent("register_success", mapOf("method" to "email"))
+    fun registerSucceeded(method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("register_success", mapOf("method" to method.normalized()))
 
-    fun registerFailed(reason: String?): AnalyticsEvent =
-        AnalyticsEvent("register_failed", mapOf("method" to "email", "reason" to reason.safeReason()))
+    fun registerFailed(reason: String?, method: String = "email"): AnalyticsEvent =
+        AnalyticsEvent("register_failed", mapOf("method" to method.normalized(), "reason" to reason.safeReason()))
 
     fun logout(): AnalyticsEvent =
         AnalyticsEvent("logout")

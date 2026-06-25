@@ -1,18 +1,24 @@
 package com.closify.myapplication.data.repository
 
 import android.content.Context
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.ClearCredentialException
 import com.closify.myapplication.data.local.AppDatabase
 import com.closify.myapplication.data.local.mapper.toDomain
 import com.closify.myapplication.data.local.mapper.toEntity
 import com.closify.myapplication.data.local.mapper.toFirestoreMap
 import com.closify.myapplication.data.local.mapper.toUserEntity
+import com.closify.myapplication.domain.model.GoogleAuthCredential
 import com.closify.myapplication.domain.model.User
+import com.closify.myapplication.domain.model.UserProfile
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +54,7 @@ class UserRepository private constructor(context: Context) {
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val userDao = AppDatabase.getInstance(context).userDao()
+    private val credentialManager = CredentialManager.create(context)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -95,6 +102,31 @@ class UserRepository private constructor(context: Context) {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: throw Exception("No se pudo obtener el usuario.")
             fetchAndCacheFromFirestore(uid)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception(mapAuthError(e)))
+        }
+    }
+
+    suspend fun loginWithGoogle(googleCredential: GoogleAuthCredential): Result<Unit> {
+        return try {
+            val firebaseCredential = GoogleAuthProvider.getCredential(googleCredential.idToken, null)
+            val result = auth.signInWithCredential(firebaseCredential).await()
+            val firebaseUser = result.user ?: throw Exception("No se pudo obtener el usuario.")
+            val uid = firebaseUser.uid
+            val userDoc = firestore.collection("users").document(uid).get().await()
+
+            if (userDoc.exists()) {
+                fetchAndCacheFromFirestore(uid)
+            } else {
+                createGoogleUser(
+                    uid = uid,
+                    email = googleCredential.email ?: firebaseUser.email.orEmpty(),
+                    displayName = googleCredential.displayName ?: firebaseUser.displayName,
+                    profileImageUrl = googleCredential.profileImageUrl ?: firebaseUser.photoUrl?.toString()
+                )
+            }
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception(mapAuthError(e)))
@@ -221,6 +253,13 @@ class UserRepository private constructor(context: Context) {
     fun logout() {
         auth.signOut()
         _currentUser.value = null
+        scope.launch {
+            try {
+                credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            } catch (_: ClearCredentialException) {
+                // Firebase ya cerr\u00F3 sesi\u00F3n; Credential Manager solo limpia el selector de cuentas.
+            }
+        }
     }
 
     private suspend fun fetchAndCacheFromFirestore(uid: String) {
@@ -236,6 +275,63 @@ class UserRepository private constructor(context: Context) {
             val entity = userDao.getById(uid)
             if (entity != null) _currentUser.value = entity.toDomain()
         }
+    }
+
+    private suspend fun createGoogleUser(
+        uid: String,
+        email: String,
+        displayName: String?,
+        profileImageUrl: String?
+    ) {
+        val createdAt = LocalDate.now().format(
+            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
+        )
+        val fullName = displayName?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?: email.substringBefore("@").ifBlank { "Usuario Closify" }
+        val username = generateAvailableGoogleUsername(email, fullName)
+        val user = User(
+            id = uid,
+            email = email,
+            profile = UserProfile(
+                id = uid,
+                fullName = fullName,
+                username = username,
+                birthDate = "",
+                bio = "",
+                avatarImageResId = com.closify.myapplication.R.drawable.avatar_default,
+                bannerImageResId = com.closify.myapplication.R.drawable.banner_default,
+                avatarImageUrl = profileImageUrl
+            ),
+            createdAt = createdAt
+        )
+
+        firestore.collection("users").document(uid).set(user.toFirestoreMap()).await()
+        userDao.upsert(user.toEntity())
+        _currentUser.value = user
+    }
+
+    private suspend fun generateAvailableGoogleUsername(email: String, displayName: String): String {
+        val rawBase = email.substringBefore("@").ifBlank { displayName }.ifBlank { "google_user" }
+        val base = sanitizeUsernameBase(rawBase)
+        var candidate = base
+        var suffix = 1
+        while (!isUsernameAvailable(candidate)) {
+            candidate = "$base$suffix"
+            suffix++
+        }
+        return normalizeUsername(candidate)
+    }
+
+    private fun sanitizeUsernameBase(value: String): String {
+        val withoutAccents = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
+        return withoutAccents
+            .lowercase(Locale.ROOT)
+            .replace("[^a-z0-9._]+".toRegex(), "_")
+            .trim('.', '_')
+            .take(24)
+            .ifBlank { "google_user" }
     }
 
     private fun normalizeUsername(username: String): String =

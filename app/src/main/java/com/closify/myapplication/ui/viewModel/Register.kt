@@ -6,6 +6,7 @@ import com.closify.myapplication.core.telemetry.AnalyticsEvents
 import com.closify.myapplication.core.telemetry.AnalyticsTracker
 import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
+import com.closify.myapplication.domain.model.GoogleAuthCredential
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -62,6 +63,8 @@ sealed interface RegisterEvent {
     data class BirthYearChanged(val value: String) : RegisterEvent
     data class BioChanged(val value: String) : RegisterEvent
     data object Submit : RegisterEvent
+    data class GoogleSignInRequested(val credential: GoogleAuthCredential) : RegisterEvent
+    data class GoogleSignInFailed(val message: String?) : RegisterEvent
 
     data object GoBack : RegisterEvent
     data object ErrorDismissed : RegisterEvent
@@ -88,6 +91,8 @@ class RegisterViewModel(
             is RegisterEvent.BirthYearChanged       -> _uiState.update { it.copy(birthYear = event.value, birthdateError = null) }
             is RegisterEvent.BioChanged             -> _uiState.update { it.copy(bio = event.value, bioError = null) }
             is RegisterEvent.Submit                 -> submit()
+            is RegisterEvent.GoogleSignInRequested  -> registerWithGoogle(event.credential)
+            is RegisterEvent.GoogleSignInFailed     -> onGoogleSignInFailed(event.message)
             is RegisterEvent.GoBack                 -> _uiState.update { it.copy(currentStep = RegisterStep.STEP_1) }
             is RegisterEvent.ErrorDismissed         -> _uiState.update { it.copy(generalError = null) }
         }
@@ -140,6 +145,33 @@ class RegisterViewModel(
                 analyticsTracker.track(AnalyticsEvents.registerStepCompleted(step = 1))
                 _uiState.update { it.copy(currentStep = RegisterStep.STEP_2) }
             }
+        }
+    }
+
+    private fun registerWithGoogle(credential: GoogleAuthCredential) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, generalError = null) }
+            analyticsTracker.track(AnalyticsEvents.registerSubmitted(method = "google"))
+            userRepository.loginWithGoogle(credential)
+                .onSuccess {
+                    analyticsTracker.setUserId(userRepository.currentUserId.takeIf { it.isNotBlank() })
+                    analyticsTracker.track(AnalyticsEvents.registerSucceeded(method = "google"))
+                    _uiState.update { it.copy(isLoading = false, registerSuccess = true) }
+                }
+                .onFailure { error ->
+                    analyticsTracker.track(AnalyticsEvents.registerFailed(error.message, method = "google"))
+                    _uiState.update { it.copy(isLoading = false, generalError = error.message) }
+                }
+        }
+    }
+
+    private fun onGoogleSignInFailed(message: String?) {
+        analyticsTracker.track(AnalyticsEvents.registerFailed(message, method = "google"))
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                generalError = message ?: "No se pudo registrarte con Google."
+            )
         }
     }
 
