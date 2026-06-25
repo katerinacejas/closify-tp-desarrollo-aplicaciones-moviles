@@ -1,6 +1,9 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +23,8 @@ data class EditProfileUiState(
 )
 
 class EditProfileViewModel(
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditProfileUiState())
@@ -71,8 +75,10 @@ class EditProfileViewModel(
             birthDate = state.birthDate,
             bio = state.bio
         ).onSuccess {
+            analyticsTracker.track(AnalyticsEvents.profileUpdated())
             _uiState.update { it.copy(saved = true, generalError = null) }
         }.onFailure { error ->
+            analyticsTracker.track(AnalyticsEvents.profileUpdateFailed(error.message))
             _uiState.update { it.copy(generalError = error.message, saved = false) }
         }
     }

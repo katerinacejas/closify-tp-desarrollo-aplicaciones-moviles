@@ -2,6 +2,10 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.Garment
@@ -40,7 +44,9 @@ sealed interface WardrobeEvent {
 
 class WardrobeViewModel(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WardrobeUiState())
@@ -86,6 +92,7 @@ class WardrobeViewModel(
                 filterGarments()
             }
             is WardrobeEvent.FilterSelected -> {
+                analyticsTracker.track(AnalyticsEvents.wardrobeFilterSelected(event.filter.name))
                 _uiState.update { it.copy(selectedFilter = event.filter) }
                 if (event.filter == WardrobeFilter.ALL) filterGarments()
             }
@@ -123,11 +130,23 @@ class WardrobeViewModel(
     private fun deleteGarment(id: String) {
         viewModelScope.launch {
             val userId = userRepository.currentUserId
-            garmentRepository.deleteGarment(id, userId)
-            _uiState.update { state ->
-                state.copy(
-                    filteredGarments = state.filteredGarments.filterNot { it.id == id },
-                    selectedGarment = null
+            runCatching {
+                garmentRepository.deleteGarment(id, userId)
+            }.onSuccess {
+                analyticsTracker.track(AnalyticsEvents.garmentDeleted())
+                _uiState.update { state ->
+                    state.copy(
+                        filteredGarments = state.filteredGarments.filterNot { it.id == id },
+                        selectedGarment = null
+                    )
+                }
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "garments",
+                        "operation" to "delete"
+                    )
                 )
             }
         }

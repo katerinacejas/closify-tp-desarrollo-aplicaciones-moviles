@@ -83,7 +83,6 @@
     <string name="weather_mild">Mild</string>
     <string name="weather_any">Any</string>
     <string name="weather_hot_long">Hot</string>
-    <string name="weather_rainy">Rainy</string>
 
     <!-- Occasions -->
     <string name="occasion_work">Work</string>
@@ -99,6 +98,8 @@
     <string name="dialog_no_garments_subtitle">Add garments to your wardrobe\nto be able to generate outfits</string>
     <string name="dialog_no_combinations_title">No possible combinations</string>
     <string name="dialog_no_combinations_subtitle">We didn\'t find garments that combine\nwith the weather and occasion you chose</string>
+    <string name="dialog_weather_unavailable_title">We could not get the weather</string>
+    <string name="dialog_weather_unavailable_subtitle">There are network issues or we could not access your location. Check your internet and/or try again later. In the meantime, you can use manual mode.</string>
 
     <!-- Wardrobe -->
     <string name="wardrobe_title">Wardrobe</string>

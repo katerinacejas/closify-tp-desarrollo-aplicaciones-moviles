@@ -2,14 +2,20 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.data.repository.WeatherRepository as WeatherRepositoryImpl
+import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +25,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 
 private val PlannerDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
@@ -74,13 +81,20 @@ data class PlannerUiState(
 class PlannerViewModel(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
-    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl.instance,
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val today: LocalDate = LocalDate.now()
 
-    private val _uiState = MutableStateFlow(PlannerUiState())
+    private val _uiState = MutableStateFlow(PlannerUiState(
+        selectedDate = today,
+        visibleMonth = YearMonth.from(today),
+        dateInput = today.format(PlannerDateFormatter),
+        plannedPosts = emptyList()
+    ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 
     init {
@@ -91,15 +105,13 @@ class PlannerViewModel(
         viewModelScope.launch {
             val userId = userRepository.getCurrentUserOrDefault().id
             val plannedPosts = outfitRepository.getPlannedPosts(userId)
-            val forecast = weatherRepository.getPlannerForecast(today)
             val garmentGroups = garmentRepository.getPlannerGroups(userId)
 
             _uiState.update { currentState -> 
                 currentState.copy(
                     selectedDate = today,
                     visibleMonth = YearMonth.from(today),
-                    dateInput = today.format    (PlannerDateFormatter),
-                    forecastDays = forecast,
+                    dateInput = today.format(PlannerDateFormatter),
                     plannedPosts = plannedPosts,
                     topAndOuterwearGarments = garmentGroups.topAndOuterwear,
                     bottomGarments = garmentGroups.bottoms,
@@ -112,6 +124,14 @@ class PlannerViewModel(
                 ) 
             }
         }
+    }
+
+    fun onForecastLocationAvailable(location: DeviceLocation) {
+        loadForecast(location)
+    }
+
+    fun onForecastUnavailable() {
+        _uiState.update { it.copy(forecastDays = emptyList()) }
     }
 
     fun onDateInputChange(value: String) {
@@ -156,6 +176,9 @@ class PlannerViewModel(
         val parsedDate = parseDateOrNull(_uiState.value.dateInput)
         if (parsedDate == null || parsedDate.isBefore(today)) return
 
+        analyticsTracker.track(
+            AnalyticsEvents.plannerDateConfirmed(ChronoUnit.DAYS.between(today, parsedDate))
+        )
         _uiState.update { currentState -> 
             currentState.copy(
                 selectedDate = parsedDate,
@@ -263,21 +286,40 @@ class PlannerViewModel(
 
             val userId = userRepository.getCurrentUserOrDefault().id
             val plannedDate = state.selectedDate.toSpanishTitle()
-            outfitRepository.savePlanning(
-                userId = userId,
-                title = state.plannedOutfitTitle,
-                garments = state.plannedGarments,
-                plannedDate = plannedDate,
-                createdAt = today.toSpanishTitle(),
-                editingPostId = state.editingPostId
-            )
-
-            val updatedPosts = outfitRepository.getPlannedPosts(userId)
-            _uiState.update { currentState -> 
-                currentState.copy(
-                    plannedPosts = updatedPosts,
-                    editingPostId = null,
-                    showSavedDialog = true
+            val editingExisting = state.editingPostId != null
+            runCatching {
+                outfitRepository.savePlanning(
+                    userId = userId,
+                    title = state.plannedOutfitTitle,
+                    garments = state.plannedGarments,
+                    plannedDate = plannedDate,
+                    createdAt = today.toSpanishTitle(),
+                    editingPostId = state.editingPostId
+                )
+                outfitRepository.getPlannedPosts(userId)
+            }.onSuccess { updatedPosts ->
+                analyticsTracker.track(
+                    AnalyticsEvents.plannerSaved(
+                        garmentCount = state.plannedGarments.size,
+                        editingExisting = editingExisting
+                    )
+                )
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        plannedPosts = updatedPosts,
+                        editingPostId = null,
+                        showSavedDialog = true
+                    )
+                }
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "planner",
+                        "operation" to "save_planning",
+                        "garment_count" to state.plannedGarments.size,
+                        "editing_existing" to editingExisting
+                    )
                 ) 
             }
         }
@@ -291,6 +333,25 @@ class PlannerViewModel(
                 plannedGarments = emptyList(),
                 plannedOutfitTitle = ""
             ) 
+        }
+    }
+
+    private fun loadForecast(location: DeviceLocation) {
+        viewModelScope.launch {
+            weatherRepository.getPlannerForecast(location, today)
+                .onSuccess { forecastDays ->
+                    _uiState.update { it.copy(forecastDays = forecastDays) }
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "planner",
+                            "operation" to "forecast"
+                        )
+                    )
+                    _uiState.update { it.copy(forecastDays = emptyList()) }
+                }
         }
     }
 

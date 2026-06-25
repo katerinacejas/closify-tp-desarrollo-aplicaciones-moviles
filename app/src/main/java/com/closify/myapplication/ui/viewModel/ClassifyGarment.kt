@@ -4,6 +4,10 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.remote.CloudinaryService
 import com.closify.myapplication.data.remote.RemoveBgService
 import com.closify.myapplication.data.repository.GarmentRepository
@@ -48,7 +52,9 @@ class ClassifyGarmentViewModel(
     imageUri: String,
     private val context: Context,
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClassifyGarmentUiState(imageUri = imageUri))
@@ -157,19 +163,39 @@ class ClassifyGarmentViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessingImage = true) }
 
-            val imageUrl = withContext(Dispatchers.IO) {
-                uriToFile(state.imageUri)?.let { CloudinaryService.upload(it) }
-            } ?: state.imageUri  // fallback a local si falla la subida
+            runCatching {
+                val imageUrl = withContext(Dispatchers.IO) {
+                    uriToFile(state.imageUri)?.let { CloudinaryService.upload(it) }
+                } ?: state.imageUri
 
-            garmentRepository.createGarment(
-                ownerUserId = userRepository.currentUserId,
-                name = state.name.trim(),
-                category = requireNotNull(state.selectedCategory),
-                imageUrl = imageUrl,
-                suitableWeather = state.selectedWeathers,
-                suitableOccasions = state.selectedOccasions
-            )
-            _uiState.update { it.copy(step = ClassifyStep.SAVED, isProcessingImage = false) }
+                garmentRepository.createGarment(
+                    ownerUserId = userRepository.currentUserId,
+                    name = state.name.trim(),
+                    category = requireNotNull(state.selectedCategory),
+                    imageUrl = imageUrl,
+                    suitableWeather = state.selectedWeathers,
+                    suitableOccasions = state.selectedOccasions
+                )
+            }.onSuccess { garment ->
+                analyticsTracker.track(
+                    AnalyticsEvents.garmentSaved(
+                        category = garment.category.name,
+                        weatherCount = garment.suitableWeather.size,
+                        occasionCount = garment.suitableOccasions.size
+                    )
+                )
+                _uiState.update { it.copy(step = ClassifyStep.SAVED, isProcessingImage = false) }
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "garments",
+                        "operation" to "create",
+                        "category" to state.selectedCategory?.name
+                    )
+                )
+                _uiState.update { it.copy(isProcessingImage = false) }
+            }
         }
     }
 }

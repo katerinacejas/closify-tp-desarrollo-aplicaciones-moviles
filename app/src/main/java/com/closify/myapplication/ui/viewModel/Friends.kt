@@ -6,6 +6,10 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
@@ -50,7 +54,9 @@ class FriendsViewModel(
     private val socialRepository: SocialRepository = SocialRepository.instance,
     private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(
@@ -141,11 +147,30 @@ class FriendsViewModel(
     fun onToggleFriend(userId: String) {
         viewModelScope.launch {
             val currentUserId = _uiState.value.currentUser.id
-            if (userId in friendIds) {
-                socialRepository.removeFriend(currentUserId, userId)
+            val wasFriend = userId in friendIds
+            val operationResult = if (wasFriend) {
+                runCatching { socialRepository.removeFriend(currentUserId, userId) }
             } else {
                 socialRepository.sendFriendRequest(currentUserId, userId)
             }
+
+            operationResult
+                .onSuccess {
+                    analyticsTracker.track(
+                        if (wasFriend) AnalyticsEvents.friendRemoved("friends")
+                        else AnalyticsEvents.friendRequestSent("friends")
+                    )
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "social",
+                            "operation" to if (wasFriend) "remove_friend" else "send_friend_request",
+                            "surface" to "friends"
+                        )
+                    )
+                }
 
             friendIds = socialRepository.getFriends(currentUserId).map { it.id }.toSet()
             val posts = outfitPostRepository.getPostsByAuthors(friendIds)
@@ -178,6 +203,7 @@ class FriendsViewModel(
                 postId = postId,
                 user = _uiState.value.currentUser
             ) ?: return@launch
+            analyticsTracker.track(AnalyticsEvents.postLiked("friends"))
             replacePost(updatedPost)
         }
     }
@@ -192,6 +218,7 @@ class FriendsViewModel(
                 text = text
             ) ?: return@launch
 
+            analyticsTracker.track(AnalyticsEvents.commentSent("friends"))
             _uiState.update {
                 it.copy(
                     posts = it.posts.map { post -> if (post.id == postId) updatedPost else post },

@@ -2,6 +2,10 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import kotlinx.coroutines.launch
 import com.closify.myapplication.data.repository.ProfileRepository
@@ -38,7 +42,9 @@ class PublicProfileViewModel(
     private val profileRepository: ProfileRepository = ProfileRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance,
     private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -84,11 +90,32 @@ class PublicProfileViewModel(
     fun onToggleFriend(userId: String) {
         viewModelScope.launch {
             val currentUserId = _uiState.value.currentUser.id
-            if (socialRepository.isFriend(currentUserId, userId)) {
-                socialRepository.removeFriend(currentUserId, userId)
-            } else if (socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) == null) {
-                socialRepository.sendFriendRequest(currentUserId, userId)
+            val isFriend = socialRepository.isFriend(currentUserId, userId)
+            val hasPendingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) != null
+            val operationResult = when {
+                isFriend -> runCatching { socialRepository.removeFriend(currentUserId, userId) }
+                !hasPendingRequest -> socialRepository.sendFriendRequest(currentUserId, userId)
+                else -> Result.success(Unit)
             }
+
+            operationResult
+                .onSuccess {
+                    if (isFriend) {
+                        analyticsTracker.track(AnalyticsEvents.friendRemoved("public_profile"))
+                    } else if (!hasPendingRequest) {
+                        analyticsTracker.track(AnalyticsEvents.friendRequestSent("public_profile"))
+                    }
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "social",
+                            "operation" to if (isFriend) "remove_friend" else "send_friend_request",
+                            "surface" to "public_profile"
+                        )
+                    )
+                }
             refresh()
         }
     }
@@ -96,6 +123,13 @@ class PublicProfileViewModel(
     fun onAcceptIncomingFriendRequest(requestId: String) {
         viewModelScope.launch {
             socialRepository.respondToFriendRequest(requestId, accepted = true)
+                .onSuccess { analyticsTracker.track(AnalyticsEvents.friendRequestResponded(accepted = true)) }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf("feature" to "social", "operation" to "accept_friend_request")
+                    )
+                }
             refresh()
         }
     }
@@ -103,6 +137,13 @@ class PublicProfileViewModel(
     fun onRejectIncomingFriendRequest(requestId: String) {
         viewModelScope.launch {
             socialRepository.respondToFriendRequest(requestId, accepted = false)
+                .onSuccess { analyticsTracker.track(AnalyticsEvents.friendRequestResponded(accepted = false)) }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf("feature" to "social", "operation" to "reject_friend_request")
+                    )
+                }
             refresh()
         }
     }
@@ -120,6 +161,7 @@ class PublicProfileViewModel(
                 user = _uiState.value.currentUser
             ) ?: return@launch
 
+            analyticsTracker.track(AnalyticsEvents.postLiked("public_profile"))
             replacePost(updatedPost)
         }
     }
@@ -136,6 +178,7 @@ class PublicProfileViewModel(
                 text = text
             ) ?: return@launch
 
+            analyticsTracker.track(AnalyticsEvents.commentSent("public_profile"))
             _uiState.update { it.copy(
                 posts = it.posts.map { post -> if (post.id == postId) updatedPost else post },
                 commentDrafts = it.commentDrafts - postId
