@@ -1,28 +1,22 @@
 package com.closify.myapplication.ui.viewmodel
 
-import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.core.telemetry.AnalyticsEvents
 import com.closify.myapplication.core.telemetry.AnalyticsTracker
 import com.closify.myapplication.core.telemetry.CrashReporter
 import com.closify.myapplication.core.telemetry.TelemetryProvider
-import com.closify.myapplication.data.remote.CloudinaryService
-import com.closify.myapplication.data.remote.RemoveBgService
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
-import kotlinx.coroutines.Dispatchers
+import com.closify.myapplication.domain.repository.GarmentImageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 
 enum class ClassifyStep { BASIC, OCCASION, SAVED }
 
@@ -34,6 +28,7 @@ data class ClassifyGarmentUiState(
     val selectedOccasions: Set<Occasion> = emptySet(),
     val nameError: String? = null,
     val categoryError: String? = null,
+    val generalError: String? = null,
     val step: ClassifyStep = ClassifyStep.BASIC,
     val isProcessingImage: Boolean = false
 )
@@ -50,7 +45,7 @@ sealed interface ClassifyGarmentEvent {
 
 class ClassifyGarmentViewModel(
     imageUri: String,
-    private val context: Context,
+    private val garmentImageRepository: GarmentImageRepository,
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance,
     private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
@@ -66,8 +61,8 @@ class ClassifyGarmentViewModel(
 
     fun onEvent(event: ClassifyGarmentEvent) {
         when (event) {
-            is ClassifyGarmentEvent.NameChanged       -> _uiState.update { it.copy(name = event.value, nameError = null) }
-            is ClassifyGarmentEvent.SelectCategory    -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null) }
+            is ClassifyGarmentEvent.NameChanged       -> _uiState.update { it.copy(name = event.value, nameError = null, generalError = null) }
+            is ClassifyGarmentEvent.SelectCategory    -> _uiState.update { it.copy(selectedCategory = event.category, categoryError = null, generalError = null) }
             is ClassifyGarmentEvent.ToggleWeather     -> toggleWeather(event.weather)
             is ClassifyGarmentEvent.ToggleOccasion    -> toggleOccasion(event.occasion)
             is ClassifyGarmentEvent.Continue          -> validateAndAdvance()
@@ -79,55 +74,18 @@ class ClassifyGarmentViewModel(
     private fun removeBackground(imageUri: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessingImage = true) }
-            try {
-                val file = withContext(Dispatchers.IO) { uriToFile(imageUri) }
-                    ?: run {
-                        _uiState.update { it.copy(isProcessingImage = false) }
-                        return@launch
+            garmentImageRepository.prepareImagePreview(imageUri)
+                .onSuccess { previewUri ->
+                    _uiState.update {
+                        it.copy(
+                            imageUri = previewUri,
+                            isProcessingImage = false
+                        )
                     }
-
-                RemoveBgService.removeBackground(file)
-                    .onSuccess { pngBytes ->
-                        val outputFile = withContext(Dispatchers.IO) {
-                            val out = File(context.cacheDir, "removebg_${System.currentTimeMillis()}.png")
-                            out.writeBytes(pngBytes)
-                            out
-                        }
-                        _uiState.update {
-                            it.copy(
-                                imageUri = Uri.fromFile(outputFile).toString(),
-                                isProcessingImage = false
-                            )
-                        }
-                    }
-                    .onFailure {
-                        // Si falla usa la imagen original sin bloquear al usuario
-                        _uiState.update { it.copy(isProcessingImage = false) }
-                    }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isProcessingImage = false) }
-            }
-        }
-    }
-
-    private fun uriToFile(uriString: String): File? {
-        return try {
-            val uri = Uri.parse(uriString)
-            if (uri.scheme == "file") {
-                val file = File(uri.path ?: return null)
-                return if (file.exists()) file else null
-            }
-            
-            // Para content:// URIs (Galeria/Camara), copiamos a un archivo temporal
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            val tempFile = File(context.cacheDir, "temp_upload_${System.currentTimeMillis()}.png")
-            tempFile.outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-            tempFile
-        } catch (e: Exception) {
-            android.util.Log.e("ClassifyGarment", "Error converting URI to file", e)
-            null
+                }
+                .onFailure {
+                    _uiState.update { it.copy(isProcessingImage = false) }
+                }
         }
     }
 
@@ -164,9 +122,7 @@ class ClassifyGarmentViewModel(
             _uiState.update { it.copy(isProcessingImage = true) }
 
             runCatching {
-                val imageUrl = withContext(Dispatchers.IO) {
-                    uriToFile(state.imageUri)?.let { CloudinaryService.upload(it) }
-                } ?: state.imageUri
+                val imageUrl = garmentImageRepository.storeGarmentImage(state.imageUri)
 
                 garmentRepository.createGarment(
                     ownerUserId = userRepository.currentUserId,
@@ -184,7 +140,7 @@ class ClassifyGarmentViewModel(
                         occasionCount = garment.suitableOccasions.size
                     )
                 )
-                _uiState.update { it.copy(step = ClassifyStep.SAVED, isProcessingImage = false) }
+                _uiState.update { it.copy(step = ClassifyStep.SAVED, isProcessingImage = false, generalError = null) }
             }.onFailure { error ->
                 crashReporter.recordException(
                     throwable = error,
@@ -194,7 +150,12 @@ class ClassifyGarmentViewModel(
                         "category" to state.selectedCategory?.name
                     )
                 )
-                _uiState.update { it.copy(isProcessingImage = false) }
+                _uiState.update {
+                    it.copy(
+                        isProcessingImage = false,
+                        generalError = error.message ?: "No se pudo guardar la prenda."
+                    )
+                }
             }
         }
     }

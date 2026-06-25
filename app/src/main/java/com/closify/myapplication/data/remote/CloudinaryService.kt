@@ -10,26 +10,33 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.security.MessageDigest
+import java.net.URLConnection
 
 object CloudinaryService {
 
     private val client = OkHttpClient()
-    private val cloudName = BuildConfig.CLOUDINARY_CLOUD_NAME
-    private val apiKey = BuildConfig.CLOUDINARY_API_KEY
-    private val apiSecret = BuildConfig.CLOUDINARY_API_SECRET
+    private val cloudName: String get() = BuildConfig.CLOUDINARY_CLOUD_NAME.trim()
+    private val apiKey: String get() = BuildConfig.CLOUDINARY_API_KEY.trim()
+    private val apiSecret: String get() = BuildConfig.CLOUDINARY_API_SECRET.trim()
 
     suspend fun upload(imageFile: File): String? {
+        if (!isConfigured()) {
+            android.util.Log.w("CloudinaryService", "Upload skipped: Cloudinary is not configured")
+            return null
+        }
+
         return try {
             val timestamp = (System.currentTimeMillis() / 1000).toString()
             val folder = "closify/garments"
             val signature = generateSignature(timestamp, folder)
+            val contentType = URLConnection.guessContentTypeFromName(imageFile.name) ?: "image/jpeg"
 
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart(
                     "file",
                     imageFile.name,
-                    imageFile.asRequestBody("image/png".toMediaType())
+                    imageFile.asRequestBody(contentType.toMediaType())
                 )
                 .addFormDataPart("api_key", apiKey)
                 .addFormDataPart("timestamp", timestamp)
@@ -42,19 +49,27 @@ object CloudinaryService {
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
-            if (response.isSuccessful) {
-                val json = JSONObject(response.body?.string() ?: return null)
-                json.getString("secure_url")
-            } else {
-                android.util.Log.w("CloudinaryService", "Upload failed: ${response.code}")
-                null
+            client.newCall(request).execute().use { response ->
+                val responseBody = response.body?.string()
+                if (response.isSuccessful) {
+                    val json = JSONObject(responseBody ?: return null)
+                    json.getString("secure_url")
+                } else {
+                    android.util.Log.w(
+                        "CloudinaryService",
+                        "Upload failed: ${response.code} ${responseBody.orEmpty().take(160)}"
+                    )
+                    null
+                }
             }
         } catch (e: Exception) {
             android.util.Log.w("CloudinaryService", "Upload error: ${e.message}")
             null
         }
     }
+
+    fun isConfigured(): Boolean =
+        cloudName.isNotBlank() && apiKey.isNotBlank() && apiSecret.isNotBlank()
 
     private fun generateSignature(timestamp: String, folder: String): String {
         val toSign = "folder=$folder&timestamp=$timestamp$apiSecret"

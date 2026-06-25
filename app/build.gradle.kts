@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -20,15 +22,25 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val localProps = project.rootProject.file("local.properties").readLines()
-        val removeBgKey = localProps.firstOrNull { it.startsWith("REMOVE_BG_API_KEY=") }?.substringAfter("=") ?: ""
-        val cloudinaryCloudName = localProps.firstOrNull { it.startsWith("CLOUDINARY_CLOUD_NAME=") }?.substringAfter("=") ?: ""
-        val cloudinaryApiKey = localProps.firstOrNull { it.startsWith("CLOUDINARY_API_KEY=") }?.substringAfter("=") ?: ""
-        val cloudinaryApiSecret = localProps.firstOrNull { it.startsWith("CLOUDINARY_API_SECRET=") }?.substringAfter("=") ?: ""
-        buildConfigField("String", "REMOVE_BG_API_KEY", "\"$removeBgKey\"")
-        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"$cloudinaryCloudName\"")
-        buildConfigField("String", "CLOUDINARY_API_KEY", "\"$cloudinaryApiKey\"")
-        buildConfigField("String", "CLOUDINARY_API_SECRET", "\"$cloudinaryApiSecret\"")
+        val localProps = Properties().apply {
+            val localPropertiesFile = project.rootProject.file("local.properties")
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.inputStream().use { load(it) }
+            }
+        }
+        fun localProperty(name: String): String =
+            localProps.getProperty(name).orEmpty().trim().removeSurrounding("\"")
+        fun buildConfigString(value: String): String =
+            value.replace("\\", "\\\\").replace("\"", "\\\"")
+
+        val removeBgKey = localProperty("REMOVE_BG_API_KEY")
+        val cloudinaryCloudName = localProperty("CLOUDINARY_CLOUD_NAME")
+        val cloudinaryApiKey = localProperty("CLOUDINARY_API_KEY")
+        val cloudinaryApiSecret = localProperty("CLOUDINARY_API_SECRET")
+        buildConfigField("String", "REMOVE_BG_API_KEY", "\"${buildConfigString(removeBgKey)}\"")
+        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${buildConfigString(cloudinaryCloudName)}\"")
+        buildConfigField("String", "CLOUDINARY_API_KEY", "\"${buildConfigString(cloudinaryApiKey)}\"")
+        buildConfigField("String", "CLOUDINARY_API_SECRET", "\"${buildConfigString(cloudinaryApiSecret)}\"")
     }
 
     buildTypes {
@@ -79,6 +91,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.play.services.location)

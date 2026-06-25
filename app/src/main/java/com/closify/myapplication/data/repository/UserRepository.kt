@@ -163,34 +163,41 @@ class UserRepository private constructor(context: Context) {
         }
     }
 
-    fun updateCurrentUserProfile(
+    suspend fun updateCurrentUserProfile(
         fullName: String,
         username: String,
         birthDate: String,
-        bio: String
+        bio: String,
+        avatarImageUrl: String? = null,
+        bannerImageUrl: String? = null
     ): Result<Unit> {
-        val uid = auth.currentUser?.uid
-            ?: return Result.failure(Exception("No hay un usuario logueado."))
-        val current = _currentUser.value
-            ?: return Result.failure(Exception("No hay un usuario logueado."))
+        return try {
+            val uid = auth.currentUser?.uid
+                ?: return Result.failure(Exception("No hay un usuario logueado."))
+            val current = _currentUser.value
+                ?: return Result.failure(Exception("No hay un usuario logueado."))
 
-        val updated = current.copy(
-            profile = current.profile.copy(
-                fullName = fullName.trim(),
-                username = normalizeUsername(username),
-                birthDate = birthDate,
-                bio = bio.trim()
+            val updated = current.copy(
+                profile = current.profile.copy(
+                    fullName = fullName.trim(),
+                    username = normalizeUsername(username),
+                    birthDate = birthDate,
+                    bio = bio.trim(),
+                    avatarImageUrl = avatarImageUrl ?: current.profile.avatarImageUrl,
+                    bannerImageUrl = bannerImageUrl ?: current.profile.bannerImageUrl
+                )
             )
-        )
-        _currentUser.value = updated
+            val entity = updated.toEntity()
+            val firestoreMap = updated.toFirestoreMap()
 
-        val entity = updated.toEntity()
-        val firestoreMap = updated.toFirestoreMap()
-        scope.launch {
-            userDao.upsert(entity)
             firestore.collection("users").document(uid).update(firestoreMap).await()
+            userDao.upsert(entity)
+
+            _currentUser.value = updated
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        return Result.success(Unit)
     }
 
     suspend fun changeCurrentUserPassword(

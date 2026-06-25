@@ -35,6 +35,8 @@ data class ProfileUiState(
     val plannedOutfitsCount: Int = 0,
     @param:DrawableRes val bannerImageResId: Int? = null,
     @param:DrawableRes val profileImageResId: Int? = null,
+    val bannerImageUrl: String? = null,
+    val profileImageUrl: String? = null,
     val friends: List<UserSummary> = emptyList(),
     val posts: List<OutfitPost> = emptyList()
 )
@@ -87,6 +89,8 @@ class ProfileViewModel(
                 plannedOutfitsCount = stats.plannedOutfitsCount,
                 bannerImageResId = profile.bannerImageResId,
                 profileImageResId = profile.profileImageResId,
+                bannerImageUrl = profile.bannerImageUrl,
+                profileImageUrl = profile.avatarImageUrl,
                 friends = friends,
                 posts = posts
             ) }
@@ -100,7 +104,8 @@ class ProfileViewModel(
                 id = currentState.userId,
                 fullName = currentState.name,
                 username = currentState.username,
-                profileImageResId = currentState.profileImageResId ?: return@launch
+                profileImageResId = currentState.profileImageResId ?: return@launch,
+                profileImageUrl = currentState.profileImageUrl
             )
             val updatedPost = outfitPostRepository.toggleLike(postId = postId, user = currentUserSummary) ?: return@launch
             analyticsTracker.track(AnalyticsEvents.postLiked("profile"))

@@ -38,7 +38,7 @@ import com.closify.myapplication.data.local.entity.WeatherForecastEntity
         WeatherCurrentEntity::class,
         WeatherForecastEntity::class
     ],
-    version = 8,
+    version = 10,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

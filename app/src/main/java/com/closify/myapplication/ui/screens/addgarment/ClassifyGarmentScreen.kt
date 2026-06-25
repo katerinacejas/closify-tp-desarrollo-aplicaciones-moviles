@@ -16,11 +16,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.data.repository.GarmentImageRepositoryImpl
 import com.closify.myapplication.ui.components.ClosifyConfirmationDialog
 import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentEvent
@@ -33,12 +33,14 @@ fun ClassifyGarmentScreen(
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
-    val context = LocalContext.current
     val viewModel: ClassifyGarmentViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ClassifyGarmentViewModel(imageUri, context) as T
+                return ClassifyGarmentViewModel(
+                    imageUri = imageUri,
+                    garmentImageRepository = GarmentImageRepositoryImpl.instance
+                ) as T
             }
         }
     )

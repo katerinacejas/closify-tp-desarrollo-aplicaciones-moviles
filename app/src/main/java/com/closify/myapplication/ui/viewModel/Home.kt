@@ -10,6 +10,7 @@ import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository as WeatherRepositoryImpl
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.Outfit
@@ -33,6 +34,7 @@ enum class HomeDialog { NO_GARMENTS, NO_COMBINATIONS, WEATHER_UNAVAILABLE }
 data class HomeUiState(
     val username: String = "",
     val selectedWeather: WeatherCondition? = null,
+    val automaticWeatherSummary: CurrentWeatherSummary? = null,
     val selectedOccasion: Occasion? = null,
     val isAutoWeather: Boolean = true,
     val isAutoWeatherAvailable: Boolean = true,
@@ -100,6 +102,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedWeather = weather,
+                automaticWeatherSummary = null,
                 isAutoWeather = false,
                 isGenerateEnabled = it.selectedOccasion != null
             )
@@ -122,6 +125,7 @@ class HomeViewModel(
             _uiState.update {
                 it.copy(
                     selectedWeather = null,
+                    automaticWeatherSummary = null,
                     isAutoWeather = true,
                     isAutoWeatherAvailable = true,
                     isLoadingWeather = true,
@@ -129,18 +133,19 @@ class HomeViewModel(
                 )
             }
 
-            weatherRepository.getCurrentWeather(location)
-                .onSuccess { weather ->
+            weatherRepository.getCurrentWeatherSummary(location)
+                .onSuccess { summary ->
                     _uiState.update {
                         it.copy(
-                            selectedWeather = weather,
+                            selectedWeather = summary.condition,
+                            automaticWeatherSummary = summary,
                             isAutoWeather = true,
                             isAutoWeatherAvailable = true,
                             isLoadingWeather = false,
                             isGenerateEnabled = it.selectedOccasion != null
                         )
                     }
-                    analyticsTracker.track(AnalyticsEvents.automaticWeatherLoaded(weather.name))
+                    analyticsTracker.track(AnalyticsEvents.automaticWeatherLoaded(summary.condition.name))
                 }
                 .onFailure { error ->
                     handleAutomaticWeatherUnavailable(
@@ -156,6 +161,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedWeather = null,
+                automaticWeatherSummary = null,
                 isAutoWeather = false,
                 isLoadingWeather = false,
                 isGenerateEnabled = false
@@ -181,6 +187,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedWeather = null,
+                automaticWeatherSummary = null,
                 isAutoWeather = false,
                 isAutoWeatherAvailable = false,
                 isLoadingWeather = false,

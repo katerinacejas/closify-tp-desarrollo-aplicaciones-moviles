@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.screens.notifications
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +60,7 @@ import com.closify.myapplication.domain.model.FriendRequestStatus
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.NotificationType
 import com.closify.myapplication.ui.components.ClosifyLogo
+import com.closify.myapplication.ui.components.UserAvatarImage
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.NotificationUiItem
 import com.closify.myapplication.ui.viewmodel.NotificationsUiState
@@ -302,8 +301,9 @@ private fun NotificationRow(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
-        Image(
-            painter = painterResource(notification.sender.profileImageResId),
+        UserAvatarImage(
+            imageUrl = notification.sender.profileImageUrl,
+            fallbackImageResId = notification.sender.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(52.dp)

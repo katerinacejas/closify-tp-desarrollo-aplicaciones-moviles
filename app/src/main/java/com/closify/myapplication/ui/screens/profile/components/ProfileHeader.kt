@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -46,6 +47,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.closify.myapplication.R
 
 @Composable
@@ -57,6 +60,8 @@ fun ProfileHeader(
     friendsCount: Int,
     @DrawableRes bannerImageResId: Int?,
     @DrawableRes profileImageResId: Int?,
+    bannerImageUrl: String? = null,
+    profileImageUrl: String? = null,
     onFriendsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -68,6 +73,7 @@ fun ProfileHeader(
         ) {
             ProfileBanner(
                 bannerImageResId = bannerImageResId,
+                bannerImageUrl = bannerImageUrl,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
@@ -75,6 +81,7 @@ fun ProfileHeader(
 
             ProfileAvatar(
                 profileImageResId = profileImageResId,
+                profileImageUrl = profileImageUrl,
                 modifier = Modifier
                     .padding(start = 22.dp)
                     .align(Alignment.TopStart)
@@ -151,15 +158,20 @@ fun ProfileHeader(
 @Composable
 private fun ProfileBanner(
     @DrawableRes bannerImageResId: Int?,
+    bannerImageUrl: String?,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier,
         color = Color.Transparent
     ) {
-        if (bannerImageResId != null) {
-            Image(
-                painter = painterResource(id = bannerImageResId),
+        val imageModel = bannerImageUrl?.takeIf { it.isNotBlank() } ?: bannerImageResId
+        if (imageModel != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageModel)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = stringResource(R.string.profile_banner_desc),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -215,6 +227,7 @@ private fun BannerPlaceholder() {
 @Composable
 private fun ProfileAvatar(
     @DrawableRes profileImageResId: Int?,
+    profileImageUrl: String?,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -225,9 +238,13 @@ private fun ProfileAvatar(
             .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        if (profileImageResId != null) {
-            Image(
-                painter = painterResource(id = profileImageResId),
+        val imageModel = profileImageUrl?.takeIf { it.isNotBlank() } ?: profileImageResId
+        if (imageModel != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageModel)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = stringResource(R.string.profile_avatar_desc),
                 modifier = Modifier.fillMaxSize()
                 .clip(CircleShape),

@@ -27,6 +27,8 @@ data class OpenMeteoDailyForecast(
     val time: List<String>?,
     @SerializedName("temperature_2m_max")
     val maxTemperatures: List<Double>?,
+    @SerializedName("temperature_2m_min")
+    val minTemperatures: List<Double>?,
     @SerializedName("wind_speed_10m_max")
     val maxWindSpeeds: List<Double>?
 )
@@ -37,7 +39,7 @@ internal interface OpenMeteoApi {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("current") current: String = "temperature_2m,apparent_temperature,wind_speed_10m",
-        @Query("daily") daily: String = "temperature_2m_max,wind_speed_10m_max",
+        @Query("daily") daily: String = "temperature_2m_max,temperature_2m_min,wind_speed_10m_max",
         @Query("forecast_days") forecastDays: Int = 7,
         @Query("timezone") timezone: String = "auto"
     ): OpenMeteoForecastResponse

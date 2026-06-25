@@ -2,11 +2,13 @@ package com.closify.myapplication.data.local.mapper
 
 import com.closify.myapplication.data.local.entity.WeatherCurrentEntity
 import com.closify.myapplication.data.local.entity.WeatherForecastEntity
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
-internal fun WeatherCondition.toCurrentEntity(
+internal fun CurrentWeatherSummary.toCurrentEntity(
     locationKey: String,
     temperature: Double?,
     apparentTemperature: Double?,
@@ -15,9 +17,12 @@ internal fun WeatherCondition.toCurrentEntity(
     expiresAtMillis: Long
 ): WeatherCurrentEntity = WeatherCurrentEntity(
     locationKey = locationKey,
-    weather = name,
+    weather = condition.name,
     temperature = temperature,
     apparentTemperature = apparentTemperature,
+    averageTemperature = averageTemperature,
+    minTemperature = minTemperature,
+    maxTemperature = maxTemperature,
     windSpeed = windSpeed,
     fetchedAtMillis = fetchedAtMillis,
     expiresAtMillis = expiresAtMillis
@@ -25,6 +30,17 @@ internal fun WeatherCondition.toCurrentEntity(
 
 internal fun WeatherCurrentEntity.toWeatherConditionOrNull(): WeatherCondition? =
     weather.toWeatherConditionOrNull()
+
+internal fun WeatherCurrentEntity.toCurrentWeatherSummaryOrNull(): CurrentWeatherSummary? {
+    val parsedWeather = weather.toWeatherConditionOrNull() ?: return null
+    val average = averageTemperature ?: apparentTemperature?.roundToInt() ?: temperature?.roundToInt() ?: return null
+    return CurrentWeatherSummary(
+        condition = parsedWeather,
+        averageTemperature = average,
+        minTemperature = minTemperature ?: average,
+        maxTemperature = maxTemperature ?: average
+    )
+}
 
 internal fun PlannerForecastDay.toEntity(
     locationKey: String,

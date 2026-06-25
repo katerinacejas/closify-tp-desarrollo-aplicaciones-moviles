@@ -35,6 +35,10 @@ object RemoveBgService {
     }
 
     suspend fun removeBackground(imageFile: File): Result<ByteArray> {
+        if (BuildConfig.REMOVE_BG_API_KEY.isBlank()) {
+            return Result.failure(IllegalStateException("Remove.bg no estÃ¡ configurado"))
+        }
+
         return try {
             val filePart = MultipartBody.Part.createFormData(
                 "image_file",

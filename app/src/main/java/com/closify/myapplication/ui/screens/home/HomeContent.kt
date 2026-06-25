@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyButton
@@ -36,6 +37,7 @@ import com.closify.myapplication.ui.viewmodel.HomeEvent
 fun HomeContent(
     username: String,
     selectedWeather: WeatherCondition?,
+    automaticWeatherSummary: CurrentWeatherSummary?,
     selectedOccasion: Occasion?,
     isAutoWeather: Boolean,
     isAutoWeatherAvailable: Boolean,
@@ -107,6 +109,7 @@ fun HomeContent(
 
         WeatherSection(
             selectedWeather = selectedWeather,
+            automaticWeatherSummary = automaticWeatherSummary,
             isAutoWeather = isAutoWeather,
             isAutoWeatherAvailable = isAutoWeatherAvailable,
             isLoadingWeather = isLoadingWeather,
@@ -141,6 +144,12 @@ private fun HomeContentPreview() {
         HomeContent(
             username = "katerina",
             selectedWeather = WeatherCondition.MILD,
+            automaticWeatherSummary = CurrentWeatherSummary(
+                condition = WeatherCondition.MILD,
+                averageTemperature = 18,
+                minTemperature = 12,
+                maxTemperature = 23
+            ),
             selectedOccasion = Occasion.CASUAL,
             isAutoWeather = false,
             isAutoWeatherAvailable = true,

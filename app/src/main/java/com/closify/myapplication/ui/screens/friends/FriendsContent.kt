@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.screens.friends
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +57,7 @@ import com.closify.myapplication.domain.model.UserSummary
 import com.closify.myapplication.ui.components.OutfitPostCard
 import com.closify.myapplication.ui.components.SocialCommentsDialog
 import com.closify.myapplication.ui.components.SocialLikesDialog
+import com.closify.myapplication.ui.components.UserAvatarImage
 import com.closify.myapplication.ui.screens.friends.components.FriendsTopBar
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.FriendSearchResult
@@ -318,8 +317,9 @@ private fun SearchUserRow(
             .height(56.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = user.profileImageResId),
+        UserAvatarImage(
+            imageUrl = user.profileImageUrl,
+            fallbackImageResId = user.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)

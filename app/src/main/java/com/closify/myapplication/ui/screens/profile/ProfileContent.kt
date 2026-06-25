@@ -136,6 +136,8 @@ fun ProfileContent(
                 friendsCount = uiState.friendsCount,
                 bannerImageResId = uiState.bannerImageResId,
                 profileImageResId = uiState.profileImageResId,
+                bannerImageUrl = uiState.bannerImageUrl,
+                profileImageUrl = uiState.profileImageUrl,
                 onFriendsClick = { showFriendsDialog = true }
             )
         }
@@ -193,6 +195,8 @@ private fun ProfileContentPreview() {
                 plannedOutfitsCount = 0,
                 bannerImageResId = R.drawable.banner_default,
                 profileImageResId = R.drawable.avatar_default,
+                bannerImageUrl = null,
+                profileImageUrl = null,
                 friends = emptyList(),
                 posts = emptyList()
             ),
