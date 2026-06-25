@@ -1,0 +1,14 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  h_e38f44ce52ca59 110-121,123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "cb81191b3648c3dd4527f4eb9474907286642909",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
