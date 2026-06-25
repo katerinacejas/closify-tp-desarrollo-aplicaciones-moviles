@@ -6,8 +6,11 @@ import com.closify.myapplication.data.local.mapper.toCommentEntity
 import com.closify.myapplication.data.local.mapper.toDomain
 import com.closify.myapplication.data.local.mapper.toEntity
 import com.closify.myapplication.data.local.mapper.toFirestoreMap
+import com.closify.myapplication.data.local.mapper.toGarmentEntity
 import com.closify.myapplication.data.local.mapper.toLikeEntity
+import com.closify.myapplication.data.local.mapper.toOutfitEntity
 import com.closify.myapplication.data.local.mapper.toOutfitPostEntity
+import com.closify.myapplication.data.local.mapper.toUserEntity
 import com.closify.myapplication.domain.model.Comment
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
@@ -51,6 +54,7 @@ class OutfitPostRepository private constructor(
     private val db = AppDatabase.getInstance(context)
     private val postDao = db.outfitPostDao()
     private val userDao = db.userDao()
+    private val garmentDao = db.garmentDao()
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -161,9 +165,12 @@ class OutfitPostRepository private constructor(
     }
 
     private suspend fun assemblePost(entity: com.closify.myapplication.data.local.entity.OutfitPostEntity): OutfitPost? {
-        val author = userDao.getById(entity.authorId)?.toDomain()?.toSummary() ?: return null
-        val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId } 
-            ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId } // Fallback to current if generated
+        val author = userDao.getById(entity.authorId)?.toDomain()?.toSummary()
+            ?: fetchUserFromFirestore(entity.authorId)
+            ?: return null
+        val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId }
+            ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId }
+            ?: fetchOutfitFromFirestore(entity.authorId, entity.outfitId)
             ?: return null
             
         val likes = postDao.getLikesForPost(entity.id).mapNotNull { likeEntity ->
@@ -204,6 +211,37 @@ class OutfitPostRepository private constructor(
     }
 
     fun resetSessionSync() { syncedThisSession = false }
+
+    private suspend fun fetchUserFromFirestore(userId: String): com.closify.myapplication.domain.model.UserSummary? {
+        return try {
+            val doc = firestore.collection("users").document(userId).get().await()
+            val entity = doc.toUserEntity() ?: return null
+            userDao.upsert(entity)
+            entity.toDomain().toSummary()
+        } catch (e: Exception) { null }
+    }
+
+    private suspend fun fetchOutfitFromFirestore(authorId: String, outfitId: String): com.closify.myapplication.domain.model.Outfit? {
+        return try {
+            val doc = firestore.collection("users/$authorId/outfits").document(outfitId).get().await()
+            val entity = doc.toOutfitEntity() ?: return null
+            val garmentIds = entity.garmentIds.split(",").filter { it.isNotBlank() }
+            val garments = garmentIds.mapNotNull { gid ->
+                garmentDao.getById(gid)?.toDomain()
+                    ?: fetchGarmentFromFirestore(authorId, gid)
+            }
+            entity.toDomain(garments)
+        } catch (e: Exception) { null }
+    }
+
+    private suspend fun fetchGarmentFromFirestore(authorId: String, garmentId: String): com.closify.myapplication.domain.model.Garment? {
+        return try {
+            val doc = firestore.collection("users/$authorId/garments").document(garmentId).get().await()
+            val entity = doc.toGarmentEntity() ?: return null
+            garmentDao.upsert(entity)
+            entity.toDomain()
+        } catch (e: Exception) { null }
+    }
 
     private fun currentDate(): String = LocalDate.now().format(
         DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))

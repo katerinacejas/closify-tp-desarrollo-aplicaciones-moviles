@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.data.remote.CloudinaryService
 import com.closify.myapplication.data.remote.RemoveBgService
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -142,15 +143,21 @@ class ClassifyGarmentViewModel(
     private fun save() {
         val state = _uiState.value
         viewModelScope.launch {
+            _uiState.update { it.copy(isProcessingImage = true) }
+
+            val imageUrl = withContext(Dispatchers.IO) {
+                uriToFile(state.imageUri)?.let { CloudinaryService.upload(it) }
+            } ?: state.imageUri  // fallback a local si falla la subida
+
             garmentRepository.createGarment(
                 ownerUserId = userRepository.currentUserId,
                 name = state.name.trim(),
                 category = requireNotNull(state.selectedCategory),
-                imageUrl = state.imageUri,
+                imageUrl = imageUrl,
                 suitableWeather = state.selectedWeathers,
                 suitableOccasions = state.selectedOccasions
             )
-            _uiState.update { it.copy(step = ClassifyStep.SAVED) }
+            _uiState.update { it.copy(step = ClassifyStep.SAVED, isProcessingImage = false) }
         }
     }
 }

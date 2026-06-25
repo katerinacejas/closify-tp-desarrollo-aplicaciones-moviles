@@ -19,11 +19,15 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val removeBgKey = project.rootProject.file("local.properties")
-            .readLines()
-            .firstOrNull { it.startsWith("REMOVE_BG_API_KEY=") }
-            ?.substringAfter("=") ?: ""
+        val localProps = project.rootProject.file("local.properties").readLines()
+        val removeBgKey = localProps.firstOrNull { it.startsWith("REMOVE_BG_API_KEY=") }?.substringAfter("=") ?: ""
+        val cloudinaryCloudName = localProps.firstOrNull { it.startsWith("CLOUDINARY_CLOUD_NAME=") }?.substringAfter("=") ?: ""
+        val cloudinaryApiKey = localProps.firstOrNull { it.startsWith("CLOUDINARY_API_KEY=") }?.substringAfter("=") ?: ""
+        val cloudinaryApiSecret = localProps.firstOrNull { it.startsWith("CLOUDINARY_API_SECRET=") }?.substringAfter("=") ?: ""
         buildConfigField("String", "REMOVE_BG_API_KEY", "\"$removeBgKey\"")
+        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"$cloudinaryCloudName\"")
+        buildConfigField("String", "CLOUDINARY_API_KEY", "\"$cloudinaryApiKey\"")
+        buildConfigField("String", "CLOUDINARY_API_SECRET", "\"$cloudinaryApiSecret\"")
     }
 
     buildTypes {

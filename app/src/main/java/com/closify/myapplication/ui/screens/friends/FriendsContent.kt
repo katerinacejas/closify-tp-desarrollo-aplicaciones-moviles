@@ -27,15 +27,19 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +65,7 @@ import com.closify.myapplication.ui.viewmodel.FriendSearchResult
 import com.closify.myapplication.ui.viewmodel.FriendRelationshipStatus
 import com.closify.myapplication.ui.viewmodel.FriendsUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsContent(
     uiState: FriendsUiState,
@@ -71,8 +76,11 @@ fun FriendsContent(
     onSendComment: (String) -> Unit,
     onUserClick: (String) -> Unit,
     onToggleFriend: (String) -> Unit,
+    onRefresh: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     var selectedLikesPostId by remember { mutableStateOf<String?>(null) }
     var selectedCommentsPostId by remember { mutableStateOf<String?>(null) }
     val selectedLikesPost = uiState.posts.firstOrNull { it.id == selectedLikesPostId }
@@ -109,8 +117,19 @@ fun FriendsContent(
         )
     }
 
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                isRefreshing = true
+                onRefresh()
+                isRefreshing = false
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = 24.dp),
@@ -188,6 +207,7 @@ fun FriendsContent(
                 )
             }
         }
+    }
     }
 }
 
