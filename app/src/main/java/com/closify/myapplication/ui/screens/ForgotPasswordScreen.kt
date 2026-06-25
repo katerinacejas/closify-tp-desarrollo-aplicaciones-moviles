@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.screens.auth.AuthBrandHeader
@@ -115,7 +117,7 @@ private fun AuthBackButton(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = "Volver",
+                contentDescription = stringResource(R.string.forgot_password_back_desc),
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -144,7 +146,7 @@ private fun ForgotPasswordContent(
         Spacer(modifier = Modifier.height(58.dp))
 
         Text(
-            text = "Restablecer contrase\u00F1a",
+            text = stringResource(R.string.forgot_password_title),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
@@ -153,7 +155,7 @@ private fun ForgotPasswordContent(
         Spacer(modifier = Modifier.height(46.dp))
 
         Text(
-            text = "Ingres\u00E1 el email con el que te registraste\ny te enviaremos instrucciones para\nrestablecer tu contrase\u00F1a.",
+            text = stringResource(R.string.forgot_password_description),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -165,7 +167,7 @@ private fun ForgotPasswordContent(
         ClosifyTextField(
             value = email,
             onValueChange = onEmailChange,
-            placeholder = "Email",
+            placeholder = stringResource(R.string.login_email),
             keyboardType = KeyboardType.Email,
             error = emailError
         )
@@ -173,7 +175,7 @@ private fun ForgotPasswordContent(
         Spacer(modifier = Modifier.height(44.dp))
 
         ClosifyButton(
-            text = "Recuperar cuenta",
+            text = stringResource(R.string.forgot_password_button),
             onClick = onSubmit,
             isLoading = isLoading
         )
@@ -199,7 +201,7 @@ private fun PasswordRecoverySentContent(
         Spacer(modifier = Modifier.height(58.dp))
 
         Text(
-            text = "Revis\u00E1 tu correo",
+            text = stringResource(R.string.forgot_password_sent_title),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
@@ -208,7 +210,7 @@ private fun PasswordRecoverySentContent(
         Spacer(modifier = Modifier.height(46.dp))
 
         Text(
-            text = "Si existe una cuenta asociada a ese email,\nte enviaremos un enlace para\nrestablecer tu contrase\u00F1a.",
+            text = stringResource(R.string.forgot_password_sent_description),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -218,7 +220,7 @@ private fun PasswordRecoverySentContent(
         Spacer(modifier = Modifier.height(56.dp))
 
         ClosifyButton(
-            text = "Volver al inicio de sesi\u00F3n",
+            text = stringResource(R.string.forgot_password_sent_login_button),
             onClick = onGoToLogin
         )
 
@@ -227,7 +229,7 @@ private fun PasswordRecoverySentContent(
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append("\u00BFNo recibiste el correo? ")
+                    append(stringResource(R.string.forgot_password_resend_prompt))
                 }
                 withStyle(
                     SpanStyle(
@@ -235,7 +237,7 @@ private fun PasswordRecoverySentContent(
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
-                    append("Reenviar")
+                    append(stringResource(R.string.forgot_password_resend_button))
                 }
             },
             style = MaterialTheme.typography.bodyMedium,

@@ -8,7 +8,8 @@ data class UserSummary(
     val id: String,
     val fullName: String,
     val username: String,
-    @param:DrawableRes val profileImageResId: Int
+    @param:DrawableRes val profileImageResId: Int,
+    val profileImageUrl: String? = null
 ) {
     val name: String
         get() = fullName

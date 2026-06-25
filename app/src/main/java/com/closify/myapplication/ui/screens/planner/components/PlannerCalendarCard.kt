@@ -33,9 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
 import java.time.LocalDate
@@ -48,14 +50,15 @@ internal fun calendarDaysFor(month: YearMonth): List<LocalDate> {
     return List(42) { index -> gridStart.plusDays(index.toLong()) }
 }
 
+@Composable
 internal fun LocalDate.toSpanishTitle(): String {
-    val month = when (monthValue) {
-        1 -> "enero"; 2 -> "febrero"; 3 -> "marzo"; 4 -> "abril"
-        5 -> "mayo"; 6 -> "junio"; 7 -> "julio"; 8 -> "agosto"
-        9 -> "septiembre"; 10 -> "octubre"; 11 -> "noviembre"
-        else -> "diciembre"
+    val monthResId = when (monthValue) {
+        1 -> R.string.month_1; 2 -> R.string.month_2; 3 -> R.string.month_3; 4 -> R.string.month_4
+        5 -> R.string.month_5; 6 -> R.string.month_6; 7 -> R.string.month_7; 8 -> R.string.month_8
+        9 -> R.string.month_9; 10 -> R.string.month_10; 11 -> R.string.month_11
+        else -> R.string.month_12
     }
-    return "$dayOfMonth de $month de $year"
+    return stringResource(R.string.planner_date_format, dayOfMonth, stringResource(monthResId), year)
 }
 
 @Composable
@@ -69,7 +72,7 @@ internal fun PlannerDateField(
         onValueChange = onValueChange,
         singleLine = true,
         label = {
-            Text(text = "Fecha", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.planner_date_label), style = MaterialTheme.typography.bodySmall)
         },
         trailingIcon = {
             Box(
@@ -156,7 +159,7 @@ internal fun PlannerCalendarCard(
                     contentPadding = PaddingValues(horizontal = 18.dp),
                     modifier = Modifier.height(40.dp)
                 ) {
-                    Text(text = "Cancelar", style = MaterialTheme.typography.labelSmall)
+                    Text(text = stringResource(R.string.common_cancel), style = MaterialTheme.typography.labelSmall)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
@@ -169,7 +172,7 @@ internal fun PlannerCalendarCard(
                     contentPadding = PaddingValues(horizontal = 18.dp),
                     modifier = Modifier.height(40.dp)
                 ) {
-                    Text(text = "Confirmar", style = MaterialTheme.typography.labelSmall)
+                    Text(text = stringResource(R.string.common_ok), style = MaterialTheme.typography.labelSmall)
                 }
             }
         }
@@ -178,11 +181,14 @@ internal fun PlannerCalendarCard(
 
 @Composable
 private fun CalendarWeekHeader() {
-    val labels = listOf("D", "L", "M", "Mi", "J", "V", "S")
+    val labels = listOf(
+        R.string.week_sun, R.string.week_mon, R.string.week_tue,
+        R.string.week_wed, R.string.week_thu, R.string.week_fri, R.string.week_sat
+    )
     Row(modifier = Modifier.fillMaxWidth()) {
-        labels.forEach { label ->
+        labels.forEach { labelResId ->
             Text(
-                text = label,
+                text = stringResource(labelResId),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,

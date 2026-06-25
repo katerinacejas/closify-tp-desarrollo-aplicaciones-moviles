@@ -18,49 +18,65 @@ data class ProfileStats(
     val plannedOutfitsCount: Int
 )
 
-class ProfileRepository(
+class ProfileRepository private constructor(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val wardrobeRepository: WardrobeRepository = WardrobeRepository.instance,
-    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance
+    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) {
 
     companion object {
-        val instance = ProfileRepository()
+        @Volatile private var _instance: ProfileRepository? = null
+
+        fun initialize() {
+            if (_instance == null) {
+                synchronized(this) {
+                    if (_instance == null) {
+                        _instance = ProfileRepository()
+                    }
+                }
+            }
+        }
+
+        val instance: ProfileRepository
+            get() = _instance ?: error("ProfileRepository.initialize() no fue llamado.")
     }
 
-    fun getProfile(userId: String = MockClosifyData.CURRENT_USER_ID): UserProfile =
-        requireNotNull(MockClosifyData.userById(userId)).profile
+    suspend fun getProfile(userId: String = userRepository.currentUserId): UserProfile? {
+        val user = userRepository.getCurrentUser()
+        if (user != null && user.id == userId) return user.profile
+        
+        // Si no es el actual, buscamos por ID (esto debería estar en UserRepository realmente)
+        return userRepository.getUserById(userId)?.profile
+    }
 
-    fun getUserProfile(userId: String): UserProfile? =
-        MockClosifyData.userById(userId)?.profile
-
-    fun getWardrobeGarments(userId: String = MockClosifyData.CURRENT_USER_ID): List<Garment> =
+    suspend fun getWardrobeGarments(userId: String = userRepository.currentUserId): List<Garment> =
         garmentRepository.getAllByUserId(userId)
 
-    fun getWardrobeUsagePercentage(userId: String = MockClosifyData.CURRENT_USER_ID): Int =
-        wardrobeRepository.calculateWardrobeUsagePercentage(outfitPostRepository.getPostsByUser(userId))
+    suspend fun getWardrobeUsagePercentage(userId: String = userRepository.currentUserId): Int =
+        wardrobeRepository.calculateWardrobeUsagePercentage(outfitPostRepository.getPostsByUser(userId), userId)
 
-    fun publicProfileBaseGarmentsCount(): Int =
-        MockClosifyData.PUBLIC_PROFILE_BASE_GARMENTS_COUNT
-
-    fun getProfileStats(userId: String = MockClosifyData.CURRENT_USER_ID): ProfileStats {
+    suspend fun getProfileStats(userId: String = userRepository.currentUserId): ProfileStats {
         val posts = outfitPostRepository.getPostsByUser(userId)
+        val garments = getWardrobeGarments(userId)
         return ProfileStats(
-            garmentsCount = getWardrobeGarments(userId).size,
+            garmentsCount = garments.size,
             wardrobeUsagePercentage = getWardrobeUsagePercentage(userId),
             favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
             plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED }
         )
     }
 
-    fun getPublicProfileStats(userId: String): PublicProfileStats {
+    suspend fun getPublicProfileStats(userId: String): PublicProfileStats {
         val posts = outfitPostRepository.getPostsByUser(userId)
-        val usedGarments = posts.flatMap { it.outfit.garments }.map { it.id }.toSet()
-        val garmentsCount = publicProfileBaseGarmentsCount() + usedGarments.size
+        val garments = getWardrobeGarments(userId)
+        
+        val usedGarmentsCount = posts.flatMap { it.outfit.garments }.map { it.id }.toSet().size
+        val totalGarmentsCount = garments.size
 
         return PublicProfileStats(
-            garmentsCount = garmentsCount,
-            wardrobeUsagePercentage = if (garmentsCount == 0) 0 else ((usedGarments.size * 100) / garmentsCount).coerceIn(0, 100),
+            garmentsCount = totalGarmentsCount,
+            wardrobeUsagePercentage = if (totalGarmentsCount == 0) 0 else ((usedGarmentsCount * 100) / totalGarmentsCount).coerceIn(0, 100),
             favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
             plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED }
         )

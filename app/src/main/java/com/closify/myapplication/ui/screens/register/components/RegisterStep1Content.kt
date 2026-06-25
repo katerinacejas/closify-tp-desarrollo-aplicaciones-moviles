@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -22,9 +23,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.components.ClosifyTextField
+import com.closify.myapplication.ui.screens.auth.GoogleSignInButton
 
 @Composable
 fun RegisterStep1Content(
@@ -42,6 +45,7 @@ fun RegisterStep1Content(
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onNext: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -59,7 +63,7 @@ fun RegisterStep1Content(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Unite a Closify",
+            text = stringResource(R.string.register_title_1),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
@@ -68,7 +72,7 @@ fun RegisterStep1Content(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Redescubrí tu closet, simplificá tu día",
+            text = stringResource(R.string.register_subtitle_1),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -79,7 +83,7 @@ fun RegisterStep1Content(
         ClosifyTextField(
             value = username,
             onValueChange = onUsernameChange,
-            placeholder = "@Usuario",
+            placeholder = stringResource(R.string.register_username_placeholder),
             error = usernameError
         )
 
@@ -88,7 +92,7 @@ fun RegisterStep1Content(
         ClosifyTextField(
             value = email,
             onValueChange = onEmailChange,
-            placeholder = "Email",
+            placeholder = stringResource(R.string.login_email),
             error = emailError,
             keyboardType = KeyboardType.Email
         )
@@ -98,7 +102,7 @@ fun RegisterStep1Content(
         ClosifyTextField(
             value = password,
             onValueChange = onPasswordChange,
-            placeholder = "Contraseña",
+            placeholder = stringResource(R.string.login_password),
             isPassword = true,
             error = passwordError
         )
@@ -108,7 +112,7 @@ fun RegisterStep1Content(
         ClosifyTextField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            placeholder = "Confirmar Contraseña",
+            placeholder = stringResource(R.string.register_confirm_password_placeholder),
             isPassword = true,
             error = confirmPasswordError
         )
@@ -116,8 +120,16 @@ fun RegisterStep1Content(
         Spacer(modifier = Modifier.height(28.dp))
 
         ClosifyButton(
-            text = "Registrarse",
+            text = stringResource(R.string.register_button),
             onClick = onNext,
+            isLoading = isLoading
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        GoogleSignInButton(
+            text = stringResource(R.string.auth_continue_google),
+            onClick = onGoogleSignIn,
             isLoading = isLoading
         )
 
@@ -126,7 +138,7 @@ fun RegisterStep1Content(
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append("¿Ya tenés una cuenta? ")
+                    append(stringResource(R.string.register_already_have_account))
                 }
                 withStyle(
                     SpanStyle(
@@ -134,7 +146,7 @@ fun RegisterStep1Content(
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
-                    append("Iniciar Sesión")
+                    append(stringResource(R.string.login_button))
                 }
             },
             style = MaterialTheme.typography.bodyMedium,

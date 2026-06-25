@@ -9,15 +9,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.data.auth.GoogleCredentialProvider
 import com.closify.myapplication.ui.screens.register.components.RegisterStep1Content
 import com.closify.myapplication.ui.screens.register.components.RegisterStep2Content
 import com.closify.myapplication.ui.screens.register.components.RegisterTopBar
 import com.closify.myapplication.ui.viewmodel.RegisterEvent
 import com.closify.myapplication.ui.viewmodel.RegisterStep
 import com.closify.myapplication.ui.viewmodel.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
@@ -28,6 +32,9 @@ fun RegisterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val googleCredentialProvider = remember(context) { GoogleCredentialProvider(context) }
 
     LaunchedEffect(uiState.registerSuccess) {
         if (uiState.registerSuccess) onRegisterSuccess()
@@ -71,6 +78,13 @@ fun RegisterScreen(
                 onPasswordChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
                 onConfirmPasswordChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
                 onNext = { viewModel.onEvent(RegisterEvent.NextStep) },
+                onGoogleSignIn = {
+                    coroutineScope.launch {
+                        googleCredentialProvider.getCredential()
+                            .onSuccess { viewModel.onEvent(RegisterEvent.GoogleSignInRequested(it)) }
+                            .onFailure { viewModel.onEvent(RegisterEvent.GoogleSignInFailed(it.message)) }
+                    }
+                },
                 onNavigateToLogin = onNavigateToLogin,
                 modifier = Modifier.padding(innerPadding)
             )

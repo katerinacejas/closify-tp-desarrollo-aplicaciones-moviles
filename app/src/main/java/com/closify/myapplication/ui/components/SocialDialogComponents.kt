@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,13 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.UserSummary
 
 @Composable
@@ -89,7 +89,7 @@ fun SocialDialogScaffold(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -158,8 +158,9 @@ fun SocialDialogUserRow(
                 .then(if (rowHeight != null) Modifier.height(rowHeight) else Modifier),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = user.profileImageResId),
+            UserAvatarImage(
+                imageUrl = user.profileImageUrl,
+                fallbackImageResId = user.profileImageResId,
                 contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)

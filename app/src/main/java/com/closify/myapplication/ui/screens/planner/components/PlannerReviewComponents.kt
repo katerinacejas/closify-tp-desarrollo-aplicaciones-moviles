@@ -25,8 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.ui.viewmodel.PlannerUiState
 
@@ -65,7 +67,7 @@ internal fun PlannedGarmentsCard(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Edit,
-                contentDescription = "Editar prendas",
+                contentDescription = stringResource(R.string.planner_edit_garments),
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
                 modifier = Modifier.size(22.dp)
             )
@@ -84,7 +86,7 @@ internal fun PlannerTitleField(
         onValueChange = onValueChange,
         placeholder = {
             Text(
-                text = "Titulo del outfit planificado",
+                text = stringResource(R.string.planner_title_placeholder),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -124,7 +126,7 @@ internal fun PlannerDateSummaryCard(
     ) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)) {
             Text(
-                text = "Se planificará para el día:",
+                text = stringResource(R.string.planner_will_be_planned_for),
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -135,14 +137,7 @@ internal fun PlannerDateSummaryCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             val forecast = uiState.selectedForecast
-            if (forecast == null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Aún no tenemos información del clima para ese día\nseleccionado",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
+            if (forecast != null) {
                 Spacer(modifier = Modifier.height(2.dp))
                 WeatherInfoRow(forecast = forecast)
             }

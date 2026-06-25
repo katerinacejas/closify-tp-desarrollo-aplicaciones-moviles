@@ -8,7 +8,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Like
 
 @Composable
@@ -20,7 +22,7 @@ fun SocialLikesDialog(
     onUserClick: (String) -> Unit = {}
 ) {
     SocialDialogScaffold(
-        title = "Me gustas",
+        title = stringResource(R.string.profile_likes_title),
         onDismiss = onDismiss,
         modifier = modifier
     ) {
@@ -38,7 +40,7 @@ fun SocialLikesDialog(
                 items(likes) { like ->
                     SocialDialogUserRow(
                         user = like.user,
-                        supportingText = "Dio me gusta el ${like.createdAt}",
+                        supportingText = stringResource(R.string.post_liked_at, like.createdAt),
                         onUserClick = { onUserClick(like.user.id) }
                     )
                 }

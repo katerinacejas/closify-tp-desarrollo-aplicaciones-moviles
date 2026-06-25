@@ -1,9 +1,12 @@
 package com.closify.myapplication.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
 import com.closify.myapplication.navigation.Screen
@@ -24,16 +28,16 @@ import com.closify.myapplication.navigation.Screen
 data class BottomNavItem(
     val screen: Screen,
     val iconRes: Int,
-    val contentDescription: String
+    val contentDescriptionResId: Int
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem(Screen.Home, R.drawable.home, "Home"),
-    BottomNavItem(Screen.Wardrobe, R.drawable.guardarropa, "Guardarropa"),
-    BottomNavItem(Screen.Friends, R.drawable.amigos, "Amigos"),
-    BottomNavItem(Screen.Camera, R.drawable.camara, "Camara"),
-    BottomNavItem(Screen.Calendar, R.drawable.calendario, "Calendario"),
-    BottomNavItem(Screen.Profile, R.drawable.perfil, "Perfil")
+    BottomNavItem(Screen.Home, R.drawable.home, R.string.nav_home),
+    BottomNavItem(Screen.Wardrobe, R.drawable.guardarropa, R.string.nav_wardrobe),
+    BottomNavItem(Screen.Friends, R.drawable.amigos, R.string.nav_friends),
+    BottomNavItem(Screen.Camera, R.drawable.camara, R.string.nav_camera),
+    BottomNavItem(Screen.Calendar, R.drawable.calendario, R.string.nav_calendar),
+    BottomNavItem(Screen.Profile, R.drawable.perfil, R.string.nav_profile)
 )
 
 @Composable
@@ -42,7 +46,9 @@ fun BottomNavBar(
     onItemSelected: (Screen) -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars),
         shape = RoundedCornerShape(0.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 6.dp,
@@ -66,7 +72,7 @@ fun BottomNavBar(
                         ) {
                             Icon(
                                 painter = painterResource(item.iconRes),
-                                contentDescription = item.contentDescription,
+                                contentDescription = stringResource(item.contentDescriptionResId),
                                 tint = Color.Unspecified,
                                 modifier = Modifier
                                     .size(if (isSelected) 30.dp else 26.dp)

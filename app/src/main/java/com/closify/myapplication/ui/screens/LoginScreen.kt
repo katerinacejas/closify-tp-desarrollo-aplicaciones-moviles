@@ -20,9 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import com.closify.myapplication.R
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,12 +35,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.closify.myapplication.data.auth.GoogleCredentialProvider
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.screens.auth.AuthBrandHeader
+import com.closify.myapplication.ui.screens.auth.GoogleSignInButton
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.LoginEvent
 import com.closify.myapplication.ui.viewmodel.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -47,6 +54,9 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val googleCredentialProvider = remember(context) { GoogleCredentialProvider(context) }
 
     LaunchedEffect(uiState.loginSuccess) {
         if (uiState.loginSuccess) onLoginSuccess()
@@ -72,6 +82,13 @@ fun LoginScreen(
             onEmailChange = { viewModel.onEvent(LoginEvent.EmailChanged(it)) },
             onPasswordChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
             onSubmit = { viewModel.onEvent(LoginEvent.Submit) },
+            onGoogleSignIn = {
+                coroutineScope.launch {
+                    googleCredentialProvider.getCredential()
+                        .onSuccess { viewModel.onEvent(LoginEvent.GoogleSignInRequested(it)) }
+                        .onFailure { viewModel.onEvent(LoginEvent.GoogleSignInFailed(it.message)) }
+                }
+            },
             onForgotPasswordClick = onNavigateToForgotPassword,
             onNavigateToRegister = {
                 viewModel.onEvent(LoginEvent.ClearErrors)
@@ -92,6 +109,7 @@ private fun LoginContent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
@@ -109,7 +127,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(54.dp))
 
         Text(
-            text = "\u00A1Bienvenido!",
+            text = stringResource(R.string.login_welcome),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -121,7 +139,7 @@ private fun LoginContent(
         ClosifyTextField(
             value = email,
             onValueChange = onEmailChange,
-            placeholder = "Email",
+            placeholder = stringResource(R.string.login_email),
             error = emailError
         )
 
@@ -130,7 +148,7 @@ private fun LoginContent(
         ClosifyTextField(
             value = password,
             onValueChange = onPasswordChange,
-            placeholder = "Contrase\u00F1a",
+            placeholder = stringResource(R.string.login_password),
             isPassword = true,
             error = passwordError
         )
@@ -138,15 +156,23 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(62.dp))
 
         ClosifyButton(
-            text = "Iniciar Sesi\u00F3n",
+            text = stringResource(R.string.login_button),
             onClick = onSubmit,
+            isLoading = isLoading
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        GoogleSignInButton(
+            text = stringResource(R.string.auth_continue_google),
+            onClick = onGoogleSignIn,
             isLoading = isLoading
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "\u00BFOlvidaste tu contrase\u00F1a?",
+            text = stringResource(R.string.login_forgot_password),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
@@ -163,7 +189,7 @@ private fun LoginContent(
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                    append("\u00BFNo ten\u00E9s cuenta? ")
+                    append(stringResource(R.string.login_no_account))
                 }
                 withStyle(
                     SpanStyle(
@@ -171,7 +197,7 @@ private fun LoginContent(
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
-                    append("Registrate")
+                    append(stringResource(R.string.login_register))
                 }
             },
             style = MaterialTheme.typography.bodyMedium,

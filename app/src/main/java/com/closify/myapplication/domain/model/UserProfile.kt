@@ -9,7 +9,9 @@ data class UserProfile(
     val birthDate: String,
     val bio: String,
     @param:DrawableRes val avatarImageResId: Int,
-    @param:DrawableRes val bannerImageResId: Int
+    @param:DrawableRes val bannerImageResId: Int,
+    val avatarImageUrl: String? = null,
+    val bannerImageUrl: String? = null
 ) {
     val name: String
         get() = fullName
@@ -21,6 +23,7 @@ data class UserProfile(
         id = id,
         fullName = fullName,
         username = username,
-        profileImageResId = avatarImageResId
+        profileImageResId = avatarImageResId,
+        profileImageUrl = avatarImageUrl
     )
 }

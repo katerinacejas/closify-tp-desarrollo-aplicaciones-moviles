@@ -1,21 +1,31 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.data.repository.WeatherRepository as WeatherRepositoryImpl
+import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 
 private val PlannerDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
@@ -45,7 +55,8 @@ data class PlannerUiState(
     val plannedPosts: List<OutfitPost> = emptyList(),
     val selectedPlannedPost: OutfitPost? = null,
     val editingPostId: String? = null,
-    val showSavedDialog: Boolean = false
+    val showSavedDialog: Boolean = false,
+    val showNoFullBodyDialog: Boolean = false
 ) {
     val selectedForecast: PlannerForecastDay?
         get() = forecastDays.firstOrNull { it.date == selectedDate && it.weather != WeatherCondition.ANY }
@@ -70,41 +81,91 @@ data class PlannerUiState(
 class PlannerViewModel(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
-    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl.instance,
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val today: LocalDate = LocalDate.now()
 
-    private val _uiState = MutableStateFlow(buildInitialState())
+    private val _uiState = MutableStateFlow(PlannerUiState(
+        selectedDate = today,
+        visibleMonth = YearMonth.from(today),
+        dateInput = today.format(PlannerDateFormatter),
+        plannedPosts = emptyList()
+    ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
+
+    init {
+        initialLoad()
+    }
+
+    private fun initialLoad() {
+        viewModelScope.launch {
+            val userId = userRepository.getCurrentUserOrDefault().id
+            val plannedPosts = outfitRepository.getPlannedPosts(userId)
+            val garmentGroups = garmentRepository.getPlannerGroups(userId)
+
+            _uiState.update { currentState -> 
+                currentState.copy(
+                    selectedDate = today,
+                    visibleMonth = YearMonth.from(today),
+                    dateInput = today.format(PlannerDateFormatter),
+                    plannedPosts = plannedPosts,
+                    topAndOuterwearGarments = garmentGroups.topAndOuterwear,
+                    bottomGarments = garmentGroups.bottoms,
+                    footwearGarments = garmentGroups.footwear,
+                    fullBodyGarments = garmentGroups.fullBody,
+                    selectedTopAndOuterwearGarmentId = defaultSelectedId(garmentGroups.topAndOuterwear),
+                    selectedBottomGarmentId = defaultSelectedId(garmentGroups.bottoms),
+                    selectedFootwearGarmentId = defaultSelectedId(garmentGroups.footwear),
+                    selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody)
+                ) 
+            }
+        }
+    }
+
+    fun onForecastLocationAvailable(location: DeviceLocation) {
+        loadForecast(location)
+    }
+
+    fun onForecastUnavailable() {
+        _uiState.update { it.copy(forecastDays = emptyList()) }
+    }
 
     fun onDateInputChange(value: String) {
         val sanitizedValue = value.toDateInputFormat()
         val parsedDate = parseDateOrNull(sanitizedValue)
 
-        _uiState.value = if (parsedDate != null && !parsedDate.isBefore(today)) {
-            _uiState.value.copy(
-                selectedDate = parsedDate,
-                visibleMonth = YearMonth.from(parsedDate),
-                dateInput = sanitizedValue
-            )
-        } else {
-            _uiState.value.copy(dateInput = sanitizedValue)
+        _uiState.update { currentState ->
+            if (parsedDate != null && !parsedDate.isBefore(today)) {
+                currentState.copy(
+                    selectedDate = parsedDate,
+                    visibleMonth = YearMonth.from(parsedDate),
+                    dateInput = sanitizedValue
+                )
+            } else {
+                currentState.copy(dateInput = sanitizedValue)
+            }
         }
     }
 
     fun onDateSelected(date: LocalDate) {
         if (date.isBefore(today)) return
 
-        val currentUserId = userRepository.getCurrentUserOrDefault().id
-        val plannedPost = outfitRepository.getPlannedPostByDate(currentUserId, date.toSpanishTitle())
-        _uiState.value = _uiState.value.copy(
-            selectedDate = date,
-            visibleMonth = YearMonth.from(date),
-            dateInput = date.format(PlannerDateFormatter),
-            selectedPlannedPost = plannedPost
-        )
+        viewModelScope.launch {
+            val currentUserId = userRepository.getCurrentUserOrDefault().id
+            val plannedPost = outfitRepository.getPlannedPostByDate(currentUserId, date.toSpanishTitle())
+            _uiState.update { currentState -> 
+                currentState.copy(
+                    selectedDate = date,
+                    visibleMonth = YearMonth.from(date),
+                    dateInput = date.format(PlannerDateFormatter),
+                    selectedPlannedPost = plannedPost
+                ) 
+            }
+        }
     }
 
     fun onCancelSelection() {
@@ -115,137 +176,183 @@ class PlannerViewModel(
         val parsedDate = parseDateOrNull(_uiState.value.dateInput)
         if (parsedDate == null || parsedDate.isBefore(today)) return
 
-        _uiState.value = _uiState.value.copy(
-            selectedDate = parsedDate,
-            visibleMonth = YearMonth.from(parsedDate),
-            step = PlannerStep.OUTFIT_SELECTION
+        analyticsTracker.track(
+            AnalyticsEvents.plannerDateConfirmed(ChronoUnit.DAYS.between(today, parsedDate))
         )
+        _uiState.update { currentState -> 
+            currentState.copy(
+                selectedDate = parsedDate,
+                visibleMonth = YearMonth.from(parsedDate),
+                step = PlannerStep.OUTFIT_SELECTION
+            ) 
+        }
     }
 
     fun onBackToDateSelection() {
-        _uiState.value = _uiState.value.copy(step = PlannerStep.DATE_SELECTION)
+        _uiState.update { currentState -> currentState.copy(step = PlannerStep.DATE_SELECTION) }
     }
 
     fun onToggleFullBody(enabled: Boolean) {
-        _uiState.value = _uiState.value.copy(useFullBody = enabled)
+        if (enabled && _uiState.value.fullBodyGarments.isEmpty()) {
+            _uiState.update { currentState -> currentState.copy(showNoFullBodyDialog = true) }
+            return
+        }
+        _uiState.update { currentState -> currentState.copy(useFullBody = enabled) }
+    }
+
+    fun onDismissNoFullBodyDialog() {
+        _uiState.update { currentState -> currentState.copy(showNoFullBodyDialog = false) }
     }
 
     fun onTopAndOuterwearCentered(garmentId: String) {
-        _uiState.value = _uiState.value.copy(selectedTopAndOuterwearGarmentId = garmentId)
+        _uiState.update { currentState -> currentState.copy(selectedTopAndOuterwearGarmentId = garmentId) }
     }
 
     fun onBottomCentered(garmentId: String) {
-        _uiState.value = _uiState.value.copy(selectedBottomGarmentId = garmentId)
+        _uiState.update { currentState -> currentState.copy(selectedBottomGarmentId = garmentId) }
     }
 
     fun onFootwearCentered(garmentId: String) {
-        _uiState.value = _uiState.value.copy(selectedFootwearGarmentId = garmentId)
+        _uiState.update { currentState -> currentState.copy(selectedFootwearGarmentId = garmentId) }
     }
 
     fun onFullBodyCentered(garmentId: String) {
-        _uiState.value = _uiState.value.copy(selectedFullBodyGarmentId = garmentId)
+        _uiState.update { currentState -> currentState.copy(selectedFullBodyGarmentId = garmentId) }
     }
 
     fun onContinueToPlanningReview() {
-        val state = _uiState.value
-        _uiState.value = state.copy(
-            plannedGarments = (state.plannedGarments + state.currentCarouselGarments).distinctBy { it.id },
-            step = PlannerStep.PLANNING_REVIEW
-        )
+        _uiState.update { state ->
+            state.copy(
+                plannedGarments = (state.plannedGarments + state.currentCarouselGarments).distinctBy { it.id },
+                step = PlannerStep.PLANNING_REVIEW
+            )
+        }
     }
 
     fun onAddMoreGarments() {
-        _uiState.value = _uiState.value.withPlannedGarmentsAsCarouselSelection()
-            .copy(step = PlannerStep.OUTFIT_SELECTION)
+        _uiState.update { currentState -> 
+            currentState.withPlannedGarmentsAsCarouselSelection().copy(step = PlannerStep.OUTFIT_SELECTION) 
+        }
     }
 
     fun onBackFromPlanningReview() {
-        _uiState.value = _uiState.value.copy(step = PlannerStep.OUTFIT_SELECTION)
+        _uiState.update { currentState -> currentState.copy(step = PlannerStep.OUTFIT_SELECTION) }
     }
 
     fun onPlannedOutfitTitleChange(value: String) {
-        _uiState.value = _uiState.value.copy(plannedOutfitTitle = value.take(100))
+        _uiState.update { currentState -> currentState.copy(plannedOutfitTitle = value.take(100)) }
     }
 
     fun onPlannedGarmentsChange(garments: List<Garment>) {
-        _uiState.value = _uiState.value.copy(plannedGarments = garments.distinctBy { it.id })
+        _uiState.update { currentState -> currentState.copy(plannedGarments = garments.distinctBy { it.id }) }
     }
 
     fun onEditSelectedPlannedPost() {
         val post = _uiState.value.selectedPlannedPost ?: return
-        _uiState.value = _uiState.value.copy(
-            selectedPlannedPost = null,
-            editingPostId = post.id,
-            plannedGarments = post.outfit.garments,
-            plannedOutfitTitle = post.title.orEmpty(),
-            step = PlannerStep.PLANNING_REVIEW
-        ).withPlannedGarmentsAsCarouselSelection()
+        _uiState.update { currentState -> 
+            currentState.copy(
+                selectedPlannedPost = null,
+                editingPostId = post.id,
+                plannedGarments = post.outfit.garments,
+                plannedOutfitTitle = post.title.orEmpty(),
+                step = PlannerStep.PLANNING_REVIEW
+            ).withPlannedGarmentsAsCarouselSelection() 
+        }
     }
 
     fun onDeleteSelectedPlannedPost() {
-        val post = _uiState.value.selectedPlannedPost ?: return
-        outfitRepository.deletePlannedOutfitPost(post.id)
-        _uiState.value = _uiState.value.copy(
-            plannedPosts = outfitRepository.getPlannedPosts(userRepository.getCurrentUserOrDefault().id),
-            selectedPlannedPost = null
-        )
+        viewModelScope.launch {
+            val post = _uiState.value.selectedPlannedPost ?: return@launch
+            val userId = userRepository.getCurrentUserOrDefault().id
+            outfitRepository.deletePlannedOutfitPost(post.id)
+            val updatedPosts = outfitRepository.getPlannedPosts(userId)
+            _uiState.update { currentState -> 
+                currentState.copy(
+                    plannedPosts = updatedPosts,
+                    selectedPlannedPost = null
+                ) 
+            }
+        }
     }
 
     fun onDismissSelectedPlannedPost() {
-        _uiState.value = _uiState.value.copy(selectedPlannedPost = null)
+        _uiState.update { currentState -> currentState.copy(selectedPlannedPost = null) }
     }
 
     fun onSavePlanning() {
-        val state = _uiState.value
-        if (state.plannedGarments.isEmpty()) return
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state.plannedGarments.isEmpty()) return@launch
 
-        val userId = userRepository.getCurrentUserOrDefault().id
-        val plannedDate = state.selectedDate.toSpanishTitle()
-        outfitRepository.savePlanning(
-            userId = userId,
-            title = state.plannedOutfitTitle,
-            garments = state.plannedGarments,
-            plannedDate = plannedDate,
-            createdAt = today.toSpanishTitle(),
-            editingPostId = state.editingPostId
-        )
-
-        _uiState.value = state.copy(
-            plannedPosts = outfitRepository.getPlannedPosts(userId),
-            editingPostId = null,
-            showSavedDialog = true
-        )
+            val userId = userRepository.getCurrentUserOrDefault().id
+            val plannedDate = state.selectedDate.toSpanishTitle()
+            val editingExisting = state.editingPostId != null
+            runCatching {
+                outfitRepository.savePlanning(
+                    userId = userId,
+                    title = state.plannedOutfitTitle,
+                    garments = state.plannedGarments,
+                    plannedDate = plannedDate,
+                    createdAt = today.toSpanishTitle(),
+                    editingPostId = state.editingPostId
+                )
+                outfitRepository.getPlannedPosts(userId)
+            }.onSuccess { updatedPosts ->
+                analyticsTracker.track(
+                    AnalyticsEvents.plannerSaved(
+                        garmentCount = state.plannedGarments.size,
+                        editingExisting = editingExisting
+                    )
+                )
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        plannedPosts = updatedPosts,
+                        editingPostId = null,
+                        showSavedDialog = true
+                    )
+                }
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "planner",
+                        "operation" to "save_planning",
+                        "garment_count" to state.plannedGarments.size,
+                        "editing_existing" to editingExisting
+                    )
+                ) 
+            }
+        }
     }
 
     fun onSavedDialogContinue() {
-        _uiState.value = _uiState.value.copy(
-            showSavedDialog = false,
-            step = PlannerStep.DATE_SELECTION,
-            plannedGarments = emptyList(),
-            plannedOutfitTitle = ""
-        )
+        _uiState.update { currentState -> 
+            currentState.copy(
+                showSavedDialog = false,
+                step = PlannerStep.DATE_SELECTION,
+                plannedGarments = emptyList(),
+                plannedOutfitTitle = ""
+            ) 
+        }
     }
 
-    private fun buildInitialState(): PlannerUiState {
-        val userId = userRepository.getCurrentUserOrDefault().id
-        val garmentGroups = garmentRepository.getPlannerGroups(userId)
-        val plannedPosts = outfitRepository.getPlannedPosts(userId)
-
-        return PlannerUiState(
-            selectedDate = today,
-            visibleMonth = YearMonth.from(today),
-            dateInput = today.format(PlannerDateFormatter),
-            forecastDays = weatherRepository.getPlannerForecast(today),
-            topAndOuterwearGarments = garmentGroups.topAndOuterwear,
-            bottomGarments = garmentGroups.bottoms,
-            footwearGarments = garmentGroups.footwear,
-            fullBodyGarments = garmentGroups.fullBody,
-            selectedTopAndOuterwearGarmentId = defaultSelectedId(garmentGroups.topAndOuterwear),
-            selectedBottomGarmentId = defaultSelectedId(garmentGroups.bottoms),
-            selectedFootwearGarmentId = defaultSelectedId(garmentGroups.footwear),
-            selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody),
-            plannedPosts = plannedPosts
-        )
+    private fun loadForecast(location: DeviceLocation) {
+        viewModelScope.launch {
+            weatherRepository.getPlannerForecast(location, today)
+                .onSuccess { forecastDays ->
+                    _uiState.update { it.copy(forecastDays = forecastDays) }
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "planner",
+                            "operation" to "forecast"
+                        )
+                    )
+                    _uiState.update { it.copy(forecastDays = emptyList()) }
+                }
+        }
     }
 
     private fun defaultSelectedId(garments: List<Garment>): String? =

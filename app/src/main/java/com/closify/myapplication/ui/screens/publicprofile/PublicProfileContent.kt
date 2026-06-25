@@ -28,9 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.FriendRequest
 import com.closify.myapplication.ui.components.OutfitPostCard
@@ -61,9 +63,9 @@ fun PublicProfileContent(
     val selectedCommentsPost = uiState.posts.firstOrNull { it.id == selectedCommentsPostId }
     val pendingIncomingRequest = uiState.pendingIncomingRequest
     val friendActionText = when {
-        uiState.isFriend -> "Eliminar"
-        uiState.hasPendingOutgoingRequest -> "Pendiente"
-        else -> "Agregar"
+        uiState.isFriend -> stringResource(R.string.friends_action_remove)
+        uiState.hasPendingOutgoingRequest -> stringResource(R.string.friends_action_pending)
+        else -> stringResource(R.string.friends_action_add)
     }
 
     if (showFriendsDialog) {
@@ -81,7 +83,7 @@ fun PublicProfileContent(
     if (selectedLikesPost != null) {
         SocialLikesDialog(
             likes = selectedLikesPost.likedBy,
-            emptyMessage = "Este outfit aun no tiene ningun me gusta\nDale me gusta y muestrale lo cool que quedo!",
+            emptyMessage = stringResource(R.string.friends_likes_empty),
             onUserClick = { userId ->
                 selectedLikesPostId = null
                 onOpenUserProfile(userId)
@@ -93,7 +95,7 @@ fun PublicProfileContent(
     if (selectedCommentsPost != null) {
         SocialCommentsDialog(
             comments = selectedCommentsPost.comments,
-            emptyMessage = "Este outfit aun no tiene ningun comentario\nComentale que tal quedo su look!",
+            emptyMessage = stringResource(R.string.friends_comments_empty),
             commentValue = uiState.commentDrafts[selectedCommentsPost.id].orEmpty(),
             onCommentValueChange = { value ->
                 onCommentDraftChange(selectedCommentsPost.id, value)
@@ -122,6 +124,8 @@ fun PublicProfileContent(
                     friendsCount = uiState.friendsCount,
                     bannerImageResId = profile.bannerImageResId,
                     profileImageResId = profile.profileImageResId,
+                    bannerImageUrl = profile.bannerImageUrl,
+                    profileImageUrl = profile.avatarImageUrl,
                     onFriendsClick = { showFriendsDialog = true }
                 )
 
@@ -234,7 +238,7 @@ private fun IncomingFriendRequestCard(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "¡$username quiere ser tu amigo!",
+                    text = stringResource(R.string.public_profile_friend_request, username),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
@@ -243,7 +247,7 @@ private fun IncomingFriendRequestCard(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 Text(
-                    text = "Solo sus amigos tienen acceso a los outfits favoritos compartidos y el perfil completo de $username.",
+                    text = stringResource(R.string.public_profile_private_info, username),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -252,7 +256,7 @@ private fun IncomingFriendRequestCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Pulsa el botón \"Aceptar\" para ser su amigo",
+                    text = stringResource(R.string.public_profile_accept_prompt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -272,7 +276,7 @@ private fun IncomingFriendRequestCard(
                         modifier = Modifier.height(34.dp)
                     ) {
                         Text(
-                            text = "Rechazar",
+                            text = stringResource(R.string.notifications_action_reject),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -289,7 +293,7 @@ private fun IncomingFriendRequestCard(
                         modifier = Modifier.height(34.dp)
                     ) {
                         Text(
-                            text = "Aceptar",
+                            text = stringResource(R.string.notifications_action_accept),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -341,7 +345,7 @@ private fun PrivateFriendProfileCard(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "No eres amigo de $username",
+                    text = stringResource(R.string.public_profile_not_friend, username),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
@@ -350,7 +354,7 @@ private fun PrivateFriendProfileCard(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
-                    text = "Solo sus amigos tienen acceso a los outfits favoritos compartidos y el perfil completo de $username.",
+                    text = stringResource(R.string.public_profile_private_info, username),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -359,7 +363,7 @@ private fun PrivateFriendProfileCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Pulsa el boton \"Agregar\" para enviar una solicitud de amistad",
+                    text = stringResource(R.string.public_profile_add_prompt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center

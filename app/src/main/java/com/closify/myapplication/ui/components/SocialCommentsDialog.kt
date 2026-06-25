@@ -17,7 +17,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.Comment
 
 @Composable
@@ -33,7 +35,7 @@ fun SocialCommentsDialog(
     onUserClick: (String) -> Unit = {}
 ) {
     SocialDialogScaffold(
-        title = "Comentarios",
+        title = stringResource(R.string.profile_comments_title),
         onDismiss = onDismiss,
         modifier = modifier
     ) {
@@ -54,7 +56,7 @@ fun SocialCommentsDialog(
                 itemsIndexed(comments) { index, comment ->
                     SocialDialogUserRow(
                         user = comment.user,
-                        supportingText = "Comento el ${comment.createdAt}",
+                        supportingText = stringResource(R.string.post_commented_at, comment.createdAt),
                         rowHeight = null,
                         onUserClick = { onUserClick(comment.user.id) }
                     ) {
@@ -82,13 +84,13 @@ fun SocialCommentsDialog(
             ClosifyTextField(
                 value = commentValue,
                 onValueChange = onCommentValueChange,
-                placeholder = "Escribi un comentario",
+                placeholder = stringResource(R.string.post_comment_placeholder),
                 modifier = Modifier.padding(top = 10.dp),
                 trailingContent = {
                     IconButton(onClick = onSendComment) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.Send,
-                            contentDescription = "Enviar comentario",
+                            contentDescription = stringResource(R.string.post_send_comment),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

@@ -1,114 +1,244 @@
 package com.closify.myapplication.data.repository
 
+import android.content.Context
+import com.closify.myapplication.data.local.AppDatabase
+import com.closify.myapplication.data.local.mapper.toCommentEntity
+import com.closify.myapplication.data.local.mapper.toDomain
+import com.closify.myapplication.data.local.mapper.toEntity
+import com.closify.myapplication.data.local.mapper.toFirestoreMap
+import com.closify.myapplication.data.local.mapper.toGarmentEntity
+import com.closify.myapplication.data.local.mapper.toLikeEntity
+import com.closify.myapplication.data.local.mapper.toOutfitEntity
+import com.closify.myapplication.data.local.mapper.toOutfitPostEntity
+import com.closify.myapplication.data.local.mapper.toUserEntity
 import com.closify.myapplication.domain.model.Comment
 import com.closify.myapplication.domain.model.Like
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.UserSummary
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.UUID
 
-class OutfitPostRepository(
-    private val notificationRepository: NotificationRepository = NotificationRepository.instance
+class OutfitPostRepository private constructor(
+    context: Context,
+    private val notificationRepository: NotificationRepository = NotificationRepository.instance,
+    private val userRepository: UserRepository = UserRepository.instance
 ) {
+    private val outfitRepository: OutfitRepository by lazy { OutfitRepository.instance }
+    private var syncedThisSession = false
 
     companion object {
-        val instance = OutfitPostRepository()
+        @Volatile private var _instance: OutfitPostRepository? = null
+
+        fun initialize(context: Context) {
+            if (_instance == null) {
+                synchronized(this) {
+                    if (_instance == null) {
+                        _instance = OutfitPostRepository(context.applicationContext)
+                    }
+                }
+            }
+        }
+
+        val instance: OutfitPostRepository
+            get() = _instance ?: error("OutfitPostRepository.initialize(context) no fue llamado.")
     }
 
-    fun getPost(postId: String): OutfitPost? =
-        MockClosifyData.outfitPosts.firstOrNull { it.id == postId }
+    private val db = AppDatabase.getInstance(context)
+    private val postDao = db.outfitPostDao()
+    private val userDao = db.userDao()
+    private val garmentDao = db.garmentDao()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun getPostsByUser(userId: String): List<OutfitPost> =
-        sortNewestFirst(MockClosifyData.outfitPosts.filter { it.author.id == userId })
+    suspend fun getPost(postId: String): OutfitPost? {
+        val entity = postDao.getPostById(postId) ?: return null
+        return assemblePost(entity)
+    }
 
-    fun getPostsByAuthors(userIds: Set<String>): List<OutfitPost> =
-        sortNewestFirst(MockClosifyData.outfitPosts.filter { it.author.id in userIds })
+    suspend fun getPostsByUser(userId: String): List<OutfitPost> {
+        val entities = postDao.getPostsByUserId(userId)
+        return entities.mapNotNull { assemblePost(it) }
+    }
 
-    fun addPost(post: OutfitPost): OutfitPost =
-        MockClosifyData.addOutfitPost(post)
+    suspend fun getPostsByAuthors(userIds: Set<String>): List<OutfitPost> {
+        val entities = postDao.getPostsByAuthors(userIds.toList())
+        return entities.mapNotNull { assemblePost(it) }
+    }
 
-    fun updatePost(post: OutfitPost): OutfitPost =
-        MockClosifyData.updateOutfitPost(post)
+    suspend fun addPost(post: OutfitPost): OutfitPost {
+        postDao.upsertPost(post.toEntity())
+        scope.launch {
+            firestore.collection("outfit_posts")
+                .document(post.id)
+                .set(post.toFirestoreMap())
+                .await()
+        }
+        return post
+    }
 
-    fun toggleLike(postId: String, user: UserSummary): OutfitPost? {
+    suspend fun updatePost(post: OutfitPost): OutfitPost {
+        postDao.upsertPost(post.toEntity())
+        scope.launch {
+            firestore.collection("outfit_posts")
+                .document(post.id)
+                .update(post.toFirestoreMap())
+                .await()
+        }
+        return post
+    }
+
+    suspend fun toggleLike(postId: String, user: UserSummary): OutfitPost? {
         val post = getPost(postId) ?: return null
         val alreadyLiked = post.likedBy.any { it.user.id == user.id }
-        val updatedPost = post.copy(
-            likedBy = if (alreadyLiked) {
-                post.likedBy.filterNot { it.user.id == user.id }
-            } else {
-                listOf(
-                    Like(
-                        id = "like_${user.id}_${post.id}_${post.likedBy.size + 1}",
-                        user = user,
-                        createdAt = MockClosifyData.CURRENT_DATE_LABEL
-                    )
-                ) + post.likedBy
+        
+        if (alreadyLiked) {
+            postDao.deleteLike(postId, user.id)
+            scope.launch {
+                firestore.collection("outfit_posts/$postId/likes").document(user.id).delete().await()
             }
-        )
-
-        updatePost(updatedPost)
-        if (!alreadyLiked) {
-            notificationRepository.createPostLikeNotification(post = updatedPost, sender = user)
+        } else {
+            val like = Like(
+                id = UUID.randomUUID().toString(),
+                user = user,
+                createdAt = currentDate()
+            )
+            postDao.upsertLike(like.toEntity(postId))
+            scope.launch {
+                firestore.collection("outfit_posts/$postId/likes").document(user.id).set(like.toFirestoreMap()).await()
+            }
+            notificationRepository.createPostLikeNotification(post = post, sender = user)
         }
-        return updatedPost
+        
+        return getPost(postId)
     }
 
-    fun addComment(postId: String, user: UserSummary, text: String): OutfitPost? {
+    suspend fun addComment(postId: String, user: UserSummary, text: String): OutfitPost? {
         val cleanText = text.trim()
         if (cleanText.isBlank()) return null
 
-        val post = getPost(postId) ?: return null
         val comment = Comment(
-            id = "comment_${user.id}_${post.id}_${post.comments.size + 1}",
+            id = UUID.randomUUID().toString(),
             user = user,
             text = cleanText,
-            createdAt = MockClosifyData.CURRENT_DATE_LABEL
+            createdAt = currentDate()
         )
-        val updatedPost = post.copy(comments = post.comments + comment)
-
-        updatePost(updatedPost)
-        notificationRepository.createPostCommentNotification(
-            post = updatedPost,
-            commentId = comment.id,
-            sender = user
-        )
-        return updatedPost
-    }
-
-    fun updatePostTitle(postId: String, title: String): OutfitPost? {
-        val post = getPost(postId) ?: return null
-        val updatedPost = post.copy(title = title.take(100).ifBlank { null })
-        return updatePost(updatedPost)
-    }
-
-    fun deletePost(postId: String) {
-        MockClosifyData.deleteOutfitPost(postId)
-    }
-
-    fun sortNewestFirst(posts: List<OutfitPost>): List<OutfitPost> =
-        posts.sortedByDescending { it.createdAt.toMockDateOrder() }
-
-    private fun String.toMockDateOrder(): Int {
-        val parts = split(" de ")
-        if (parts.size != 3) return 0
-
-        val day = parts[0].toIntOrNull() ?: return 0
-        val month = when (parts[1].lowercase()) {
-            "enero" -> 1
-            "febrero" -> 2
-            "marzo" -> 3
-            "abril" -> 4
-            "mayo" -> 5
-            "junio" -> 6
-            "julio" -> 7
-            "agosto" -> 8
-            "septiembre" -> 9
-            "octubre" -> 10
-            "noviembre" -> 11
-            "diciembre" -> 12
-            else -> return 0
+        
+        postDao.upsertComment(comment.toEntity(postId))
+        scope.launch {
+            firestore.collection("outfit_posts/$postId/comments").document(comment.id).set(comment.toFirestoreMap()).await()
         }
-        val year = parts[2].toIntOrNull() ?: return 0
-
-        return year * 10_000 + month * 100 + day
+        
+        val post = getPost(postId)
+        if (post != null) {
+            notificationRepository.createPostCommentNotification(
+                post = post,
+                commentId = comment.id,
+                sender = user
+            )
+        }
+        return post
     }
+
+    suspend fun updatePostTitle(postId: String, title: String): OutfitPost? {
+        val entity = postDao.getPostById(postId) ?: return null
+        val updatedEntity = entity.copy(title = title.take(100).ifBlank { null })
+        postDao.upsertPost(updatedEntity)
+        scope.launch {
+            firestore.collection("outfit_posts").document(postId).update("title", updatedEntity.title).await()
+        }
+        return assemblePost(updatedEntity)
+    }
+
+    suspend fun deletePost(postId: String) {
+        postDao.deletePostById(postId)
+        scope.launch {
+            firestore.collection("outfit_posts").document(postId).delete().await()
+        }
+    }
+
+    private suspend fun assemblePost(entity: com.closify.myapplication.data.local.entity.OutfitPostEntity): OutfitPost? {
+        val author = userRepository.getUserSummary(entity.authorId) ?: return null
+        val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId }
+            ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId }
+            ?: outfitRepository.getOutfitById(entity.outfitId)
+            ?: fetchOutfitFromFirestore(entity.authorId, entity.outfitId)
+            ?: return null
+
+        val likes = postDao.getLikesForPost(entity.id).mapNotNull { likeEntity ->
+            val likeUser = userRepository.getUserSummary(likeEntity.userId)
+            if (likeUser != null) likeEntity.toDomain(likeUser) else null
+        }
+
+        val comments = postDao.getCommentsForPost(entity.id).mapNotNull { commentEntity ->
+            val commentUser = userRepository.getUserSummary(commentEntity.userId)
+            if (commentUser != null) commentEntity.toDomain(commentUser) else null
+        }
+
+        return entity.toDomain(author, outfit, likes, comments)
+    }
+
+    suspend fun syncFromFirestore() {
+        if (syncedThisSession) return
+        try {
+            val snapshot = firestore.collection("outfit_posts").get().await()
+            val posts = snapshot.documents.mapNotNull { it.toOutfitPostEntity() }
+            
+            if (posts.isEmpty()) {
+                postDao.deleteAllPosts()
+            } else {
+                postDao.upsertPosts(posts)
+                postDao.deleteNotInList(posts.map { it.id })
+            }
+            
+            // Sync likes and comments for each post (can be heavy, should be optimized)
+            posts.forEach { post ->
+                val likesSnapshot = firestore.collection("outfit_posts/${post.id}/likes").get().await()
+                val likes = likesSnapshot.documents.mapNotNull { it.toLikeEntity(post.id) }
+                postDao.upsertLikes(likes)
+                
+                val commentsSnapshot = firestore.collection("outfit_posts/${post.id}/comments").get().await()
+                val comments = commentsSnapshot.documents.mapNotNull { it.toCommentEntity(post.id) }
+                postDao.upsertComments(comments)
+            }
+            syncedThisSession = true
+        } catch (e: Exception) {
+            android.util.Log.w("OutfitPostRepository", "syncFromFirestore failed: ${e.message}")
+        }
+    }
+
+    fun resetSessionSync() { syncedThisSession = false }
+
+    private suspend fun fetchOutfitFromFirestore(authorId: String, outfitId: String): com.closify.myapplication.domain.model.Outfit? {
+        return try {
+            val doc = firestore.collection("users/$authorId/outfits").document(outfitId).get().await()
+            val entity = doc.toOutfitEntity() ?: return null
+            val garmentIds = entity.garmentIds.split(",").filter { it.isNotBlank() }
+            val garments = garmentIds.mapNotNull { gid ->
+                garmentDao.getById(gid)?.toDomain()
+                    ?: fetchGarmentFromFirestore(authorId, gid)
+            }
+            entity.toDomain(garments)
+        } catch (e: Exception) { null }
+    }
+
+    private suspend fun fetchGarmentFromFirestore(authorId: String, garmentId: String): com.closify.myapplication.domain.model.Garment? {
+        return try {
+            val doc = firestore.collection("users/$authorId/garments").document(garmentId).get().await()
+            val entity = doc.toGarmentEntity() ?: return null
+            garmentDao.upsert(entity)
+            entity.toDomain()
+        } catch (e: Exception) { null }
+    }
+
+    private fun currentDate(): String = LocalDate.now().format(
+        DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
+    )
 }

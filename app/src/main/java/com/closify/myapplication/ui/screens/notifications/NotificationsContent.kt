@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.screens.notifications
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,8 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -54,12 +53,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.domain.model.FriendRequestStatus
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.NotificationType
 import com.closify.myapplication.ui.components.ClosifyLogo
+import com.closify.myapplication.ui.components.UserAvatarImage
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.NotificationUiItem
 import com.closify.myapplication.ui.viewmodel.NotificationsUiState
@@ -136,7 +137,7 @@ private fun EmptyNotificationsCard(
                 Spacer(modifier = Modifier.height(28.dp))
 
                 Text(
-                    text = "Aún no tenés ninguna notificación",
+                    text = stringResource(R.string.notifications_empty_title),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
@@ -145,7 +146,7 @@ private fun EmptyNotificationsCard(
                 Spacer(modifier = Modifier.height(26.dp))
 
                 Text(
-                    text = "¡Interactuá con tus amigos para disfrutar de\nsus outfits!",
+                    text = stringResource(R.string.notifications_empty_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -180,7 +181,7 @@ private fun NotificationsTopBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = "Volver",
+                    contentDescription = stringResource(R.string.common_back),
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
@@ -241,7 +242,7 @@ private fun NotificationsSearchField(
 
                 Icon(
                     imageVector = Icons.Rounded.Search,
-                    contentDescription = "Buscar usuarios",
+                    contentDescription = stringResource(R.string.notifications_search_users),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )
@@ -300,8 +301,9 @@ private fun NotificationRow(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
-        Image(
-            painter = painterResource(notification.sender.profileImageResId),
+        UserAvatarImage(
+            imageUrl = notification.sender.profileImageUrl,
+            fallbackImageResId = notification.sender.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(52.dp)
@@ -377,10 +379,10 @@ private fun NotificationMessage(type: NotificationType) {
             NotificationType.FRIEND_REQUEST_ACCEPTED -> Icons.Outlined.Group
         }
         val message = when (type) {
-            NotificationType.POST_LIKE -> "Indicó que le gusta tu outfit favorito"
-            NotificationType.POST_COMMENT -> "Comentó sobre tu outfit favorito"
-            NotificationType.FRIEND_REQUEST_RECEIVED -> "Te envió una solicitud de amistad"
-            NotificationType.FRIEND_REQUEST_ACCEPTED -> "Aceptó tu solicitud de amistad"
+            NotificationType.POST_LIKE -> stringResource(R.string.notifications_msg_like)
+            NotificationType.POST_COMMENT -> stringResource(R.string.notifications_msg_comment)
+            NotificationType.FRIEND_REQUEST_RECEIVED -> stringResource(R.string.notifications_msg_request)
+            NotificationType.FRIEND_REQUEST_ACCEPTED -> stringResource(R.string.notifications_msg_accepted)
         }
 
         Icon(
@@ -425,8 +427,8 @@ private fun FriendRequestActions(
     onRejectFriendRequest: (String) -> Unit
 ) {
     val isPending = status == FriendRequestStatus.PENDING
-    val rejectText = if (status == FriendRequestStatus.REJECTED) "Rechazado" else "Rechazar"
-    val acceptText = if (status == FriendRequestStatus.ACCEPTED) "Aceptada" else "Aceptar"
+    val rejectText = if (status == FriendRequestStatus.REJECTED) stringResource(R.string.notifications_action_rejected) else stringResource(R.string.notifications_action_reject)
+    val acceptText = if (status == FriendRequestStatus.ACCEPTED) stringResource(R.string.notifications_action_accepted) else stringResource(R.string.notifications_action_accept)
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(
@@ -477,16 +479,9 @@ private fun FriendRequestActions(
 @Composable
 private fun NotificationsContentPreview() {
     ClosifyTheme {
-        val repository = NotificationRepository.instance
-        val outfitPostRepository = OutfitPostRepository.instance
         NotificationsContent(
             uiState = NotificationsUiState(
-                notifications = repository.getNotifications().map {
-                    NotificationUiItem(
-                        notification = it,
-                        post = it.postId?.let(outfitPostRepository::getPost)
-                    )
-                }
+                notifications = emptyList()
             ),
             onOpenUserProfile = {},
             onOpenPostInProfile = {},

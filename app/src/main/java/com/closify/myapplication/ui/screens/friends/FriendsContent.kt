@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.screens.friends
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,24 +25,30 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -52,12 +57,14 @@ import com.closify.myapplication.domain.model.UserSummary
 import com.closify.myapplication.ui.components.OutfitPostCard
 import com.closify.myapplication.ui.components.SocialCommentsDialog
 import com.closify.myapplication.ui.components.SocialLikesDialog
+import com.closify.myapplication.ui.components.UserAvatarImage
 import com.closify.myapplication.ui.screens.friends.components.FriendsTopBar
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.FriendSearchResult
 import com.closify.myapplication.ui.viewmodel.FriendRelationshipStatus
 import com.closify.myapplication.ui.viewmodel.FriendsUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsContent(
     uiState: FriendsUiState,
@@ -68,8 +75,11 @@ fun FriendsContent(
     onSendComment: (String) -> Unit,
     onUserClick: (String) -> Unit,
     onToggleFriend: (String) -> Unit,
+    onRefresh: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     var selectedLikesPostId by remember { mutableStateOf<String?>(null) }
     var selectedCommentsPostId by remember { mutableStateOf<String?>(null) }
     val selectedLikesPost = uiState.posts.firstOrNull { it.id == selectedLikesPostId }
@@ -79,7 +89,7 @@ fun FriendsContent(
     if (selectedLikesPost != null) {
         SocialLikesDialog(
             likes = selectedLikesPost.likedBy,
-            emptyMessage = "Este outfit aun no tiene ningun me gusta\nDale me gusta y muestrale lo cool que quedo!",
+            emptyMessage = stringResource(R.string.friends_likes_empty),
             onUserClick = { userId ->
                 selectedLikesPostId = null
                 onUserClick(userId)
@@ -91,7 +101,7 @@ fun FriendsContent(
     if (selectedCommentsPost != null) {
         SocialCommentsDialog(
             comments = selectedCommentsPost.comments,
-            emptyMessage = "Este outfit aun no tiene ningun comentario\nComentale que tal quedo su look!",
+            emptyMessage = stringResource(R.string.friends_comments_empty),
             commentValue = uiState.commentDrafts[selectedCommentsPost.id].orEmpty(),
             onCommentValueChange = { value ->
                 onCommentDraftChange(selectedCommentsPost.id, value)
@@ -106,8 +116,19 @@ fun FriendsContent(
         )
     }
 
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                isRefreshing = true
+                onRefresh()
+                isRefreshing = false
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = 24.dp),
@@ -120,6 +141,31 @@ fun FriendsContent(
                 onNotificationsClick = onNotificationsClick,
                 hasUnreadNotifications = uiState.hasUnreadNotifications
             )
+        }
+
+        if (uiState.isLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 80.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            }
+            return@LazyColumn
+        }
+
+        if (uiState.isOffline) {
+            item {
+                EmptyFriendsState(
+                    title = "Sin conexión",
+                    subtitle = "Necesitás internet para ver el feed de tus amigos.",
+                    modifier = Modifier.padding(horizontal = 22.dp)
+                )
+            }
+            return@LazyColumn
         }
 
         when {
@@ -135,16 +181,16 @@ fun FriendsContent(
 
             uiState.friendsCount == 0 -> item {
                 EmptyFriendsState(
-                    title = "Aun no tenes amigos agregados para ver sus posteos de outfits favoritos o planificados",
-                    subtitle = "Escribe el nombre de un amigo en la barra de busqueda y enviale una solicitud de amistad",
+                    title = stringResource(R.string.friends_empty_title),
+                    subtitle = stringResource(R.string.friends_empty_subtitle),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
             }
 
             uiState.posts.isEmpty() -> item {
                 EmptyFriendsState(
-                    title = "Aun ningun amigo compartio su outfit",
-                    subtitle = "Cuando compartan sus looks, lo veras aqui",
+                    title = stringResource(R.string.friends_no_posts_title),
+                    subtitle = stringResource(R.string.friends_no_posts_subtitle),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
             }
@@ -160,6 +206,7 @@ fun FriendsContent(
                 )
             }
         }
+    }
     }
 }
 
@@ -204,7 +251,7 @@ private fun FriendsSearchResults(
         ) {
             if (friends.isNotEmpty()) {
                 Text(
-                    text = "Mis amigos",
+                    text = stringResource(R.string.friends_my_friends),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -229,7 +276,7 @@ private fun FriendsSearchResults(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 Text(
-                    text = "Quiza estas buscando a...",
+                    text = stringResource(R.string.friends_suggestions),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth(),
@@ -259,9 +306,9 @@ private fun SearchUserRow(
     val isPending = relationshipStatus == FriendRelationshipStatus.OUTGOING_PENDING
     val isFriend = relationshipStatus == FriendRelationshipStatus.FRIEND
     val actionText = when (relationshipStatus) {
-        FriendRelationshipStatus.FRIEND -> "Eliminar"
-        FriendRelationshipStatus.OUTGOING_PENDING -> "Pendiente"
-        FriendRelationshipStatus.NONE -> "Agregar"
+        FriendRelationshipStatus.FRIEND -> stringResource(R.string.friends_action_remove)
+        FriendRelationshipStatus.OUTGOING_PENDING -> stringResource(R.string.friends_action_pending)
+        FriendRelationshipStatus.NONE -> stringResource(R.string.friends_action_add)
     }
 
     Row(
@@ -270,8 +317,9 @@ private fun SearchUserRow(
             .height(56.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = user.profileImageResId),
+        UserAvatarImage(
+            imageUrl = user.profileImageUrl,
+            fallbackImageResId = user.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)
@@ -334,7 +382,7 @@ private fun EmptyFriendsState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Amigos",
+            text = stringResource(R.string.profile_friends_title),
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)
@@ -391,16 +439,13 @@ private fun EmptyFriendsState(
 @Composable
 private fun FriendsContentPreview() {
     ClosifyTheme {
-        val user = UserRepository.instance.getCurrentUserOrDefault().toSummary()
-        val userId = user.id
+        val user = UserSummary("1", "Maria Cejas", "@maria_cejas", R.drawable.avatar_default)
 
         FriendsContent(
             uiState = FriendsUiState(
                 currentUser = user,
-                friendsCount = SocialRepository.instance.getFriends(userId).size,
-                posts = OutfitPostRepository.instance.getPostsByAuthors(
-                    SocialRepository.instance.getFriends(userId).map { it.id }.toSet()
-                )
+                friendsCount = 0,
+                posts = emptyList()
             ),
             onSearchQueryChange = {},
             onNotificationsClick = {},

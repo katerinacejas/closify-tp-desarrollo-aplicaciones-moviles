@@ -12,7 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import com.closify.myapplication.R
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyButton
@@ -34,25 +37,34 @@ import com.closify.myapplication.ui.viewmodel.HomeEvent
 fun HomeContent(
     username: String,
     selectedWeather: WeatherCondition?,
+    automaticWeatherSummary: CurrentWeatherSummary?,
     selectedOccasion: Occasion?,
     isAutoWeather: Boolean,
+    isAutoWeatherAvailable: Boolean,
     isLoadingWeather: Boolean,
     isGenerateEnabled: Boolean,
     dialog: HomeDialog? = null,
     onEvent: (HomeEvent) -> Unit,
+    onAutomaticWeatherRequested: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (dialog) {
         HomeDialog.NO_GARMENTS -> ClosifyConfirmationDialog(
-            title = "Tu guardarropa está vacío",
-            subtitle = "Agrega prendas en tu guardarropa\npara poder generar outfits",
-            buttonText = "Continuar",
+            title = stringResource(R.string.dialog_no_garments_title),
+            subtitle = stringResource(R.string.dialog_no_garments_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = { onEvent(HomeEvent.DismissDialog) }
         )
         HomeDialog.NO_COMBINATIONS -> ClosifyConfirmationDialog(
-            title = "Sin combinaciones posibles",
-            subtitle = "No encontramos prendas que combinen\ncon el clima y ocasión que elegiste",
-            buttonText = "Continuar",
+            title = stringResource(R.string.dialog_no_combinations_title),
+            subtitle = stringResource(R.string.dialog_no_combinations_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
+            onDismiss = { onEvent(HomeEvent.DismissDialog) }
+        )
+        HomeDialog.WEATHER_UNAVAILABLE -> ClosifyConfirmationDialog(
+            title = stringResource(R.string.dialog_weather_unavailable_title),
+            subtitle = stringResource(R.string.dialog_weather_unavailable_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
             onDismiss = { onEvent(HomeEvent.DismissDialog) }
         )
         null -> Unit
@@ -74,7 +86,7 @@ fun HomeContent(
                         fontWeight = FontWeight.SemiBold
                     )
                 ) {
-                    append("BUEN DÍA")
+                    append(stringResource(R.string.home_good_morning))
                     if (username.isNotEmpty()) append(", ${username.removePrefix("@").uppercase()}")
                 }
             },
@@ -86,7 +98,7 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "¿Qué outfit preferís hoy?",
+            text = stringResource(R.string.home_what_outfit),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -97,10 +109,13 @@ fun HomeContent(
 
         WeatherSection(
             selectedWeather = selectedWeather,
+            automaticWeatherSummary = automaticWeatherSummary,
             isAutoWeather = isAutoWeather,
+            isAutoWeatherAvailable = isAutoWeatherAvailable,
             isLoadingWeather = isLoadingWeather,
             onWeatherSelected = { onEvent(HomeEvent.SelectWeather(it)) },
-            onToggleAuto = { onEvent(HomeEvent.ToggleAutoWeather(it)) }
+            onAutomaticWeatherRequested = onAutomaticWeatherRequested,
+            onManualWeatherSelected = { onEvent(HomeEvent.SelectManualWeatherMode) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -113,7 +128,7 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         ClosifyButton(
-            text = "Generar outfits",
+            text = stringResource(R.string.home_generate_button),
             onClick = { onEvent(HomeEvent.GenerateOutfits) },
             enabled = isGenerateEnabled
         )
@@ -129,11 +144,19 @@ private fun HomeContentPreview() {
         HomeContent(
             username = "katerina",
             selectedWeather = WeatherCondition.MILD,
+            automaticWeatherSummary = CurrentWeatherSummary(
+                condition = WeatherCondition.MILD,
+                averageTemperature = 18,
+                minTemperature = 12,
+                maxTemperature = 23
+            ),
             selectedOccasion = Occasion.CASUAL,
             isAutoWeather = false,
+            isAutoWeatherAvailable = true,
             isLoadingWeather = false,
             isGenerateEnabled = true,
-            onEvent = {}
+            onEvent = {},
+            onAutomaticWeatherRequested = {}
         )
     }
 }

@@ -22,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.ui.components.ClosifyTextField
@@ -33,19 +35,19 @@ import com.closify.myapplication.ui.viewmodel.ClassifyGarmentEvent
 import com.closify.myapplication.ui.viewmodel.ClassifyGarmentUiState
 
 private val categoryOptions = listOf(
-    GarmentCategory.TOP       to "Superior",
-    GarmentCategory.BOTTOM    to "Inferior",
-    GarmentCategory.FOOTWEAR  to "Calzado",
-    GarmentCategory.OUTERWEAR to "Abrigo",
-    GarmentCategory.FULL_BODY to "FullBody"
+    GarmentCategory.TOP       to R.string.category_top,
+    GarmentCategory.BOTTOM    to R.string.category_bottom,
+    GarmentCategory.FOOTWEAR  to R.string.category_footwear,
+    GarmentCategory.OUTERWEAR to R.string.category_outerwear,
+    GarmentCategory.FULL_BODY to R.string.category_full_body
 )
 
 private val weatherOptions = listOf(
-    WeatherCondition.HOT   to "Calor",
-    WeatherCondition.COLD  to "Frío",
-    WeatherCondition.WINDY to "Ventoso",
-    WeatherCondition.MILD  to "Templado",
-    WeatherCondition.ANY   to "Indistinto"
+    WeatherCondition.HOT   to R.string.weather_hot,
+    WeatherCondition.COLD  to R.string.weather_cold,
+    WeatherCondition.WINDY to R.string.weather_windy,
+    WeatherCondition.MILD  to R.string.weather_mild,
+    WeatherCondition.ANY   to R.string.weather_any
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -69,7 +71,7 @@ fun ClassifyGarmentStep1Content(
         ClosifyTextField(
             value = uiState.name,
             onValueChange = { onEvent(ClassifyGarmentEvent.NameChanged(it)) },
-            placeholder = "Nombre de la prenda",
+            placeholder = stringResource(R.string.classify_name_placeholder),
             error = uiState.nameError
         )
 
@@ -83,7 +85,7 @@ fun ClassifyGarmentStep1Content(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "TIPO DE PRENDA",
+                    text = stringResource(R.string.classify_type_title),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -92,9 +94,9 @@ fun ClassifyGarmentStep1Content(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    categoryOptions.forEach { (category, label) ->
+                    categoryOptions.forEach { (category, labelRes) ->
                         SelectableChip(
-                            label = label,
+                            label = stringResource(labelRes),
                             selected = uiState.selectedCategory == category,
                             onClick = { onEvent(ClassifyGarmentEvent.SelectCategory(category)) }
                         )
@@ -112,7 +114,7 @@ fun ClassifyGarmentStep1Content(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "¿EN QUÉ CLIMA LA USARÍAS?",
+                    text = stringResource(R.string.classify_weather_title),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -121,9 +123,9 @@ fun ClassifyGarmentStep1Content(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    weatherOptions.forEach { (weather, label) ->
+                    weatherOptions.forEach { (weather, labelRes) ->
                         SelectableChip(
-                            label = label,
+                            label = stringResource(labelRes),
                             selected = weather in uiState.selectedWeathers,
                             onClick = { onEvent(ClassifyGarmentEvent.ToggleWeather(weather)) }
                         )
@@ -150,7 +152,7 @@ fun ClassifyGarmentStep1Content(
                     .height(42.dp)
             ) {
                 Text(
-                    text = "Cancelar",
+                    text = stringResource(R.string.common_cancel),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -167,7 +169,7 @@ fun ClassifyGarmentStep1Content(
                     .height(42.dp)
             ) {
                 Text(
-                    text = "Continuar",
+                    text = stringResource(R.string.btn_continue),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

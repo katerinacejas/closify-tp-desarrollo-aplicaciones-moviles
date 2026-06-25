@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.closify.myapplication.data.repository.OutfitPostRepository
+import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.domain.model.OutfitPostType
@@ -136,6 +136,8 @@ fun ProfileContent(
                 friendsCount = uiState.friendsCount,
                 bannerImageResId = uiState.bannerImageResId,
                 profileImageResId = uiState.profileImageResId,
+                bannerImageUrl = uiState.bannerImageUrl,
+                profileImageUrl = uiState.profileImageUrl,
                 onFriendsClick = { showFriendsDialog = true }
             )
         }
@@ -179,30 +181,24 @@ fun ProfileContent(
 @Composable
 private fun ProfileContentPreview() {
     ClosifyTheme {
-        val repository = ProfileRepository.instance
-        val socialRepository = SocialRepository.instance
-        val outfitPostRepository = OutfitPostRepository.instance
-        val profile = repository.getProfile()
-        val friends = socialRepository.getFriends(profile.id)
-        val posts = outfitPostRepository.getPostsByUser(profile.id)
-        val garments = repository.getWardrobeGarments()
-
         ProfileContent(
             uiState = ProfileUiState(
-                userId = profile.id,
-                name = profile.name,
-                username = profile.username,
-                bio = profile.bio,
-                birthDate = profile.birthDate,
-                friendsCount = friends.size,
-                garmentsCount = garments.size,
-                wardrobeUsagePercentage = repository.getWardrobeUsagePercentage(),
-                favoriteOutfitsCount = posts.count { it.type == OutfitPostType.FAVORITE },
-                plannedOutfitsCount = posts.count { it.type == OutfitPostType.PLANNED },
-                bannerImageResId = profile.bannerImageResId,
-                profileImageResId = profile.profileImageResId,
-                friends = friends,
-                posts = posts
+                userId = "1",
+                name = "Maria Cejas",
+                username = "@maria_cejas",
+                bio = "Bio de prueba",
+                birthDate = "1 de enero de 2000",
+                friendsCount = 0,
+                garmentsCount = 0,
+                wardrobeUsagePercentage = 0,
+                favoriteOutfitsCount = 0,
+                plannedOutfitsCount = 0,
+                bannerImageResId = R.drawable.banner_default,
+                profileImageResId = R.drawable.avatar_default,
+                bannerImageUrl = null,
+                profileImageUrl = null,
+                friends = emptyList(),
+                posts = emptyList()
             ),
             onLikeClick = {},
             onUpdatePostTitle = { _, _ -> },

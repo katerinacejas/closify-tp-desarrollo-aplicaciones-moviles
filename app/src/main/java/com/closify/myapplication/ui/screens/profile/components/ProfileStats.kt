@@ -8,10 +8,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.closify.myapplication.R
 
 private data class ProfileStatItem(
     val value: String,
@@ -27,10 +29,10 @@ fun ProfileStats(
     modifier: Modifier = Modifier
 ) {
     val stats = listOf(
-        ProfileStatItem(garmentsCount.toString(), "prendas"),
-        ProfileStatItem("$wardrobeUsage%", "guardarropa en uso"),
-        ProfileStatItem(favoriteOutfits.toString(), "outfit fav"),
-        ProfileStatItem(plannedOutfits.toString(), "outfits planificados")
+        ProfileStatItem(garmentsCount.toString(), stringResource(R.string.profile_stats_garments)),
+        ProfileStatItem("$wardrobeUsage%", stringResource(R.string.profile_stats_wardrobe_usage)),
+        ProfileStatItem(favoriteOutfits.toString(), stringResource(R.string.profile_stats_favorites)),
+        ProfileStatItem(plannedOutfits.toString(), stringResource(R.string.profile_stats_planned))
     )
 
     Row(

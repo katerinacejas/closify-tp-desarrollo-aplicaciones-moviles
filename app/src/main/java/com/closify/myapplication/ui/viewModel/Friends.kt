@@ -1,6 +1,15 @@
 package com.closify.myapplication.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
@@ -10,6 +19,8 @@ import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 enum class FriendRelationshipStatus {
     FRIEND,
@@ -33,15 +44,20 @@ data class FriendsUiState(
     val otherSearchResults: List<FriendSearchResult> = emptyList(),
     val commentDrafts: Map<String, String> = emptyMap(),
     val posts: List<OutfitPost> = emptyList(),
-    val hasUnreadNotifications: Boolean = false
+    val hasUnreadNotifications: Boolean = false,
+    val isOffline: Boolean = false,
+    val isLoading: Boolean = true
 )
 
 class FriendsViewModel(
+    application: Application,
     private val socialRepository: SocialRepository = SocialRepository.instance,
     private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
-) : ViewModel() {
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(
         FriendsUiState(currentUser = userRepository.getCurrentUserOrDefault().toSummary())
@@ -50,110 +66,195 @@ class FriendsViewModel(
     private var friendIds: Set<String> = emptySet()
 
     init {
-        loadFeed()
+        viewModelScope.launch {
+            val offline = !isConnected()
+            _uiState.update { it.copy(isOffline = offline) }
+            if (!offline) {
+                val userId = userRepository.currentUserId
+                if (userId.isNotBlank()) {
+                    socialRepository.syncSocialData(userId)
+                    outfitPostRepository.syncFromFirestore()
+                }
+            }
+            loadFeed()
+        }
     }
 
     fun refresh() {
-        loadFeed()
+        viewModelScope.launch {
+            val offline = !isConnected()
+            _uiState.update { it.copy(isOffline = offline) }
+            if (!offline) {
+                val userId = userRepository.currentUserId
+                if (userId.isNotBlank()) {
+                    socialRepository.resetSessionSync()
+                    outfitPostRepository.resetSessionSync()
+                    socialRepository.syncSocialData(userId)
+                    outfitPostRepository.syncFromFirestore()
+                }
+            }
+            loadFeed()
+        }
     }
 
     private fun loadFeed() {
-        val user = userRepository.getCurrentUserOrDefault().toSummary()
-        friendIds = socialRepository.getFriends(user.id).map { it.id }.toSet()
-        _uiState.value = _uiState.value.copy(
-            currentUser = user,
-            friendsCount = friendIds.size,
-            posts = outfitPostRepository.getPostsByAuthors(friendIds),
-            hasUnreadNotifications = notificationRepository.getUnreadCount(user.id) > 0
-        )
+        if (_uiState.value.isOffline) {
+            _uiState.update { it.copy(isLoading = false) }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val user = userRepository.getCurrentUserOrDefault().toSummary()
+            friendIds = socialRepository.getFriends(user.id).map { it.id }.toSet()
+            val posts = outfitPostRepository.getPostsByAuthors(friendIds)
+            val unreadCount = notificationRepository.getUnreadCount(user.id)
+
+            _uiState.update {
+                it.copy(
+                    currentUser = user,
+                    friendsCount = friendIds.size,
+                    posts = posts,
+                    hasUnreadNotifications = unreadCount > 0,
+                    isLoading = false
+                )
+            }
+        }
     }
 
     fun onSearchQueryChange(query: String) {
-        val currentState = _uiState.value
-        val allResults = socialRepository.searchUserSummariesByName(
-            query = query,
-            userId = currentState.currentUser.id
-        ).map { user ->
-            FriendSearchResult(
-                user = user,
-                relationshipStatus = relationshipStatusFor(user.id)
-            )
-        }
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            val currentUserId = currentState.currentUser.id
+            val allUsers = socialRepository.searchUserSummariesByName(query, currentUserId)
 
-        _uiState.value = currentState.copy(
-            searchQuery = query,
-            friendSearchResults = allResults.filter { it.isFriend },
-            otherSearchResults = allResults.filterNot { it.isFriend }
-        )
+            val results = allUsers.map { user ->
+                FriendSearchResult(
+                    user = user,
+                    relationshipStatus = relationshipStatusFor(user.id, currentUserId)
+                )
+            }
+
+            _uiState.update {
+                it.copy(
+                    searchQuery = query,
+                    friendSearchResults = results.filter { it.isFriend },
+                    otherSearchResults = results.filterNot { it.isFriend }
+                )
+            }
+        }
     }
 
     fun onToggleFriend(userId: String) {
-        val currentUserId = _uiState.value.currentUser.id
-        if (userId in friendIds) {
-            socialRepository.removeFriend(currentUserId, userId)
-        } else {
-            socialRepository.sendFriendRequest(currentUserId, userId)
+        viewModelScope.launch {
+            val currentUserId = _uiState.value.currentUser.id
+            val wasFriend = userId in friendIds
+            val operationResult = if (wasFriend) {
+                runCatching { socialRepository.removeFriend(currentUserId, userId) }
+            } else {
+                socialRepository.sendFriendRequest(currentUserId, userId)
+            }
+
+            operationResult
+                .onSuccess {
+                    analyticsTracker.track(
+                        if (wasFriend) AnalyticsEvents.friendRemoved("friends")
+                        else AnalyticsEvents.friendRequestSent("friends")
+                    )
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "social",
+                            "operation" to if (wasFriend) "remove_friend" else "send_friend_request",
+                            "surface" to "friends"
+                        )
+                    )
+                }
+
+            friendIds = socialRepository.getFriends(currentUserId).map { it.id }.toSet()
+            val posts = outfitPostRepository.getPostsByAuthors(friendIds)
+
+            _uiState.update { state ->
+                val allSearchResults = (state.friendSearchResults + state.otherSearchResults)
+                    .distinctBy { it.user.id }
+
+                val updatedResults = allSearchResults.map { item ->
+                    item.copy(relationshipStatus = relationshipStatusFor(item.user.id, currentUserId))
+                }
+
+                state.copy(
+                    friendsCount = friendIds.size,
+                    posts = posts,
+                    friendSearchResults = updatedResults.filter { it.isFriend },
+                    otherSearchResults = updatedResults.filterNot { it.isFriend }
+                )
+            }
         }
-        friendIds = socialRepository.getFriends(currentUserId).map { it.id }.toSet()
-
-        val currentState = _uiState.value
-
-        val updatedSearchResults = (currentState.friendSearchResults + currentState.otherSearchResults)
-            .distinctBy { it.user.id }
-            .map { it.copy(relationshipStatus = relationshipStatusFor(it.user.id)) }
-
-        _uiState.value = currentState.copy(
-            friendsCount = friendIds.size,
-            posts = outfitPostRepository.getPostsByAuthors(friendIds),
-            friendSearchResults = updatedSearchResults.filter { it.isFriend },
-            otherSearchResults = updatedSearchResults.filterNot { it.isFriend }
-        )
     }
 
     fun onCommentDraftChange(postId: String, value: String) {
-        _uiState.value = _uiState.value.copy(
-            commentDrafts = _uiState.value.commentDrafts + (postId to value)
-        )
+        _uiState.update { it.copy(commentDrafts = it.commentDrafts + (postId to value)) }
     }
 
     fun onLikeClick(postId: String) {
-        val updatedPost = outfitPostRepository.toggleLike(
-            postId = postId,
-            user = _uiState.value.currentUser
-        ) ?: return
-
-        replacePost(updatedPost)
+        viewModelScope.launch {
+            val updatedPost = outfitPostRepository.toggleLike(
+                postId = postId,
+                user = _uiState.value.currentUser
+            ) ?: return@launch
+            analyticsTracker.track(AnalyticsEvents.postLiked("friends"))
+            replacePost(updatedPost)
+        }
     }
 
     fun onSendComment(postId: String) {
-        val text = _uiState.value.commentDrafts[postId].orEmpty()
-        val currentState = _uiState.value
-        val updatedPost = outfitPostRepository.addComment(
-            postId = postId,
-            user = currentState.currentUser,
-            text = text
-        ) ?: return
+        viewModelScope.launch {
+            val text = _uiState.value.commentDrafts[postId].orEmpty()
+            val user = _uiState.value.currentUser
+            val updatedPost = outfitPostRepository.addComment(
+                postId = postId,
+                user = user,
+                text = text
+            ) ?: return@launch
 
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post -> if (post.id == postId) updatedPost else post },
-            commentDrafts = currentState.commentDrafts - postId
-        )
+            analyticsTracker.track(AnalyticsEvents.commentSent("friends"))
+            _uiState.update {
+                it.copy(
+                    posts = it.posts.map { post -> if (post.id == postId) updatedPost else post },
+                    commentDrafts = it.commentDrafts - postId
+                )
+            }
+        }
     }
 
     private fun replacePost(updatedPost: OutfitPost) {
-        _uiState.value = _uiState.value.copy(
-            posts = _uiState.value.posts.map { post ->
-                if (post.id == updatedPost.id) updatedPost else post
-            }
-        )
+        _uiState.update { state ->
+            state.copy(posts = state.posts.map { if (it.id == updatedPost.id) updatedPost else it })
+        }
     }
 
-    private fun relationshipStatusFor(userId: String): FriendRelationshipStatus {
-        val currentUserId = _uiState.value.currentUser.id
+    private suspend fun relationshipStatusFor(userId: String, currentUserId: String): FriendRelationshipStatus {
         return when {
             userId in friendIds -> FriendRelationshipStatus.FRIEND
             socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) != null -> FriendRelationshipStatus.OUTGOING_PENDING
             else -> FriendRelationshipStatus.NONE
         }
+    }
+
+    private fun isConnected(): Boolean {
+        val cm = getApplication<Application>().getSystemService(ConnectivityManager::class.java)
+        val network = cm.activeNetwork ?: return false
+        val caps = cm.getNetworkCapabilities(network) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    companion object {
+        fun factory(application: Application): ViewModelProvider.Factory =
+            object : ViewModelProvider.AndroidViewModelFactory(application) {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
+                    FriendsViewModel(application) as T
+            }
     }
 }

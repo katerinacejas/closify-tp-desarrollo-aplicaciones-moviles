@@ -1,7 +1,8 @@
 package com.closify.myapplication.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.closify.myapplication.R
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
 
@@ -80,7 +82,7 @@ fun OutfitPostCard(
                 )
             }
             Text(
-                text = post.dateLabel,
+                text = post.getDateLabel(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -93,25 +95,17 @@ fun OutfitPostCard(
             ) {
                 post.outfit.garments.forEach { garment ->
                     val context = LocalContext.current
-                    val resName = garment.imageUrl.substringAfterLast("/")
-                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) {
-                        Image(
-                            painter = painterResource(id = resId),
-                            contentDescription = garment.name,
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .padding(4.dp)
-                        )
-                    }
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(garment.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = garment.name,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                    )
                 }
             }
 
@@ -126,7 +120,7 @@ fun OutfitPostCard(
                     IconButton(onClick = onLikeClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = if (isLikedByCurrentUser) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                            contentDescription = "Me gusta",
+                            contentDescription = stringResource(R.string.common_like),
                             modifier = Modifier.size(22.dp),
                             tint = if (isLikedByCurrentUser) {
                                 MaterialTheme.colorScheme.secondary
@@ -137,7 +131,7 @@ fun OutfitPostCard(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${post.likesCount} me gustas",
+                        text = stringResource(R.string.post_likes_count, post.likesCount),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.clickable(
@@ -152,14 +146,14 @@ fun OutfitPostCard(
                     IconButton(onClick = onCommentsClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = Icons.Rounded.ChatBubbleOutline,
-                            contentDescription = "Comentarios",
+                            contentDescription = stringResource(R.string.common_comments),
                             modifier = Modifier.size(21.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f)
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${post.commentsCount} comentarios",
+                        text = stringResource(R.string.post_comments_count, post.commentsCount),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.clickable(
@@ -174,7 +168,7 @@ fun OutfitPostCard(
                     IconButton(onClick = onEditClick, modifier = Modifier.size(28.dp)) {
                         Icon(
                             imageVector = Icons.Rounded.Edit,
-                            contentDescription = "Editar",
+                            contentDescription = stringResource(R.string.common_edit),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.62f),
                             modifier = Modifier.size(20.dp)
                         )
@@ -195,8 +189,9 @@ private fun OutfitPostAuthor(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = post.author.profileImageResId),
+        UserAvatarImage(
+            imageUrl = post.author.profileImageUrl,
+            fallbackImageResId = post.author.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(54.dp)
@@ -237,8 +232,8 @@ private fun OutfitPostAuthor(
     }
 }
 
-private val OutfitPost.dateLabel: String
-    get() = when (type) {
-        OutfitPostType.FAVORITE -> "Anadido a favoritos el: $createdAt"
-        OutfitPostType.PLANNED -> "Planificado para el dia: ${plannedDate ?: createdAt}"
-    }
+@Composable
+fun OutfitPost.getDateLabel(): String = when (type) {
+    OutfitPostType.FAVORITE -> stringResource(R.string.post_favorite_date, createdAt)
+    OutfitPostType.PLANNED -> stringResource(R.string.post_planned_date, plannedDate ?: createdAt)
+}

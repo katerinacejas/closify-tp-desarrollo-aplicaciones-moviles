@@ -1,52 +1,102 @@
 package com.closify.myapplication.data.repository
 
+import android.content.Context
+import com.closify.myapplication.data.local.AppDatabase
+import com.closify.myapplication.data.local.mapper.toDomain
+import com.closify.myapplication.data.local.mapper.toEntity
+import com.closify.myapplication.data.local.mapper.toFirestoreMap
+import com.closify.myapplication.data.local.mapper.toOutfitEntity
+import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
-import com.closify.myapplication.domain.model.Garment
-import com.closify.myapplication.domain.model.SuggestedOutfit
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
 
-class OutfitRepository(
-    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance
+class OutfitRepository private constructor(
+    context: Context
 ) {
+    private val outfitPostRepository: OutfitPostRepository by lazy { OutfitPostRepository.instance }
 
     companion object {
-        val instance = OutfitRepository()
+        @Volatile private var _instance: OutfitRepository? = null
+
+        fun initialize(context: Context) {
+            if (_instance == null) {
+                synchronized(this) {
+                    if (_instance == null) {
+                        _instance = OutfitRepository(context.applicationContext)
+                    }
+                }
+            }
+        }
+
+        val instance: OutfitRepository
+            get() = _instance ?: error("OutfitRepository.initialize(context) no fue llamado.")
     }
 
-    // Outfits generados por HomeViewModel — leídos por OutfitResultViewModel
-    var currentOutfits: List<Outfit> = emptyList()
+    private val outfitDao = AppDatabase.getInstance(context).outfitDao()
+    private val garmentDao = AppDatabase.getInstance(context).garmentDao()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // Outfits seleccionados para guardar — leídos por SaveFavoritesViewModel
+    // Estado temporal de navegación — no necesita persistirse
+    var currentOutfits: List<Outfit> = emptyList()
     var pendingFavorites: List<Outfit> = emptyList()
 
     fun setPendingFavorites(outfits: List<Outfit>, favoriteIds: Set<String>) {
         pendingFavorites = outfits.filter { it.id in favoriteIds }
     }
 
-    // Favoritos guardados en memoria
-    // TODO: reemplazar por Firebase Firestore
-    private val _favoriteOutfits = mutableListOf<Outfit>()
-    val favoriteOutfits: List<Outfit> get() = _favoriteOutfits.toList()
+    suspend fun syncFromFirestore(userId: String) {
+        try {
+            val snapshot = firestore.collection("users/$userId/outfits").get().await()
+            val entities = snapshot.documents.mapNotNull { it.toOutfitEntity() }
+            
+            if (entities.isEmpty()) {
+                outfitDao.deleteAllByUserId(userId)
+            } else {
+                outfitDao.upsertAll(entities)
+                outfitDao.deleteNotInList(userId, entities.map { it.id })
+            }
+        } catch (e: Exception) {
+            // Sin conexión — Room ya tiene los datos del último sync
+        }
+    }
 
-    fun saveFavorites(outfits: List<Outfit>) {
+    suspend fun isFavorite(outfitId: String): Boolean =
+        outfitDao.getById(outfitId) != null
+
+    suspend fun saveFavorites(outfits: List<Outfit>) {
+        val userId = UserRepository.instance.currentUserId
         val author = UserRepository.instance.getCurrentUserOrDefault().toSummary()
         val createdAt = LocalDate.now().format(
-            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+            DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
         )
         outfits.forEach { outfit ->
-            if (_favoriteOutfits.none { it.id == outfit.id }) {
-                _favoriteOutfits.add(outfit)
+            val outfitWithOwner = outfit.copy(ownerUserId = userId)
+            if (outfitDao.getById(outfitWithOwner.id) == null) {
+                outfitDao.upsert(outfitWithOwner.toEntity())
+                scope.launch {
+                    firestore.collection("users/$userId/outfits")
+                        .document(outfitWithOwner.id)
+                        .set(outfitWithOwner.toFirestoreMap())
+                        .await()
+                }
                 outfitPostRepository.addPost(
                     OutfitPost(
                         id = UUID.randomUUID().toString(),
                         author = author,
-                        outfit = outfit,
-                        title = outfit.name,
+                        outfit = outfitWithOwner,
+                        title = outfitWithOwner.name,
                         type = OutfitPostType.FAVORITE,
                         createdAt = createdAt
                     )
@@ -55,7 +105,7 @@ class OutfitRepository(
         }
     }
 
-    fun saveFavorites(outfits: List<Outfit>, outfitNames: Map<String, String>) {
+    suspend fun saveFavorites(outfits: List<Outfit>, outfitNames: Map<String, String>) {
         saveFavorites(
             outfits.map { outfit ->
                 outfit.copy(name = outfitNames[outfit.id]?.trim()?.ifEmpty { null })
@@ -63,41 +113,68 @@ class OutfitRepository(
         )
     }
 
-    fun toggleFavorite(outfitId: String) {
-        val existing = _favoriteOutfits.find { it.id == outfitId }
+    suspend fun toggleFavorite(outfitId: String) {
+        val existing = outfitDao.getById(outfitId)
         if (existing != null) {
-            _favoriteOutfits.remove(existing)
+            outfitDao.deleteById(outfitId)
+            scope.launch {
+                val userId = UserRepository.instance.currentUserId
+                firestore.collection("users/$userId/outfits").document(outfitId).delete().await()
+            }
         } else {
-            currentOutfits.find { it.id == outfitId }?.let {
-                _favoriteOutfits.add(it)
+            currentOutfits.find { it.id == outfitId }?.let { outfit ->
+                outfitDao.upsert(outfit.toEntity())
+                scope.launch {
+                    firestore.collection("users/${outfit.ownerUserId}/outfits")
+                        .document(outfit.id)
+                        .set(outfit.toFirestoreMap())
+                        .await()
+                }
             }
         }
     }
 
-    fun isFavorite(outfitId: String): Boolean =
-        _favoriteOutfits.any { it.id == outfitId }
+    suspend fun getFavoriteOutfits(userId: String): List<Outfit> {
+        val entities = outfitDao.getAllByUserId(userId)
+        return entities.mapNotNull { entity ->
+            val garmentIds = entity.garmentIds.split(",").filter { it.isNotBlank() }
+            val garments = garmentIds.mapNotNull { garmentDao.getById(it)?.toDomain() }
+            entity.toDomain(garments)
+        }
+    }
 
-    fun getSuggestedOutfits(): List<SuggestedOutfit> =
-        MockClosifyData.suggestedOutfits
-
-    fun getFavoritePosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
+    suspend fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
-    fun getPlannedPosts(userId: String = MockClosifyData.CURRENT_USER_ID): List<OutfitPost> =
+    suspend fun getOutfitById(outfitId: String): Outfit? {
+        val entity = outfitDao.getById(outfitId) ?: return currentOutfits.find { it.id == outfitId }
+        val garmentIds = entity.garmentIds.split(",").filter { it.isNotBlank() }
+        val garments = garmentIds.mapNotNull { garmentDao.getById(it)?.toDomain() }
+        return entity.toDomain(garments)
+    }
+
+    suspend fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.PLANNED }
 
-    fun savePlannedOutfitPost(
+    suspend fun savePlannedOutfitPost(
         userId: String,
         title: String?,
         outfit: Outfit,
         plannedDate: String,
         createdAt: String
     ): OutfitPost? {
-        val author = MockClosifyData.userById(userId)?.toSummary() ?: return null
+        val author = UserRepository.instance.getCurrentUser()?.toSummary() ?: return null
+        val outfitWithOwner = outfit.copy(ownerUserId = userId)
+        
+        // Persistir el outfit para que el post pueda reconstruirse
+        if (outfitDao.getById(outfitWithOwner.id) == null) {
+            outfitDao.upsert(outfitWithOwner.toEntity())
+        }
+
         val post = OutfitPost(
-            id = "planned_post_${MockClosifyData.outfitPosts.size + 1}",
+            id = UUID.randomUUID().toString(),
             author = author,
-            outfit = outfit.copy(ownerUserId = userId),
+            outfit = outfitWithOwner,
             title = title?.take(100)?.ifBlank { null },
             type = OutfitPostType.PLANNED,
             createdAt = createdAt,
@@ -106,7 +183,7 @@ class OutfitRepository(
         return outfitPostRepository.addPost(post)
     }
 
-    fun savePlanning(
+    suspend fun savePlanning(
         userId: String,
         title: String,
         garments: List<Garment>,
@@ -140,28 +217,35 @@ class OutfitRepository(
         }
     }
 
-    fun updatePlannedOutfitPost(
+    suspend fun updatePlannedOutfitPost(
         postId: String,
         title: String?,
         outfit: Outfit,
         plannedDate: String
     ): OutfitPost? {
         val currentPost = outfitPostRepository.getPost(postId) ?: return null
+        val outfitWithOwner = outfit.copy(ownerUserId = currentPost.author.id)
+        
+        // Asegurar que el nuevo outfit esté persistido
+        if (outfitDao.getById(outfitWithOwner.id) == null) {
+            outfitDao.upsert(outfitWithOwner.toEntity())
+        }
+
         val updatedPost = currentPost.copy(
-            outfit = outfit.copy(ownerUserId = currentPost.author.id),
+            outfit = outfitWithOwner,
             title = title?.take(100)?.ifBlank { null },
             plannedDate = plannedDate
         )
         return outfitPostRepository.updatePost(updatedPost)
     }
 
-    fun deletePlannedOutfitPost(postId: String) {
+    suspend fun deletePlannedOutfitPost(postId: String) {
         outfitPostRepository.deletePost(postId)
     }
 
-    fun getPlannedPostById(postId: String): OutfitPost? =
+    suspend fun getPlannedPostById(postId: String): OutfitPost? =
         outfitPostRepository.getPost(postId)?.takeIf { it.type == OutfitPostType.PLANNED }
 
-    fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
+    suspend fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
         getPlannedPosts(userId).firstOrNull { it.plannedDate == plannedDate }
 }
