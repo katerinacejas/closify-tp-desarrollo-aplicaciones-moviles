@@ -479,16 +479,9 @@ private fun FriendRequestActions(
 @Composable
 private fun NotificationsContentPreview() {
     ClosifyTheme {
-        val repository = NotificationRepository.instance
-        val outfitPostRepository = OutfitPostRepository.instance
         NotificationsContent(
             uiState = NotificationsUiState(
-                notifications = repository.getNotifications().map {
-                    NotificationUiItem(
-                        notification = it,
-                        post = it.postId?.let(outfitPostRepository::getPost)
-                    )
-                }
+                notifications = emptyList()
             ),
             onOpenUserProfile = {},
             onOpenPostInProfile = {},

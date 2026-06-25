@@ -2,6 +2,9 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.data.repository.NotificationRepository
+import com.closify.myapplication.data.repository.OutfitPostRepository
+import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +33,9 @@ class MainViewModel : ViewModel() {
 
     fun onLogout() {
         UserRepository.instance.logout()
+        OutfitPostRepository.instance.resetSessionSync()
+        SocialRepository.instance.resetSessionSync()
+        NotificationRepository.instance.resetSessionSync()
         hasLoggedOutOnce = true
         _isLoggedIn.value = false
     }

@@ -60,10 +60,22 @@ class UserRepository private constructor(context: Context) {
 
     fun getCurrentUser(): User? = _currentUser.value
 
-    fun getCurrentUserOrDefault(): User = _currentUser.value ?: MockClosifyData.currentUser
+    fun getCurrentUserOrDefault(): User = _currentUser.value
+        ?: error("getCurrentUserOrDefault() llamado sin usuario logueado.")
 
-    fun getUserById(userId: String): User? =
-        MockClosifyData.authUserById(userId) ?: MockClosifyData.userById(userId)
+    suspend fun getUserById(userId: String): User? {
+        val entity = userDao.getById(userId)
+        if (entity != null) return entity.toDomain()
+        
+        return try {
+            val doc = firestore.collection("users").document(userId).get().await()
+            val remoteEntity = doc.toUserEntity() ?: return null
+            userDao.upsert(remoteEntity)
+            remoteEntity.toDomain()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     // Restaura la sesión al abrir la app si ya había un usuario logueado
     suspend fun restoreSession() {
@@ -71,9 +83,9 @@ class UserRepository private constructor(context: Context) {
         val entity = userDao.getById(uid)
         if (entity != null) {
             _currentUser.value = entity.toDomain()
-        } else {
-            fetchAndCacheFromFirestore(uid)
         }
+        // Siempre sincroniza desde Firestore para tener datos frescos
+        fetchAndCacheFromFirestore(uid)
     }
 
     suspend fun login(email: String, password: String): Result<Unit> {
@@ -99,7 +111,7 @@ class UserRepository private constructor(context: Context) {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: throw Exception("No se pudo crear el usuario.")
             val createdAt = LocalDate.now().format(
-                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
             )
             val user = User(
                 id = uid,
@@ -205,7 +217,9 @@ class UserRepository private constructor(context: Context) {
     private suspend fun fetchAndCacheFromFirestore(uid: String) {
         try {
             val doc = firestore.collection("users").document(uid).get().await()
+            if (!doc.exists()) return
             val entity = doc.toUserEntity() ?: return
+            if (entity.fullName.isBlank() && entity.username.isBlank()) return
             userDao.upsert(entity)
             _currentUser.value = entity.toDomain()
         } catch (e: Exception) {
