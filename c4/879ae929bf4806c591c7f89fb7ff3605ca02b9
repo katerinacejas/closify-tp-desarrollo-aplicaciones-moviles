@@ -1,0 +1,22 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/Planner.kt
+  h_e38f44ce52ca59 86,88,106
+app/src/main/java/com/closify/myapplication/data/repository/OutfitRepository.kt
+  h_e38f44ce52ca59 143-147,161-167,171,221-227,229
+app/src/main/java/com/closify/myapplication/data/repository/OutfitPostRepository.kt
+  h_e38f44ce52ca59 165
+app/src/main/java/com/closify/myapplication/ui/viewModel/Main.kt
+  h_e38f44ce52ca59 5,8,28,35-47
+app/src/main/AndroidManifest.xml
+  h_e38f44ce52ca59 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "c4879ae929bf4806c591c7f89fb7ff3605ca02b9",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
