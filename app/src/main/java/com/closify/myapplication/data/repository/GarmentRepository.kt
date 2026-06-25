@@ -61,7 +61,13 @@ class GarmentRepository private constructor(context: Context) {
         try {
             val snapshot = firestore.collection("users/$userId/garments").get().await()
             val entities = snapshot.documents.mapNotNull { it.toGarmentEntity() }
-            garmentDao.upsertAll(entities)
+            
+            if (entities.isEmpty()) {
+                garmentDao.deleteAllByUserId(userId)
+            } else {
+                garmentDao.upsertAll(entities)
+                garmentDao.deleteNotInList(userId, entities.map { it.id })
+            }
         } catch (e: Exception) {
             // Sin conexión — Room ya tiene los datos del último sync
         }

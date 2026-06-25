@@ -26,4 +26,10 @@ interface GarmentDao {
 
     @Query("DELETE FROM garments WHERE id = :id AND ownerUserId = :userId")
     suspend fun delete(id: String, userId: String)
+
+    @Query("DELETE FROM garments WHERE ownerUserId = :userId AND id NOT IN (:remainingIds)")
+    suspend fun deleteNotInList(userId: String, remainingIds: List<String>)
+
+    @Query("DELETE FROM garments WHERE ownerUserId = :userId")
+    suspend fun deleteAllByUserId(userId: String)
 }

@@ -56,4 +56,7 @@ interface OutfitPostDao {
     
     @Query("DELETE FROM outfit_posts")
     suspend fun deleteAllPosts()
+
+    @Query("DELETE FROM outfit_posts WHERE id NOT IN (:remainingIds)")
+    suspend fun deleteNotInList(remainingIds: List<String>)
 }

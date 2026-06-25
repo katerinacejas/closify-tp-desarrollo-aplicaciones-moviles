@@ -91,8 +91,9 @@ class PlannerViewModel(
 
     private val _uiState = MutableStateFlow(PlannerUiState(
         selectedDate = today,
-        visibleMonth = java.time.YearMonth.from(today),
-        dateInput = today.format(PlannerDateFormatter)
+        visibleMonth = YearMonth.from(today),
+        dateInput = today.format(PlannerDateFormatter),
+        plannedPosts = emptyList()
     ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 

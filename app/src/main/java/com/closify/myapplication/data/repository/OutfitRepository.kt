@@ -60,7 +60,13 @@ class OutfitRepository private constructor(
         try {
             val snapshot = firestore.collection("users/$userId/outfits").get().await()
             val entities = snapshot.documents.mapNotNull { it.toOutfitEntity() }
-            outfitDao.upsertAll(entities)
+            
+            if (entities.isEmpty()) {
+                outfitDao.deleteAllByUserId(userId)
+            } else {
+                outfitDao.upsertAll(entities)
+                outfitDao.deleteNotInList(userId, entities.map { it.id })
+            }
         } catch (e: Exception) {
             // Sin conexión — Room ya tiene los datos del último sync
         }
@@ -140,6 +146,13 @@ class OutfitRepository private constructor(
     suspend fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
+    suspend fun getOutfitById(outfitId: String): Outfit? {
+        val entity = outfitDao.getById(outfitId) ?: return currentOutfits.find { it.id == outfitId }
+        val garmentIds = entity.garmentIds.split(",").filter { it.isNotBlank() }
+        val garments = garmentIds.mapNotNull { garmentDao.getById(it)?.toDomain() }
+        return entity.toDomain(garments)
+    }
+
     suspend fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.PLANNED }
 
@@ -151,10 +164,17 @@ class OutfitRepository private constructor(
         createdAt: String
     ): OutfitPost? {
         val author = UserRepository.instance.getCurrentUser()?.toSummary() ?: return null
+        val outfitWithOwner = outfit.copy(ownerUserId = userId)
+        
+        // Persistir el outfit para que el post pueda reconstruirse
+        if (outfitDao.getById(outfitWithOwner.id) == null) {
+            outfitDao.upsert(outfitWithOwner.toEntity())
+        }
+
         val post = OutfitPost(
             id = UUID.randomUUID().toString(),
             author = author,
-            outfit = outfit.copy(ownerUserId = userId),
+            outfit = outfitWithOwner,
             title = title?.take(100)?.ifBlank { null },
             type = OutfitPostType.PLANNED,
             createdAt = createdAt,
@@ -204,8 +224,15 @@ class OutfitRepository private constructor(
         plannedDate: String
     ): OutfitPost? {
         val currentPost = outfitPostRepository.getPost(postId) ?: return null
+        val outfitWithOwner = outfit.copy(ownerUserId = currentPost.author.id)
+        
+        // Asegurar que el nuevo outfit esté persistido
+        if (outfitDao.getById(outfitWithOwner.id) == null) {
+            outfitDao.upsert(outfitWithOwner.toEntity())
+        }
+
         val updatedPost = currentPost.copy(
-            outfit = outfit.copy(ownerUserId = currentPost.author.id),
+            outfit = outfitWithOwner,
             title = title?.take(100)?.ifBlank { null },
             plannedDate = plannedDate
         )

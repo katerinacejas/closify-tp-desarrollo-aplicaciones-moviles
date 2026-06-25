@@ -162,9 +162,7 @@ class OutfitPostRepository private constructor(
 
     private suspend fun assemblePost(entity: com.closify.myapplication.data.local.entity.OutfitPostEntity): OutfitPost? {
         val author = userDao.getById(entity.authorId)?.toDomain()?.toSummary() ?: return null
-        val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId } 
-            ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId } // Fallback to current if generated
-            ?: return null
+        val outfit = outfitRepository.getOutfitById(entity.outfitId) ?: return null
             
         val likes = postDao.getLikesForPost(entity.id).mapNotNull { likeEntity ->
             val likeUser = userDao.getById(likeEntity.userId)?.toDomain()?.toSummary()
@@ -182,10 +180,15 @@ class OutfitPostRepository private constructor(
     suspend fun syncFromFirestore() {
         if (syncedThisSession) return
         try {
-            // This is a simplified global sync. In a real app we might only sync followed users.
             val snapshot = firestore.collection("outfit_posts").get().await()
             val posts = snapshot.documents.mapNotNull { it.toOutfitPostEntity() }
-            postDao.upsertPosts(posts)
+            
+            if (posts.isEmpty()) {
+                postDao.deleteAllPosts()
+            } else {
+                postDao.upsertPosts(posts)
+                postDao.deleteNotInList(posts.map { it.id })
+            }
             
             // Sync likes and comments for each post (can be heavy, should be optimized)
             posts.forEach { post ->
