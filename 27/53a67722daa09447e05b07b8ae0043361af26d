@@ -1,0 +1,46 @@
+app/src/main/java/com/closify/myapplication/ui/screens/friends/FriendsContent.kt
+  s_ef187569660cfa::t_23753d6e4e760c 30,35
+  s_ef187569660cfa::t_2922802696da40 68,79,82-83
+  s_ef187569660cfa::t_dca5322ff936a0 41-42
+  s_ef187569660cfa::t_f5bc2ffb053019 120-130,132
+  s_ef187569660cfa::t_38e220a4b8c5c4 211
+app/build.gradle.kts
+  s_ef187569660cfa::t_d7639c37e400e3 22-26,28-30
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  s_ef187569660cfa::t_69ce0fb9faae6a 146-151,156,160
+  s_ef187569660cfa::t_e98eea8ab1497b 7
+app/src/main/java/com/closify/myapplication/ui/screens/friends/FriendsScreen.kt
+  s_ef187569660cfa::t_a1b5a2cfbc761e 35-36
+app/src/main/java/com/closify/myapplication/data/remote/CloudinaryService.kt
+  s_ef187569660cfa::t_4e4f5d99095c3a 1-65
+app/src/main/java/com/closify/myapplication/data/repository/OutfitPostRepository.kt
+  s_ef187569660cfa::t_a516cb5a5ab701 9,11,13
+  s_ef187569660cfa::t_68d069e5d9a718 57
+  s_ef187569660cfa::t_d3482c727c56e6 168-173
+  s_ef187569660cfa::t_4024b818240cca 215-245
+app/src/main/java/com/closify/myapplication/data/local/mapper/SocialMapper.kt
+  s_ef187569660cfa::t_9b74b582a69c73 32
+app/src/main/java/com/closify/myapplication/ui/viewModel/Friends.kt
+  s_ef187569660cfa::t_2589dbc6ecc78a 84-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2753a67722daa09447e05b07b8ae0043361af26d",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
