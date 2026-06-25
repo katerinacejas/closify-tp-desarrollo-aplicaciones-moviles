@@ -19,6 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.ui.components.BottomNavBar
 import com.closify.myapplication.domain.model.GarmentCategory
 import com.closify.myapplication.domain.model.Occasion
@@ -47,10 +49,12 @@ private const val WARDROBE_FLOW_ROUTE = "wardrobe_flow"
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
+    TrackScreenViews(navController = navController, analyticsTracker = analyticsTracker)
 
     Scaffold(
         bottomBar = {

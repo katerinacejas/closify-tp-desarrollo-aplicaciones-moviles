@@ -2,6 +2,10 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
@@ -55,7 +59,9 @@ class HomeViewModel(
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
     private val weatherRepository: WeatherRepository = WeatherRepository.instance,
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private var automaticWeatherJob: Job? = null
@@ -89,6 +95,7 @@ class HomeViewModel(
     }
 
     private fun selectWeather(weather: WeatherCondition) {
+        analyticsTracker.track(AnalyticsEvents.manualWeatherSelected(weather.name))
         _uiState.update {
             it.copy(
                 selectedWeather = weather,
@@ -99,6 +106,7 @@ class HomeViewModel(
     }
 
     private fun selectOccasion(occasion: Occasion) {
+        analyticsTracker.track(AnalyticsEvents.occasionSelected(occasion.name))
         _uiState.update {
             it.copy(
                 selectedOccasion = occasion,
@@ -131,9 +139,13 @@ class HomeViewModel(
                             isGenerateEnabled = it.selectedOccasion != null
                         )
                     }
+                    analyticsTracker.track(AnalyticsEvents.automaticWeatherLoaded(weather.name))
                 }
-                .onFailure {
-                    handleAutomaticWeatherUnavailable()
+                .onFailure { error ->
+                    handleAutomaticWeatherUnavailable(
+                        reason = error.message ?: "weather_request_failed",
+                        throwable = error
+                    )
                 }
         }
     }
@@ -150,8 +162,21 @@ class HomeViewModel(
         }
     }
 
-    private fun handleAutomaticWeatherUnavailable() {
+    private fun handleAutomaticWeatherUnavailable(
+        reason: String = "weather_unavailable",
+        throwable: Throwable? = null
+    ) {
         automaticWeatherJob?.cancel()
+        analyticsTracker.track(AnalyticsEvents.automaticWeatherFailed(reason))
+        throwable?.let {
+            crashReporter.recordException(
+                throwable = it,
+                keys = mapOf(
+                    "feature" to "weather",
+                    "operation" to "current_weather"
+                )
+            )
+        }
         _uiState.update {
             it.copy(
                 selectedWeather = null,
@@ -169,22 +194,70 @@ class HomeViewModel(
         val weather = state.selectedWeather ?: return
         val occasion = state.selectedOccasion ?: return
         val userId = userRepository.currentUserId
+        val weatherMode = if (state.isAutoWeather) "automatic" else "manual"
 
         viewModelScope.launch {
-            val allGarments = garmentRepository.getAllByUserId(userId)
-            if (allGarments.isEmpty()) {
-                _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
-                return@launch
-            }
+            analyticsTracker.track(
+                AnalyticsEvents.outfitGenerationRequested(
+                    weather = weather.name,
+                    occasion = occasion.name,
+                    weatherMode = weatherMode
+                )
+            )
+            runCatching {
+                val allGarments = garmentRepository.getAllByUserId(userId)
+                if (allGarments.isEmpty()) {
+                    analyticsTracker.track(
+                        AnalyticsEvents.outfitGenerationFailed(
+                            reason = "no_garments",
+                            weather = weather.name,
+                            occasion = occasion.name
+                        )
+                    )
+                    _uiState.update { it.copy(dialog = HomeDialog.NO_GARMENTS) }
+                    return@launch
+                }
 
-            val outfits = generateOutfitsUseCase(weather, occasion, userId)
-            if (outfits.isEmpty()) {
+                val outfits = generateOutfitsUseCase(weather, occasion, userId)
+                if (outfits.isEmpty()) {
+                    analyticsTracker.track(
+                        AnalyticsEvents.outfitGenerationFailed(
+                            reason = "no_combinations",
+                            weather = weather.name,
+                            occasion = occasion.name
+                        )
+                    )
+                    _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
+                    return@launch
+                }
+
+                analyticsTracker.track(
+                    AnalyticsEvents.outfitGenerated(
+                        weather = weather.name,
+                        occasion = occasion.name,
+                        resultCount = outfits.size
+                    )
+                )
+                outfitRepository.currentOutfits = outfits
+                _navigationEffect.send(HomeNavigationEffect.NavigateToOutfitResult(outfits))
+            }.onFailure { error ->
+                analyticsTracker.track(
+                    AnalyticsEvents.outfitGenerationFailed(
+                        reason = "unexpected_error",
+                        weather = weather.name,
+                        occasion = occasion.name
+                    )
+                )
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "outfit_generation",
+                        "weather" to weather.name,
+                        "occasion" to occasion.name
+                    )
+                )
                 _uiState.update { it.copy(dialog = HomeDialog.NO_COMBINATIONS) }
-                return@launch
             }
-
-            outfitRepository.currentOutfits = outfits
-            _navigationEffect.send(HomeNavigationEffect.NavigateToOutfitResult(outfits))
         }
     }
 }

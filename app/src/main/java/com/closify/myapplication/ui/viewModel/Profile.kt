@@ -3,6 +3,10 @@ package com.closify.myapplication.ui.viewmodel
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
@@ -39,7 +43,9 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository = ProfileRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance,
     private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -97,6 +103,7 @@ class ProfileViewModel(
                 profileImageResId = currentState.profileImageResId ?: return@launch
             )
             val updatedPost = outfitPostRepository.toggleLike(postId = postId, user = currentUserSummary) ?: return@launch
+            analyticsTracker.track(AnalyticsEvents.postLiked("profile"))
 
             _uiState.update { state ->
                 state.copy(
@@ -110,15 +117,33 @@ class ProfileViewModel(
 
     fun onUpdatePostTitle(postId: String, title: String) {
         viewModelScope.launch {
-            outfitPostRepository.updatePostTitle(postId, title) ?: return@launch
-            refreshProfile()
+            runCatching {
+                outfitPostRepository.updatePostTitle(postId, title) ?: return@launch
+            }.onSuccess {
+                analyticsTracker.track(AnalyticsEvents.postTitleUpdated())
+                refreshProfile()
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf("feature" to "profile", "operation" to "update_post_title")
+                )
+            }
         }
     }
 
     fun onDeletePost(postId: String) {
         viewModelScope.launch {
-            outfitPostRepository.deletePost(postId)
-            refreshProfile()
+            runCatching {
+                outfitPostRepository.deletePost(postId)
+            }.onSuccess {
+                analyticsTracker.track(AnalyticsEvents.postDeleted())
+                refreshProfile()
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf("feature" to "profile", "operation" to "delete_post")
+                )
+            }
         }
     }
 
@@ -127,12 +152,30 @@ class ProfileViewModel(
             val currentState = _uiState.value
             val isFriend = currentState.friends.any { it.id == friendId }
 
-            if (isFriend) {
-                socialRepository.removeFriend(currentState.userId, friendId)
+            val operationResult = if (isFriend) {
+                runCatching { socialRepository.removeFriend(currentState.userId, friendId) }
             } else {
                 // En el perfil solemos enviar solicitud en lugar de agregar directo
                 socialRepository.sendFriendRequest(currentState.userId, friendId)
             }
+
+            operationResult
+                .onSuccess {
+                    analyticsTracker.track(
+                        if (isFriend) AnalyticsEvents.friendRemoved("profile")
+                        else AnalyticsEvents.friendRequestSent("profile")
+                    )
+                }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf(
+                            "feature" to "social",
+                            "operation" to if (isFriend) "remove_friend" else "send_friend_request",
+                            "surface" to "profile"
+                        )
+                    )
+                }
 
             val friends = socialRepository.getFriends(currentState.userId)
             _uiState.update { it.copy(

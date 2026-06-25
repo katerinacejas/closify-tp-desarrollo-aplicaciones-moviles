@@ -2,6 +2,9 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SecurityViewModel(
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) : ViewModel() {
 
     private val _currentPassword = MutableStateFlow("")
@@ -70,6 +74,7 @@ class SecurityViewModel(
                 currentPassword = _currentPassword.value,
                 newPassword = _newPassword.value
             ).onSuccess {
+                analyticsTracker.track(AnalyticsEvents.passwordChanged())
                 _currentPassword.value = ""
                 _newPassword.value = ""
                 _confirmPassword.value = ""
@@ -78,6 +83,7 @@ class SecurityViewModel(
                 _confirmError.value = null
                 _successMessage.value = "Contraseña actualizada correctamente."
             }.onFailure { error ->
+                analyticsTracker.track(AnalyticsEvents.passwordChangeFailed(error.message))
                 _currentPasswordError.value = error.message
                 _successMessage.value = null
             }
