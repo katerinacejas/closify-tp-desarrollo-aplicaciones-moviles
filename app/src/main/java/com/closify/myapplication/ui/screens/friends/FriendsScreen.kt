@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -15,7 +16,11 @@ import com.closify.myapplication.ui.viewmodel.FriendsViewModel
 fun FriendsScreen(
     onNotificationsClick: () -> Unit,
     onOpenUserProfile: (String) -> Unit,
-    viewModel: FriendsViewModel = viewModel()
+    viewModel: FriendsViewModel = viewModel(
+        factory = FriendsViewModel.factory(
+            LocalContext.current.applicationContext as android.app.Application
+        )
+    )
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current

@@ -14,6 +14,7 @@ import com.closify.myapplication.domain.model.UserSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class PublicProfileUiState(
     val currentUser: UserSummary,
@@ -56,84 +57,99 @@ class PublicProfileViewModel(
         val userId = profileUserId ?: return
         viewModelScope.launch {
             val currentUser = userRepository.getCurrentUserOrDefault().toSummary()
-            val profile = profileRepository.getUserProfile(userId) ?: return@launch
+            val profile = profileRepository.getProfile(userId) ?: return@launch
             val posts = outfitPostRepository.getPostsByUser(userId)
             val friends = socialRepository.getFriends(userId)
             val stats = profileRepository.getPublicProfileStats(userId)
+            val isFriend = socialRepository.isFriend(currentUser.id, userId)
+            val pendingOutgoing = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId)
+            val pendingIncoming = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId)
 
-            _uiState.value = _uiState.value.copy(
+            _uiState.update { it.copy(
                 currentUser = currentUser,
                 profile = profile,
-                isFriend = socialRepository.isFriend(currentUser.id, userId),
-                hasPendingOutgoingRequest = socialRepository.getPendingOutgoingFriendRequest(currentUser.id, userId) != null,
-                pendingIncomingRequest = socialRepository.getPendingIncomingFriendRequest(currentUser.id, userId),
+                isFriend = isFriend,
+                hasPendingOutgoingRequest = pendingOutgoing != null,
+                pendingIncomingRequest = pendingIncoming,
                 friends = friends,
                 garmentsCount = stats.garmentsCount,
                 wardrobeUsagePercentage = stats.wardrobeUsagePercentage,
                 favoriteOutfitsCount = stats.favoriteOutfitsCount,
                 plannedOutfitsCount = stats.plannedOutfitsCount,
                 posts = posts
-            )
+            ) }
         }
     }
 
     fun onToggleFriend(userId: String) {
-        val currentUserId = _uiState.value.currentUser.id
-        if (socialRepository.isFriend(currentUserId, userId)) {
-            socialRepository.removeFriend(currentUserId, userId)
-        } else if (socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) == null) {
-            socialRepository.sendFriendRequest(currentUserId, userId)
+        viewModelScope.launch {
+            val currentUserId = _uiState.value.currentUser.id
+            if (socialRepository.isFriend(currentUserId, userId)) {
+                socialRepository.removeFriend(currentUserId, userId)
+            } else if (socialRepository.getPendingOutgoingFriendRequest(currentUserId, userId) == null) {
+                socialRepository.sendFriendRequest(currentUserId, userId)
+            }
+            refresh()
         }
-        refresh()
     }
 
     fun onAcceptIncomingFriendRequest(requestId: String) {
-        socialRepository.respondToFriendRequest(requestId, accepted = true)
-        refresh()
+        viewModelScope.launch {
+            socialRepository.respondToFriendRequest(requestId, accepted = true)
+            refresh()
+        }
     }
 
     fun onRejectIncomingFriendRequest(requestId: String) {
-        socialRepository.respondToFriendRequest(requestId, accepted = false)
-        refresh()
+        viewModelScope.launch {
+            socialRepository.respondToFriendRequest(requestId, accepted = false)
+            refresh()
+        }
     }
 
     fun onCommentDraftChange(postId: String, value: String) {
-        _uiState.value = _uiState.value.copy(
-            commentDrafts = _uiState.value.commentDrafts + (postId to value)
-        )
+        _uiState.update { it.copy(
+            commentDrafts = it.commentDrafts + (postId to value)
+        ) }
     }
 
     fun onLikeClick(postId: String) {
-        val updatedPost = outfitPostRepository.toggleLike(
-            postId = postId,
-            user = _uiState.value.currentUser
-        ) ?: return
+        viewModelScope.launch {
+            val updatedPost = outfitPostRepository.toggleLike(
+                postId = postId,
+                user = _uiState.value.currentUser
+            ) ?: return@launch
 
-        replacePost(updatedPost)
+            replacePost(updatedPost)
+        }
     }
 
     fun onSendComment(postId: String) {
-        val text = _uiState.value.commentDrafts[postId].orEmpty().trim()
-        if (text.isBlank()) return
+        viewModelScope.launch {
+            val text = _uiState.value.commentDrafts[postId].orEmpty().trim()
+            if (text.isBlank()) return@launch
 
-        val currentState = _uiState.value
-        val updatedPost = outfitPostRepository.addComment(
-            postId = postId,
-            user = currentState.currentUser,
-            text = text
-        ) ?: return
+            val user = _uiState.value.currentUser
+            val updatedPost = outfitPostRepository.addComment(
+                postId = postId,
+                user = user,
+                text = text
+            ) ?: return@launch
 
-        _uiState.value = currentState.copy(
-            posts = currentState.posts.map { post -> if (post.id == postId) updatedPost else post },
-            commentDrafts = currentState.commentDrafts - postId
-        )
+            _uiState.update { it.copy(
+                posts = it.posts.map { post -> if (post.id == postId) updatedPost else post },
+                commentDrafts = it.commentDrafts - postId
+            ) }
+        }
     }
 
     private fun replacePost(updatedPost: OutfitPost) {
-        _uiState.value = _uiState.value.copy(
-            posts = _uiState.value.posts.map { post ->
-                if (post.id == updatedPost.id) updatedPost else post
-            }
-        )
+        _uiState.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == updatedPost.id) updatedPost else post
+                }
+            )
+        }
     }
 }

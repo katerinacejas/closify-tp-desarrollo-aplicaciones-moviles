@@ -10,7 +10,6 @@ import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
-import com.closify.myapplication.domain.model.SuggestedOutfit
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +22,9 @@ import java.util.Locale
 import java.util.UUID
 
 class OutfitRepository private constructor(
-    context: Context,
-    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance
+    context: Context
 ) {
+    private val outfitPostRepository: OutfitPostRepository by lazy { OutfitPostRepository.instance }
 
     companion object {
         @Volatile private var _instance: OutfitRepository? = null
@@ -138,27 +137,22 @@ class OutfitRepository private constructor(
         }
     }
 
-    fun getSuggestedOutfits(): List<SuggestedOutfit> =
-        MockClosifyData.suggestedOutfits
-
-    fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
+    suspend fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
-    fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
+    suspend fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.PLANNED }
 
-    fun savePlannedOutfitPost(
+    suspend fun savePlannedOutfitPost(
         userId: String,
         title: String?,
         outfit: Outfit,
         plannedDate: String,
         createdAt: String
     ): OutfitPost? {
-        val author = UserRepository.instance.getCurrentUser()?.toSummary()
-            ?: MockClosifyData.userById(userId)?.toSummary()
-            ?: return null
+        val author = UserRepository.instance.getCurrentUser()?.toSummary() ?: return null
         val post = OutfitPost(
-            id = "planned_post_${MockClosifyData.outfitPosts.size + 1}",
+            id = UUID.randomUUID().toString(),
             author = author,
             outfit = outfit.copy(ownerUserId = userId),
             title = title?.take(100)?.ifBlank { null },
@@ -169,7 +163,7 @@ class OutfitRepository private constructor(
         return outfitPostRepository.addPost(post)
     }
 
-    fun savePlanning(
+    suspend fun savePlanning(
         userId: String,
         title: String,
         garments: List<Garment>,
@@ -203,7 +197,7 @@ class OutfitRepository private constructor(
         }
     }
 
-    fun updatePlannedOutfitPost(
+    suspend fun updatePlannedOutfitPost(
         postId: String,
         title: String?,
         outfit: Outfit,
@@ -218,13 +212,13 @@ class OutfitRepository private constructor(
         return outfitPostRepository.updatePost(updatedPost)
     }
 
-    fun deletePlannedOutfitPost(postId: String) {
+    suspend fun deletePlannedOutfitPost(postId: String) {
         outfitPostRepository.deletePost(postId)
     }
 
-    fun getPlannedPostById(postId: String): OutfitPost? =
+    suspend fun getPlannedPostById(postId: String): OutfitPost? =
         outfitPostRepository.getPost(postId)?.takeIf { it.type == OutfitPostType.PLANNED }
 
-    fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
+    suspend fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
         getPlannedPosts(userId).firstOrNull { it.plannedDate == plannedDate }
 }
