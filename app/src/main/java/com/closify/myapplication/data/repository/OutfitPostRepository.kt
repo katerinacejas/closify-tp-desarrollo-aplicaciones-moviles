@@ -162,9 +162,7 @@ class OutfitPostRepository private constructor(
 
     private suspend fun assemblePost(entity: com.closify.myapplication.data.local.entity.OutfitPostEntity): OutfitPost? {
         val author = userDao.getById(entity.authorId)?.toDomain()?.toSummary() ?: return null
-        val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId } 
-            ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId } // Fallback to current if generated
-            ?: return null
+        val outfit = outfitRepository.getOutfitById(entity.outfitId) ?: return null
             
         val likes = postDao.getLikesForPost(entity.id).mapNotNull { likeEntity ->
             val likeUser = userDao.getById(likeEntity.userId)?.toDomain()?.toSummary()

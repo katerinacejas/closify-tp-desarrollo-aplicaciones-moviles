@@ -83,9 +83,9 @@ class PlannerViewModel(
 
     private val _uiState = MutableStateFlow(PlannerUiState(
         selectedDate = today,
-        visibleMonth = java.time.YearMonth.from(today),
+        visibleMonth = YearMonth.from(today),
         dateInput = today.format(PlannerDateFormatter),
-        plannedPosts = outfitRepository.getPlannedPosts(userRepository.getCurrentUserOrDefault().id)
+        plannedPosts = emptyList()
     ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 
@@ -97,15 +97,13 @@ class PlannerViewModel(
         viewModelScope.launch {
             val userId = userRepository.getCurrentUserOrDefault().id
             val plannedPosts = outfitRepository.getPlannedPosts(userId)
-            val forecast = weatherRepository.getPlannerForecast(today)
             val garmentGroups = garmentRepository.getPlannerGroups(userId)
 
             _uiState.update { currentState -> 
                 currentState.copy(
                     selectedDate = today,
                     visibleMonth = YearMonth.from(today),
-                    dateInput = today.format    (PlannerDateFormatter),
-                    forecastDays = forecast,
+                    dateInput = today.format(PlannerDateFormatter),
                     plannedPosts = plannedPosts,
                     topAndOuterwearGarments = garmentGroups.topAndOuterwear,
                     bottomGarments = garmentGroups.bottoms,
