@@ -9,12 +9,13 @@ import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.data.repository.WeatherRepository as WeatherRepositoryImpl
 import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,7 +81,7 @@ data class PlannerUiState(
 class PlannerViewModel(
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
-    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl.instance,
     private val userRepository: UserRepository = UserRepository.instance,
     private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
     private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
@@ -109,7 +110,7 @@ class PlannerViewModel(
                 currentState.copy(
                     selectedDate = today,
                     visibleMonth = YearMonth.from(today),
-                    dateInput = today.format    (PlannerDateFormatter),
+                    dateInput = today.format(PlannerDateFormatter),
                     plannedPosts = plannedPosts,
                     topAndOuterwearGarments = garmentGroups.topAndOuterwear,
                     bottomGarments = garmentGroups.bottoms,

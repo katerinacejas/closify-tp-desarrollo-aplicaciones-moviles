@@ -11,6 +11,7 @@ import com.closify.myapplication.data.local.dao.NotificationDao
 import com.closify.myapplication.data.local.dao.OutfitDao
 import com.closify.myapplication.data.local.dao.OutfitPostDao
 import com.closify.myapplication.data.local.dao.UserDao
+import com.closify.myapplication.data.local.dao.WeatherDao
 import com.closify.myapplication.data.local.entity.CommentEntity
 import com.closify.myapplication.data.local.entity.FriendRequestEntity
 import com.closify.myapplication.data.local.entity.FriendshipEntity
@@ -20,6 +21,8 @@ import com.closify.myapplication.data.local.entity.NotificationEntity
 import com.closify.myapplication.data.local.entity.OutfitEntity
 import com.closify.myapplication.data.local.entity.OutfitPostEntity
 import com.closify.myapplication.data.local.entity.UserEntity
+import com.closify.myapplication.data.local.entity.WeatherCurrentEntity
+import com.closify.myapplication.data.local.entity.WeatherForecastEntity
 
 @Database(
     entities = [
@@ -31,9 +34,11 @@ import com.closify.myapplication.data.local.entity.UserEntity
         NotificationEntity::class,
         OutfitPostEntity::class,
         LikeEntity::class,
-        CommentEntity::class
+        CommentEntity::class,
+        WeatherCurrentEntity::class,
+        WeatherForecastEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -45,6 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun friendRequestDao(): FriendRequestDao
     abstract fun notificationDao(): NotificationDao
     abstract fun outfitPostDao(): OutfitPostDao
+    abstract fun weatherDao(): WeatherDao
 
     companion object {
         @Volatile private var instance: AppDatabase? = null
