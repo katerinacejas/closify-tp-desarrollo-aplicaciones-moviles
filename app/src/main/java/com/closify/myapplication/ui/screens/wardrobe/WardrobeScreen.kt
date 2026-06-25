@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -137,27 +138,26 @@ fun WardrobeContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 SelectableChip(
                     label = stringResource(R.string.wardrobe_filter_type),
                     selected = uiState.selectedFilter == WardrobeFilter.TYPE,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.TYPE)) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
                     label = stringResource(R.string.wardrobe_filter_weather),
                     selected = uiState.selectedFilter == WardrobeFilter.WEATHER,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.WEATHER)) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
                     label = stringResource(R.string.wardrobe_filter_occasion),
                     selected = uiState.selectedFilter == WardrobeFilter.OCCASION,
                     onClick = { onEvent(WardrobeEvent.FilterSelected(WardrobeFilter.OCCASION)) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 SelectableChip(
                     label = stringResource(R.string.wardrobe_filter_all),
                     selected = uiState.selectedFilter == WardrobeFilter.ALL,

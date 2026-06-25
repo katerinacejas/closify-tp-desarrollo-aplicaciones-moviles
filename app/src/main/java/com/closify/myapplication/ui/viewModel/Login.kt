@@ -7,6 +7,7 @@ import com.closify.myapplication.core.telemetry.AnalyticsEvents
 import com.closify.myapplication.core.telemetry.AnalyticsTracker
 import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
+import com.closify.myapplication.domain.model.GoogleAuthCredential
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,8 @@ sealed interface LoginEvent {
     data class EmailChanged(val value: String) : LoginEvent
     data class PasswordChanged(val value: String) : LoginEvent
     data object Submit : LoginEvent
+    data class GoogleSignInRequested(val credential: GoogleAuthCredential) : LoginEvent
+    data class GoogleSignInFailed(val message: String?) : LoginEvent
     data object ErrorDismissed : LoginEvent
     data object ClearErrors : LoginEvent
 }
@@ -44,6 +47,8 @@ class LoginViewModel(
             is LoginEvent.EmailChanged    -> _uiState.update { it.copy(email = event.value, emailError = null) }
             is LoginEvent.PasswordChanged -> _uiState.update { it.copy(password = event.value, passwordError = null) }
             is LoginEvent.Submit          -> submit()
+            is LoginEvent.GoogleSignInRequested -> loginWithGoogle(event.credential)
+            is LoginEvent.GoogleSignInFailed -> onGoogleSignInFailed(event.message)
             is LoginEvent.ErrorDismissed  -> _uiState.update { it.copy(generalError = null) }
             is LoginEvent.ClearErrors     -> _uiState.update { it.copy(emailError = null, passwordError = null, generalError = null) }
         }
@@ -86,6 +91,33 @@ class LoginViewModel(
                         it.copy(isLoading = false, generalError = error.message)
                     }
                 }
+        }
+    }
+
+    private fun loginWithGoogle(credential: GoogleAuthCredential) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, generalError = null) }
+            analyticsTracker.track(AnalyticsEvents.loginSubmitted(method = "google"))
+            userRepository.loginWithGoogle(credential)
+                .onSuccess {
+                    analyticsTracker.setUserId(userRepository.currentUserId.takeIf { it.isNotBlank() })
+                    analyticsTracker.track(AnalyticsEvents.loginSucceeded(method = "google"))
+                    _uiState.update { it.copy(isLoading = false, loginSuccess = true) }
+                }
+                .onFailure { error ->
+                    analyticsTracker.track(AnalyticsEvents.loginFailed(error.message, method = "google"))
+                    _uiState.update { it.copy(isLoading = false, generalError = error.message) }
+                }
+        }
+    }
+
+    private fun onGoogleSignInFailed(message: String?) {
+        analyticsTracker.track(AnalyticsEvents.loginFailed(message, method = "google"))
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                generalError = message ?: "No se pudo iniciar sesi\u00F3n con Google."
+            )
         }
     }
 }

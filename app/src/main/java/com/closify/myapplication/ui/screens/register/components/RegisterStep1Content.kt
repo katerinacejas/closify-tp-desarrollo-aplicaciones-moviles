@@ -27,6 +27,7 @@ import com.closify.myapplication.R
 import com.closify.myapplication.ui.components.ClosifyButton
 import com.closify.myapplication.ui.components.ClosifyLogo
 import com.closify.myapplication.ui.components.ClosifyTextField
+import com.closify.myapplication.ui.screens.auth.GoogleSignInButton
 
 @Composable
 fun RegisterStep1Content(
@@ -44,6 +45,7 @@ fun RegisterStep1Content(
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onNext: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,6 +122,14 @@ fun RegisterStep1Content(
         ClosifyButton(
             text = stringResource(R.string.register_button),
             onClick = onNext,
+            isLoading = isLoading
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        GoogleSignInButton(
+            text = stringResource(R.string.auth_continue_google),
+            onClick = onGoogleSignIn,
             isLoading = isLoading
         )
 
