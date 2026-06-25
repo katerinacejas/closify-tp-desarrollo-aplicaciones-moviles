@@ -9,11 +9,12 @@ import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.data.repository.WeatherRepository as WeatherRepositoryImpl
 import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.WeatherCondition
+import com.closify.myapplication.domain.repository.WeatherRepository
 import com.closify.myapplication.domain.usecase.GenerateOutfitsUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -57,7 +58,7 @@ sealed interface HomeNavigationEffect {
 class HomeViewModel(
     private val generateOutfitsUseCase: GenerateOutfitsUseCase = GenerateOutfitsUseCase(),
     private val outfitRepository: OutfitRepository = OutfitRepository.instance,
-    private val weatherRepository: WeatherRepository = WeatherRepository.instance,
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl.instance,
     private val garmentRepository: GarmentRepository = GarmentRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance,
     private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,

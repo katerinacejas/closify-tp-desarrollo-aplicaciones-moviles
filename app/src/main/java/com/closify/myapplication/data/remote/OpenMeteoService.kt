@@ -31,7 +31,7 @@ data class OpenMeteoDailyForecast(
     val maxWindSpeeds: List<Double>?
 )
 
-interface OpenMeteoApi {
+internal interface OpenMeteoApi {
     @GET("v1/forecast")
     suspend fun getForecast(
         @Query("latitude") latitude: Double,
@@ -53,7 +53,7 @@ object OpenMeteoService {
             .build()
     }
 
-    private val api: OpenMeteoApi by lazy {
+    internal val api: OpenMeteoApi by lazy {
         Retrofit.Builder()
             .baseUrl("https://api.open-meteo.com/")
             .client(client)
@@ -61,6 +61,11 @@ object OpenMeteoService {
             .build()
             .create(OpenMeteoApi::class.java)
     }
+}
+
+internal class OpenMeteoRemoteDataSource(
+    private val api: OpenMeteoApi = OpenMeteoService.api
+) {
 
     suspend fun getForecast(
         latitude: Double,

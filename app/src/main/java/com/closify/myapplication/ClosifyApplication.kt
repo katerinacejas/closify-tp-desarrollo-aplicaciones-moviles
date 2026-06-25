@@ -9,6 +9,7 @@ import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.ProfileRepository
 import com.closify.myapplication.data.repository.SocialRepository
 import com.closify.myapplication.data.repository.UserRepository
+import com.closify.myapplication.data.repository.WeatherRepository
 import com.closify.myapplication.data.telemetry.FirebaseAnalyticsTracker
 import com.closify.myapplication.data.telemetry.FirebaseCrashReporter
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -27,5 +28,6 @@ class ClosifyApplication : Application() {
         OutfitRepository.initialize(this)
         SocialRepository.initialize(this)
         ProfileRepository.initialize()
+        WeatherRepository.initialize(this)
     }
 }
