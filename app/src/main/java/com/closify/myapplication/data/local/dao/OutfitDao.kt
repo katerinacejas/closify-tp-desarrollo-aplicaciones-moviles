@@ -26,4 +26,10 @@ interface OutfitDao {
 
     @Query("DELETE FROM outfits WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM outfits WHERE ownerUserId = :userId AND id NOT IN (:remainingIds)")
+    suspend fun deleteNotInList(userId: String, remainingIds: List<String>)
+
+    @Query("DELETE FROM outfits WHERE ownerUserId = :userId")
+    suspend fun deleteAllByUserId(userId: String)
 }

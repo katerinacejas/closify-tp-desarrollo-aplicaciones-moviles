@@ -180,10 +180,15 @@ class OutfitPostRepository private constructor(
     suspend fun syncFromFirestore() {
         if (syncedThisSession) return
         try {
-            // This is a simplified global sync. In a real app we might only sync followed users.
             val snapshot = firestore.collection("outfit_posts").get().await()
             val posts = snapshot.documents.mapNotNull { it.toOutfitPostEntity() }
-            postDao.upsertPosts(posts)
+            
+            if (posts.isEmpty()) {
+                postDao.deleteAllPosts()
+            } else {
+                postDao.upsertPosts(posts)
+                postDao.deleteNotInList(posts.map { it.id })
+            }
             
             // Sync likes and comments for each post (can be heavy, should be optimized)
             posts.forEach { post ->
