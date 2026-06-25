@@ -7,6 +7,7 @@ import com.closify.myapplication.data.local.mapper.toEntity
 import com.closify.myapplication.data.local.mapper.toFirestoreMap
 import com.closify.myapplication.data.local.mapper.toFriendRequestEntity
 import com.closify.myapplication.data.local.mapper.toFriendshipEntity
+import com.closify.myapplication.data.local.mapper.toUserEntity
 import com.closify.myapplication.domain.model.FriendRequest
 import com.closify.myapplication.domain.model.FriendRequestStatus
 import com.closify.myapplication.domain.model.Friendship
@@ -52,6 +53,7 @@ class SocialRepository private constructor(
     private val userDao = db.userDao()
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var syncedThisSession = false
 
     fun observeFriends(userId: String): Flow<List<UserSummary>> {
         return friendshipDao.observeByUserId(userId).map { entities ->
@@ -70,6 +72,7 @@ class SocialRepository private constructor(
     }
 
     suspend fun syncSocialData(userId: String) {
+        if (syncedThisSession) return
         try {
             // Sync friendships
             val friendshipSnapshot = firestore.collection("friendships")
@@ -92,8 +95,9 @@ class SocialRepository private constructor(
             val requestEntities = (incomingRequests.documents + outgoingRequests.documents)
                 .mapNotNull { it.toFriendRequestEntity() }
             requestDao.upsertAll(requestEntities)
+            syncedThisSession = true
         } catch (e: Exception) {
-            // Offline
+            android.util.Log.w("SocialRepository", "syncSocialData failed: ${e.message}")
         }
     }
 
@@ -235,20 +239,39 @@ class SocialRepository private constructor(
     }
 
     suspend fun getAllUserSummaries(excludeUserId: String): List<UserSummary> {
-        // En una app real esto paginaría o buscaría en Firestore
-        // Por ahora, devolvemos lo que hay en Room que no sea el usuario actual
-        return MockClosifyData.users
-            .filter { it.id != excludeUserId }
-            .map { it.toSummary() }
+        return try {
+            firestore.collection("users")
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toUserEntity()?.toDomain()?.toSummary() }
+                .filter { it.id != excludeUserId }
+        } catch (e: Exception) {
+            android.util.Log.w("SocialRepository", "getAllUserSummaries failed: ${e.message}")
+            emptyList()
+        }
     }
 
     suspend fun searchUserSummariesByName(query: String, currentUserId: String): List<UserSummary> {
-        val cleanQuery = query.trim().removePrefix("@")
+        val cleanQuery = query.trim().removePrefix("@").lowercase()
         if (cleanQuery.isBlank()) return emptyList()
-        
-        // Search in local DB (Room)
-        return userDao.searchByName(cleanQuery)
-            .filter { it.id != currentUserId }
-            .map { it.toDomain().toSummary() }
+
+        return try {
+            firestore.collection("users")
+                .get()
+                .await()
+                .documents
+                .mapNotNull { it.toUserEntity()?.toDomain()?.toSummary() }
+                .filter { it.id != currentUserId }
+                .filter {
+                    it.fullName.lowercase().contains(cleanQuery) ||
+                    it.username.lowercase().contains(cleanQuery)
+                }
+        } catch (e: Exception) {
+            android.util.Log.w("SocialRepository", "searchUserSummariesByName failed: ${e.message}")
+            emptyList()
+        }
     }
+
+    fun resetSessionSync() { syncedThisSession = false }
 }

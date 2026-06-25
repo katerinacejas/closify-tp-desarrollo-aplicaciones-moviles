@@ -18,14 +18,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.UUID
 
 class OutfitPostRepository private constructor(
     context: Context,
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
-    private val outfitRepository: OutfitRepository = OutfitRepository.instance,
     private val userRepository: UserRepository = UserRepository.instance
 ) {
+    private val outfitRepository: OutfitRepository by lazy { OutfitRepository.instance }
+    private var syncedThisSession = false
 
     companion object {
         @Volatile private var _instance: OutfitPostRepository? = null
@@ -100,7 +104,7 @@ class OutfitPostRepository private constructor(
             val like = Like(
                 id = UUID.randomUUID().toString(),
                 user = user,
-                createdAt = "ahora"
+                createdAt = currentDate()
             )
             postDao.upsertLike(like.toEntity(postId))
             scope.launch {
@@ -120,7 +124,7 @@ class OutfitPostRepository private constructor(
             id = UUID.randomUUID().toString(),
             user = user,
             text = cleanText,
-            createdAt = "ahora"
+            createdAt = currentDate()
         )
         
         postDao.upsertComment(comment.toEntity(postId))
@@ -176,6 +180,7 @@ class OutfitPostRepository private constructor(
     }
 
     suspend fun syncFromFirestore() {
+        if (syncedThisSession) return
         try {
             // This is a simplified global sync. In a real app we might only sync followed users.
             val snapshot = firestore.collection("outfit_posts").get().await()
@@ -192,8 +197,15 @@ class OutfitPostRepository private constructor(
                 val comments = commentsSnapshot.documents.mapNotNull { it.toCommentEntity(post.id) }
                 postDao.upsertComments(comments)
             }
+            syncedThisSession = true
         } catch (e: Exception) {
-            // Offline
+            android.util.Log.w("OutfitPostRepository", "syncFromFirestore failed: ${e.message}")
         }
     }
+
+    fun resetSessionSync() { syncedThisSession = false }
+
+    private fun currentDate(): String = LocalDate.now().format(
+        DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
+    )
 }

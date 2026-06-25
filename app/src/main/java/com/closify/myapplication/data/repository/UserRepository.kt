@@ -82,9 +82,9 @@ class UserRepository private constructor(context: Context) {
         val entity = userDao.getById(uid)
         if (entity != null) {
             _currentUser.value = entity.toDomain()
-        } else {
-            fetchAndCacheFromFirestore(uid)
         }
+        // Siempre sincroniza desde Firestore para tener datos frescos
+        fetchAndCacheFromFirestore(uid)
     }
 
     suspend fun login(email: String, password: String): Result<Unit> {
@@ -216,7 +216,9 @@ class UserRepository private constructor(context: Context) {
     private suspend fun fetchAndCacheFromFirestore(uid: String) {
         try {
             val doc = firestore.collection("users").document(uid).get().await()
+            if (!doc.exists()) return
             val entity = doc.toUserEntity() ?: return
+            if (entity.fullName.isBlank() && entity.username.isBlank()) return
             userDao.upsert(entity)
             _currentUser.value = entity.toDomain()
         } catch (e: Exception) {

@@ -36,11 +36,27 @@ class NotificationsViewModel(
     val uiState: StateFlow<NotificationsUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
-        markAllAsRead()
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            if (userId.isNotBlank()) {
+                notificationRepository.syncNotifications(userId)
+            }
+            loadNotifications()
+            markAllAsRead()
+        }
     }
 
     fun refresh() {
+        viewModelScope.launch {
+            val userId = userRepository.currentUserId
+            if (userId.isNotBlank()) {
+                notificationRepository.syncNotifications(userId)
+            }
+            loadNotifications()
+        }
+    }
+
+    private fun loadNotifications() {
         viewModelScope.launch {
             val currentUserId = userRepository.getCurrentUserOrDefault().id
             val notifications = notificationRepository.getNotifications(currentUserId)

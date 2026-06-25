@@ -16,8 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.UUID
 
 class NotificationRepository private constructor(context: Context) {
@@ -44,18 +48,16 @@ class NotificationRepository private constructor(context: Context) {
     private val userDao = db.userDao()
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var syncedThisSession = false
 
     fun observeNotifications(userId: String): Flow<List<Notification>> =
-        notificationDao.observeByUserId(userId).map { entities ->
-            entities.mapNotNull { entity ->
-                // NOTA: Esto es ineficiente en un Flow. En producción se usaría un JOIN o Room Relation.
-                // Por ahora, como es para migración, lo dejamos asíncrono manual.
-                // Pero en un Flow .map no podemos llamar a suspend functions fácilmente sin bloquear.
-                // Usaremos MockClosifyData como fallback para los summaries en el Flow si no están en cache local.
-                val sender = MockClosifyData.userById(entity.senderId)?.toSummary()
-                val receiver = MockClosifyData.userById(entity.receiverId)?.toSummary()
+        notificationDao.observeByUserId(userId).transform { entities ->
+            val notifications = entities.mapNotNull { entity ->
+                val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary()
+                val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary()
                 if (sender != null && receiver != null) entity.toDomain(sender, receiver) else null
             }
+            emit(notifications)
         }
 
     fun observeUnreadCount(userId: String): Flow<Int> =
@@ -75,12 +77,14 @@ class NotificationRepository private constructor(context: Context) {
     }
 
     suspend fun syncNotifications(userId: String) {
+        if (syncedThisSession) return
         try {
             val snapshot = firestore.collection("users/$userId/notifications").get().await()
             val entities = snapshot.documents.mapNotNull { it.toNotificationEntity() }
             notificationDao.upsertAll(entities)
+            syncedThisSession = true
         } catch (e: Exception) {
-            // Offline
+            android.util.Log.w("NotificationRepository", "syncNotifications failed: ${e.message}")
         }
     }
 
@@ -156,7 +160,9 @@ class NotificationRepository private constructor(context: Context) {
             postId = postId,
             commentId = commentId,
             friendRequestId = friendRequestId,
-            createdAt = "ahora"
+            createdAt = LocalDate.now().format(
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
+            )
         )
 
         notificationDao.upsert(notification.toEntity())
@@ -168,4 +174,6 @@ class NotificationRepository private constructor(context: Context) {
                 .await()
         } catch (e: Exception) { }
     }
+
+    fun resetSessionSync() { syncedThisSession = false }
 }

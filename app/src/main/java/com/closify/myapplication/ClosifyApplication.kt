@@ -14,10 +14,10 @@ class ClosifyApplication : Application() {
         super.onCreate()
         UserRepository.initialize(this)
         GarmentRepository.initialize(this)
-        OutfitRepository.initialize(this)
-        SocialRepository.initialize(this)
         NotificationRepository.initialize(this)
         OutfitPostRepository.initialize(this)
+        OutfitRepository.initialize(this)
+        SocialRepository.initialize(this)
         ProfileRepository.initialize()
     }
 }

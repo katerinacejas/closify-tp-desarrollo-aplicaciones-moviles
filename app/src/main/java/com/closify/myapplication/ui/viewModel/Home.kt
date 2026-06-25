@@ -14,6 +14,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,13 +53,18 @@ class HomeViewModel(
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        HomeUiState(username = userRepository.currentUsername)
-    )
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val _navigationEffect = Channel<HomeNavigationEffect>()
     val navigationEffect = _navigationEffect.receiveAsFlow()
+
+    init {
+        userRepository.currentUser
+            .filterNotNull()
+            .onEach { user -> _uiState.update { it.copy(username = user.profile.username) } }
+            .launchIn(viewModelScope)
+    }
 
     fun onEvent(event: HomeEvent) {
         when (event) {

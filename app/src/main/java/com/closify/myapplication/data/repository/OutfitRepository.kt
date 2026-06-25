@@ -23,9 +23,9 @@ import java.util.Locale
 import java.util.UUID
 
 class OutfitRepository private constructor(
-    context: Context,
-    private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance
+    context: Context
 ) {
+    private val outfitPostRepository: OutfitPostRepository by lazy { OutfitPostRepository.instance }
 
     companion object {
         @Volatile private var _instance: OutfitRepository? = null

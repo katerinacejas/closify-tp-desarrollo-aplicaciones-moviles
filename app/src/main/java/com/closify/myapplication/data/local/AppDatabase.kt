@@ -33,7 +33,7 @@ import com.closify.myapplication.data.local.entity.UserEntity
         LikeEntity::class,
         CommentEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
