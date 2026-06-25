@@ -2,6 +2,8 @@ package com.closify.myapplication
 
 import android.app.Application
 import com.closify.myapplication.core.telemetry.TelemetryProvider
+import com.closify.myapplication.data.repository.FirebaseProfileImageRepository
+import com.closify.myapplication.data.repository.GarmentImageRepositoryImpl
 import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
@@ -21,7 +23,9 @@ class ClosifyApplication : Application() {
         TelemetryProvider.analyticsTracker = FirebaseAnalyticsTracker(FirebaseAnalytics.getInstance(this))
         TelemetryProvider.crashReporter = FirebaseCrashReporter(FirebaseCrashlytics.getInstance())
 
+        FirebaseProfileImageRepository.initialize(this)
         UserRepository.initialize(this)
+        GarmentImageRepositoryImpl.initialize(this)
         GarmentRepository.initialize(this)
         NotificationRepository.initialize(this)
         OutfitPostRepository.initialize(this)

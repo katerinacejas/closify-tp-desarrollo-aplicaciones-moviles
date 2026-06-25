@@ -1,29 +1,41 @@
 package com.closify.myapplication.ui.screens.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -36,6 +48,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +64,8 @@ import com.closify.myapplication.ui.components.ClosifyTextField
 import com.closify.myapplication.ui.components.ClosifyTopBar
 import com.closify.myapplication.ui.theme.ClosifyTheme
 import com.closify.myapplication.ui.viewmodel.EditProfileViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -63,6 +80,18 @@ fun EditProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showDatePicker by remember { mutableStateOf(false) }
     val birthdate = remember(uiState.birthDate) { uiState.birthDate.toLocalDateOrNull() }
+    val avatarPreview = uiState.pendingAvatarImageUri ?: uiState.avatarImageUrl
+    val bannerPreview = uiState.pendingBannerImageUri ?: uiState.bannerImageUrl
+    val avatarPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { viewModel.onAvatarImageSelected(it.toString()) }
+    }
+    val bannerPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { viewModel.onBannerImageSelected(it.toString()) }
+    }
 
     LaunchedEffect(uiState.saved) {
         if (uiState.saved) onBack()
@@ -96,6 +125,20 @@ fun EditProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            ProfileImagesEditor(
+                avatarImage = avatarPreview,
+                bannerImage = bannerPreview,
+                isSaving = uiState.isSaving,
+                onAvatarClick = {
+                    avatarPickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                },
+                onBannerClick = {
+                    bannerPickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                }
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             Text(text = stringResource(R.string.edit_profile_name_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(4.dp))
@@ -188,7 +231,8 @@ fun EditProfileScreen(
 
             ClosifyButton(
                 text = stringResource(R.string.edit_profile_save_button),
-                onClick = viewModel::saveChanges
+                onClick = viewModel::saveChanges,
+                isLoading = uiState.isSaving
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -218,6 +262,126 @@ fun EditProfileScreen(
             ) {
                 DatePicker(state = datePickerState)
             }
+        }
+    }
+}
+
+@Composable
+private fun ProfileImagesEditor(
+    avatarImage: String?,
+    bannerImage: String?,
+    isSaving: Boolean,
+    onAvatarClick: () -> Unit,
+    onBannerClick: () -> Unit
+) {
+    val context = LocalContext.current
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.profile_banner_desc),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(2.9f)
+                .clip(RoundedCornerShape(18.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.42f), RoundedCornerShape(18.dp))
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(bannerImage?.takeIf { it.isNotBlank() } ?: R.drawable.banner_default)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(R.string.profile_banner_desc),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            ImageEditButton(
+                onClick = onBannerClick,
+                enabled = !isSaving,
+                contentDescription = stringResource(R.string.edit_profile_change_banner),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(10.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(avatarImage?.takeIf { it.isNotBlank() } ?: R.drawable.avatar_default)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = stringResource(R.string.profile_avatar_desc),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                ImageEditButton(
+                    onClick = onAvatarClick,
+                    enabled = !isSaving,
+                    contentDescription = stringResource(R.string.edit_profile_change_avatar),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(2.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = stringResource(R.string.profile_avatar_desc),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImageEditButton(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    contentDescription: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.size(36.dp),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primary,
+        tonalElevation = 1.dp
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Edit,
+                contentDescription = contentDescription,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

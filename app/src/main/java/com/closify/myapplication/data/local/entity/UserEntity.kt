@@ -11,5 +11,7 @@ data class UserEntity(
     val username: String,
     val birthDate: String,
     val bio: String,
+    val avatarImageUrl: String = "",
+    val bannerImageUrl: String = "",
     val createdAt: String
 )

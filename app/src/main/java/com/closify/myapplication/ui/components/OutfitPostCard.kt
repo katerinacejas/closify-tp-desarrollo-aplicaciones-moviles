@@ -1,6 +1,5 @@
 package com.closify.myapplication.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -36,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -191,8 +189,9 @@ private fun OutfitPostAuthor(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = post.author.profileImageResId),
+        UserAvatarImage(
+            imageUrl = post.author.profileImageUrl,
+            fallbackImageResId = post.author.profileImageResId,
             contentDescription = null,
             modifier = Modifier
                 .size(54.dp)

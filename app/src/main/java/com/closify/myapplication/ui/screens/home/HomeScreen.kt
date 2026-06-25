@@ -71,6 +71,7 @@ fun HomeScreen(
         HomeContent(
             username = uiState.username,
             selectedWeather = uiState.selectedWeather,
+            automaticWeatherSummary = uiState.automaticWeatherSummary,
             selectedOccasion = uiState.selectedOccasion,
             isAutoWeather = uiState.isAutoWeather,
             isAutoWeatherAvailable = uiState.isAutoWeatherAvailable,

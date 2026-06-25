@@ -5,13 +5,14 @@ import android.util.Log
 import com.closify.myapplication.data.local.AppDatabase
 import com.closify.myapplication.data.local.WeatherLocalDataSource
 import com.closify.myapplication.data.local.mapper.toCurrentEntity
+import com.closify.myapplication.data.local.mapper.toCurrentWeatherSummaryOrNull
 import com.closify.myapplication.data.local.mapper.toEntity
 import com.closify.myapplication.data.local.mapper.toPlannerForecastDayOrNull
-import com.closify.myapplication.data.local.mapper.toWeatherConditionOrNull
 import com.closify.myapplication.data.network.NetworkMonitor
 import com.closify.myapplication.data.remote.OpenMeteoRemoteDataSource
+import com.closify.myapplication.data.remote.mapper.toCurrentWeatherSummary
 import com.closify.myapplication.data.remote.mapper.toPlannerForecastDays
-import com.closify.myapplication.data.remote.mapper.toWeatherCondition
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
@@ -40,7 +41,7 @@ class WeatherRepository : WeatherRepositoryContract {
     private data class CachedWeather(
         val locationKey: String,
         val fetchedAtMillis: Long,
-        val currentWeather: WeatherCondition?,
+        val currentWeatherSummary: CurrentWeatherSummary?,
         val forecastDays: List<PlannerForecastDay>
     ) {
         fun isFresh(nowMillis: Long): Boolean =
@@ -54,13 +55,16 @@ class WeatherRepository : WeatherRepositoryContract {
     private var networkMonitor: NetworkMonitor? = null
 
     override suspend fun getCurrentWeather(location: DeviceLocation): Result<WeatherCondition> =
+        getCurrentWeatherSummary(location).map { it.condition }
+
+    override suspend fun getCurrentWeatherSummary(location: DeviceLocation): Result<CurrentWeatherSummary> =
         cacheMutex.withLock {
             val now = System.currentTimeMillis()
             val locationKey = location.toCacheKey()
 
             memoryCache
                 ?.takeIf { it.locationKey == locationKey && it.isFresh(now) }
-                ?.currentWeather
+                ?.currentWeatherSummary
                 ?.let { return@withLock Result.success(it) }
 
             val localCurrent = try {
@@ -72,18 +76,18 @@ class WeatherRepository : WeatherRepositoryContract {
             }
 
             localCurrent
-                ?.toWeatherConditionOrNull()
-                ?.let { cachedWeather ->
+                ?.toCurrentWeatherSummaryOrNull()
+                ?.let { cachedSummary ->
                     memoryCache = CachedWeather(
                         locationKey = locationKey,
                         fetchedAtMillis = now,
-                        currentWeather = cachedWeather,
+                        currentWeatherSummary = cachedSummary,
                         forecastDays = memoryCache
                             ?.takeIf { it.locationKey == locationKey && it.isFresh(now) }
                             ?.forecastDays
                             .orEmpty()
                     )
-                    return@withLock Result.success(cachedWeather)
+                    return@withLock Result.success(cachedSummary)
                 }
 
             fetchAndCacheWeather(
@@ -92,7 +96,7 @@ class WeatherRepository : WeatherRepositoryContract {
                 startDate = LocalDate.now(),
                 nowMillis = now
             ).mapCatching { weather ->
-                weather.currentWeather ?: error("Open-Meteo did not return current weather.")
+                weather.currentWeatherSummary ?: error("Open-Meteo did not return current weather.")
             }
         }
 
@@ -125,9 +129,9 @@ class WeatherRepository : WeatherRepositoryContract {
             memoryCache = CachedWeather(
                 locationKey = locationKey,
                 fetchedAtMillis = now,
-                currentWeather = memoryCache
+                currentWeatherSummary = memoryCache
                     ?.takeIf { it.locationKey == locationKey && it.isFresh(now) }
-                    ?.currentWeather,
+                    ?.currentWeatherSummary,
                 forecastDays = localForecast
             )
             return@withLock Result.success(localForecast)
@@ -171,13 +175,13 @@ class WeatherRepository : WeatherRepositoryContract {
             "Open-Meteo current=${response.current?.temperature}, apparent=${response.current?.apparentTemperature}, firstDailyMax=${response.daily?.maxTemperatures?.firstOrNull()}"
         )
 
-        val currentWeather = response.current?.toWeatherCondition()
+        val currentWeatherSummary = response.toCurrentWeatherSummary()
         val forecastDays = response.daily?.toPlannerForecastDays(startDate).orEmpty()
         val expiresAtMillis = nowMillis + CACHE_DURATION_MILLIS
 
         try {
             localDataSource?.saveWeather(
-                current = currentWeather?.toCurrentEntity(
+                current = currentWeatherSummary?.toCurrentEntity(
                     locationKey = locationKey,
                     temperature = response.current?.temperature,
                     apparentTemperature = response.current?.apparentTemperature,
@@ -202,7 +206,7 @@ class WeatherRepository : WeatherRepositoryContract {
             CachedWeather(
                 locationKey = locationKey,
                 fetchedAtMillis = nowMillis,
-                currentWeather = currentWeather,
+                currentWeatherSummary = currentWeatherSummary,
                 forecastDays = forecastDays
             ).also { memoryCache = it }
         )

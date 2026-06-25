@@ -87,6 +87,8 @@ class FriendsViewModel(
             if (!offline) {
                 val userId = userRepository.currentUserId
                 if (userId.isNotBlank()) {
+                    socialRepository.resetSessionSync()
+                    outfitPostRepository.resetSessionSync()
                     socialRepository.syncSocialData(userId)
                     outfitPostRepository.syncFromFirestore()
                 }

@@ -29,6 +29,7 @@ fun Friendship.toEntity(): FriendshipEntity = FriendshipEntity(
 fun Friendship.toFirestoreMap(): Map<String, Any> = mapOf(
     "userAId" to userA.id,
     "userBId" to userB.id,
+    "userIds" to listOf(userA.id, userB.id),
     "createdAt" to createdAt
 )
 

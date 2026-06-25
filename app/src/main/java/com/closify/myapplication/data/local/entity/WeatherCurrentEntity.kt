@@ -9,6 +9,9 @@ data class WeatherCurrentEntity(
     val weather: String,
     val temperature: Double?,
     val apparentTemperature: Double?,
+    val averageTemperature: Int?,
+    val minTemperature: Int?,
+    val maxTemperature: Int?,
     val windSpeed: Double?,
     val fetchedAtMillis: Long,
     val expiresAtMillis: Long

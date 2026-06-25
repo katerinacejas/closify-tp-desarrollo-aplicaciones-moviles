@@ -48,6 +48,8 @@
     <string name="edit_profile_birthdate_label">Fecha de nacimiento</string>
     <string name="edit_profile_birthdate_placeholder">dd / mm / aaaa</string>
     <string name="edit_profile_save_button">Guardar Cambios</string>
+    <string name="edit_profile_change_avatar">Cambiar foto de perfil</string>
+    <string name="edit_profile_change_banner">Cambiar banner</string>
 
     <!-- Security -->
     <string name="security_title">Seguridad</string>
@@ -72,6 +74,7 @@
     <string name="home_what_outfit">¿Qué outfit preferís hoy?</string>
     <string name="home_generate_button">Generar outfits</string>
     <string name="home_weather_title">CLIMA</string>
+    <string name="home_weather_min_max">Mín %1$d°  Máx %2$d°</string>
     <string name="home_occasion_title">OCASIÓN</string>
     <string name="home_toggle_auto">AUTOMÁTICO</string>
     <string name="home_toggle_manual">MANUAL</string>

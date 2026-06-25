@@ -124,6 +124,8 @@ fun PublicProfileContent(
                     friendsCount = uiState.friendsCount,
                     bannerImageResId = profile.bannerImageResId,
                     profileImageResId = profile.profileImageResId,
+                    bannerImageUrl = profile.bannerImageUrl,
+                    profileImageUrl = profile.avatarImageUrl,
                     onFriendsClick = { showFriendsDialog = true }
                 )
 

@@ -52,11 +52,12 @@ class SocialRepository private constructor(
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var syncedThisSession = false
+    private val userRepository: UserRepository by lazy { UserRepository.instance }
 
     suspend fun getFriends(userId: String): List<UserSummary> {
         return friendshipDao.getAllByUserId(userId).mapNotNull { entity ->
             val friendId = if (entity.userAId == userId) entity.userBId else entity.userAId
-            userDao.getById(friendId)?.toDomain()?.toSummary()
+            userRepository.getUserSummary(friendId)
         }
     }
 
@@ -100,8 +101,8 @@ class SocialRepository private constructor(
             val createdAt = LocalDate.now().format(
                 DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
             )
-            val senderSummary = userDao.getById(senderId)?.toDomain()?.toSummary() ?: return Result.failure(Exception("Sender not found"))
-            val receiverSummary = userDao.getById(receiverId)?.toDomain()?.toSummary() ?: return Result.failure(Exception("Receiver not found"))
+            val senderSummary = userRepository.getUserSummary(senderId) ?: return Result.failure(Exception("Sender not found"))
+            val receiverSummary = userRepository.getUserSummary(receiverId) ?: return Result.failure(Exception("Receiver not found"))
             
             val request = FriendRequest(
                 id = UUID.randomUUID().toString(),
@@ -142,8 +143,8 @@ class SocialRepository private constructor(
                 createFriendship(entity.senderId, entity.receiverId)
                 
                 // Create acceptance notification
-                val senderSummary = userDao.getById(entity.senderId)?.toDomain()?.toSummary()
-                val receiverSummary = userDao.getById(entity.receiverId)?.toDomain()?.toSummary()
+                val senderSummary = userRepository.getUserSummary(entity.senderId)
+                val receiverSummary = userRepository.getUserSummary(entity.receiverId)
                 if (senderSummary != null && receiverSummary != null) {
                     notificationRepository.createFriendRequestAcceptedNotification(senderSummary, receiverSummary, requestId)
                 }
@@ -160,8 +161,8 @@ class SocialRepository private constructor(
         )
         val friendship = Friendship(
             id = UUID.randomUUID().toString(),
-            userA = userDao.getById(userAId)?.toDomain()?.toSummary() ?: return,
-            userB = userDao.getById(userBId)?.toDomain()?.toSummary() ?: return,
+            userA = userRepository.getUserSummary(userAId) ?: return,
+            userB = userRepository.getUserSummary(userBId) ?: return,
             createdAt = createdAt
         )
         
@@ -194,8 +195,8 @@ class SocialRepository private constructor(
         val entities = requestDao.getAllByUserId(senderId)
         val entity = entities.find { it.senderId == senderId && it.receiverId == receiverId && it.status == FriendRequestStatus.PENDING.name }
         return entity?.let {
-            val sender = userDao.getById(it.senderId)?.toDomain()?.toSummary()
-            val receiver = userDao.getById(it.receiverId)?.toDomain()?.toSummary()
+            val sender = userRepository.getUserSummary(it.senderId)
+            val receiver = userRepository.getUserSummary(it.receiverId)
             if (sender != null && receiver != null) it.toDomain(sender, receiver) else null
         }
     }
@@ -204,16 +205,16 @@ class SocialRepository private constructor(
         val entities = requestDao.getAllByUserId(receiverId)
         val entity = entities.find { it.senderId == senderId && it.receiverId == receiverId && it.status == FriendRequestStatus.PENDING.name }
         return entity?.let {
-            val sender = userDao.getById(it.senderId)?.toDomain()?.toSummary()
-            val receiver = userDao.getById(it.receiverId)?.toDomain()?.toSummary()
+            val sender = userRepository.getUserSummary(it.senderId)
+            val receiver = userRepository.getUserSummary(it.receiverId)
             if (sender != null && receiver != null) it.toDomain(sender, receiver) else null
         }
     }
 
     suspend fun getFriendRequest(requestId: String): FriendRequest? {
         val entity = requestDao.getById(requestId) ?: return null
-        val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary() ?: return null
-        val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary() ?: return null
+        val sender = userRepository.getUserSummary(entity.senderId) ?: return null
+        val receiver = userRepository.getUserSummary(entity.receiverId) ?: return null
         return entity.toDomain(sender, receiver)
     }
 

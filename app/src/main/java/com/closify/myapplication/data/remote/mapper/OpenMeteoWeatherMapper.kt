@@ -1,7 +1,9 @@
 package com.closify.myapplication.data.remote.mapper
 
 import com.closify.myapplication.data.remote.OpenMeteoCurrentWeather
+import com.closify.myapplication.data.remote.OpenMeteoForecastResponse
 import com.closify.myapplication.data.remote.OpenMeteoDailyForecast
+import com.closify.myapplication.domain.model.CurrentWeatherSummary
 import com.closify.myapplication.domain.model.PlannerForecastDay
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.domain.usecase.ResolveWeatherConditionUseCase
@@ -17,6 +19,27 @@ internal fun OpenMeteoCurrentWeather.toWeatherCondition(): WeatherCondition {
     return resolveWeatherCondition(
         temperatureCelsius = apparentOrCurrentTemperature,
         windSpeedKmh = currentWindSpeed
+    )
+}
+
+internal fun OpenMeteoForecastResponse.toCurrentWeatherSummary(): CurrentWeatherSummary? {
+    val currentWeather = current ?: return null
+    val currentTemperature = currentWeather.apparentTemperature
+        ?: currentWeather.temperature
+        ?: DEFAULT_TEMPERATURE_CELSIUS
+    val minTemperature = daily?.minTemperatures?.firstOrNull()
+    val maxTemperature = daily?.maxTemperatures?.firstOrNull()
+    val averageTemperature = if (minTemperature != null && maxTemperature != null) {
+        (minTemperature + maxTemperature) / 2.0
+    } else {
+        currentTemperature
+    }
+
+    return CurrentWeatherSummary(
+        condition = currentWeather.toWeatherCondition(),
+        averageTemperature = averageTemperature.roundToInt(),
+        minTemperature = (minTemperature ?: minOf(currentTemperature, averageTemperature)).roundToInt(),
+        maxTemperature = (maxTemperature ?: maxOf(currentTemperature, averageTemperature)).roundToInt()
     )
 }
 
