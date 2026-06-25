@@ -83,7 +83,6 @@
     <string name="weather_mild">Templado</string>
     <string name="weather_any">Indistinto</string>
     <string name="weather_hot_long">Caluroso</string>
-    <string name="weather_rainy">Lluvioso</string>
 
     <!-- Occasions -->
     <string name="occasion_work">Trabajo</string>
@@ -99,6 +98,8 @@
     <string name="dialog_no_garments_subtitle">Agrega prendas en tu guardarropa\npara poder generar outfits</string>
     <string name="dialog_no_combinations_title">Sin combinaciones posibles</string>
     <string name="dialog_no_combinations_subtitle">No encontramos prendas que combinen\ncon el clima y ocasión que elegiste</string>
+    <string name="dialog_weather_unavailable_title">No pudimos obtener el clima</string>
+    <string name="dialog_weather_unavailable_subtitle">Hay problemas de red o no pudimos acceder a tu ubicacion. Revisa tu internet y/o volve a intentarlo mas tarde. Mientras tanto, podes usar el modo manual.</string>
 
     <!-- Wardrobe -->
     <string name="wardrobe_title">Guardarropas</string>

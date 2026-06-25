@@ -30,20 +30,30 @@ private val weatherOptions = listOf(
 fun WeatherSection(
     selectedWeather: WeatherCondition?,
     isAutoWeather: Boolean,
+    isAutoWeatherAvailable: Boolean,
     isLoadingWeather: Boolean,
     onWeatherSelected: (WeatherCondition) -> Unit,
-    onToggleAuto: (Boolean) -> Unit
+    onAutomaticWeatherRequested: () -> Unit,
+    onManualWeatherSelected: () -> Unit
 ) {
     SectionCard(title = stringResource(R.string.home_weather_title)) {
 
-        AutoManualToggle(
-            isAuto = isAutoWeather,
-            onToggle = onToggleAuto,
-            labelAuto = stringResource(R.string.home_toggle_auto),
-            labelManual = stringResource(R.string.home_toggle_manual)
-        )
+        if (isAutoWeatherAvailable) {
+            AutoManualToggle(
+                isAuto = isAutoWeather,
+                onToggle = { useAutomaticWeather ->
+                    if (useAutomaticWeather) {
+                        onAutomaticWeatherRequested()
+                    } else {
+                        onManualWeatherSelected()
+                    }
+                },
+                labelAuto = stringResource(R.string.home_toggle_auto),
+                labelManual = stringResource(R.string.home_toggle_manual)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         if (isLoadingWeather) {
             CircularProgressIndicator(

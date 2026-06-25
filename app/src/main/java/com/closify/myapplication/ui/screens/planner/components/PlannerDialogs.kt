@@ -163,13 +163,7 @@ internal fun PlannedOutfitDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (forecast == null) {
-                    Text(
-                        text = stringResource(R.string.planner_no_forecast),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                } else {
+                if (forecast != null) {
                     WeatherInfoRow(forecast = forecast)
                 }
 

@@ -73,12 +73,15 @@ dependencies {
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
     implementation(libs.retrofit)
     implementation(libs.retrofit.scalars)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
     implementation(libs.material)
     
     // Jetpack Glance para el Widget
