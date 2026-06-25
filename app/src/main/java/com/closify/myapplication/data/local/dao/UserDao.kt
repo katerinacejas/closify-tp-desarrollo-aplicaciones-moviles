@@ -17,6 +17,9 @@ interface UserDao {
     @Upsert
     suspend fun upsert(user: UserEntity)
 
+    @Query("SELECT * FROM users WHERE fullName LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%'")
+    suspend fun searchByName(query: String): List<UserEntity>
+
     @Query("DELETE FROM users WHERE id = :id")
     suspend fun deleteById(id: String)
 }

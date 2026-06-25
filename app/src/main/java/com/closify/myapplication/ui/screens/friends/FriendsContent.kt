@@ -393,16 +393,13 @@ private fun EmptyFriendsState(
 @Composable
 private fun FriendsContentPreview() {
     ClosifyTheme {
-        val user = UserRepository.instance.getCurrentUserOrDefault().toSummary()
-        val userId = user.id
+        val user = UserSummary("1", "Maria Cejas", "@maria_cejas", R.drawable.avatar_default)
 
         FriendsContent(
             uiState = FriendsUiState(
                 currentUser = user,
-                friendsCount = SocialRepository.instance.getFriends(userId).size,
-                posts = OutfitPostRepository.instance.getPostsByAuthors(
-                    SocialRepository.instance.getFriends(userId).map { it.id }.toSet()
-                )
+                friendsCount = 0,
+                posts = emptyList()
             ),
             onSearchQueryChange = {},
             onNotificationsClick = {},

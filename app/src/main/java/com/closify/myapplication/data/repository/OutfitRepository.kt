@@ -141,13 +141,13 @@ class OutfitRepository private constructor(
     fun getSuggestedOutfits(): List<SuggestedOutfit> =
         MockClosifyData.suggestedOutfits
 
-    fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
+    suspend fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
-    fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
+    suspend fun getPlannedPosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.PLANNED }
 
-    fun savePlannedOutfitPost(
+    suspend fun savePlannedOutfitPost(
         userId: String,
         title: String?,
         outfit: Outfit,
@@ -169,7 +169,7 @@ class OutfitRepository private constructor(
         return outfitPostRepository.addPost(post)
     }
 
-    fun savePlanning(
+    suspend fun savePlanning(
         userId: String,
         title: String,
         garments: List<Garment>,
@@ -203,7 +203,7 @@ class OutfitRepository private constructor(
         }
     }
 
-    fun updatePlannedOutfitPost(
+    suspend fun updatePlannedOutfitPost(
         postId: String,
         title: String?,
         outfit: Outfit,
@@ -218,13 +218,13 @@ class OutfitRepository private constructor(
         return outfitPostRepository.updatePost(updatedPost)
     }
 
-    fun deletePlannedOutfitPost(postId: String) {
+    suspend fun deletePlannedOutfitPost(postId: String) {
         outfitPostRepository.deletePost(postId)
     }
 
-    fun getPlannedPostById(postId: String): OutfitPost? =
+    suspend fun getPlannedPostById(postId: String): OutfitPost? =
         outfitPostRepository.getPost(postId)?.takeIf { it.type == OutfitPostType.PLANNED }
 
-    fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
+    suspend fun getPlannedPostByDate(userId: String, plannedDate: String): OutfitPost? =
         getPlannedPosts(userId).firstOrNull { it.plannedDate == plannedDate }
 }

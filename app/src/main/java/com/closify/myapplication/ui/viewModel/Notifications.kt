@@ -1,6 +1,7 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
@@ -11,6 +12,8 @@ import com.closify.myapplication.domain.model.OutfitPost
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class NotificationUiItem(
     val notification: Notification,
@@ -38,31 +41,39 @@ class NotificationsViewModel(
     }
 
     fun refresh() {
-        val currentUserId = userRepository.getCurrentUserOrDefault().id
-        _uiState.value = NotificationsUiState(
-            notifications = notificationRepository.getNotifications(currentUserId).map { notification ->
-                NotificationUiItem(
-                    notification = notification,
-                    post = notification.postId?.let(outfitPostRepository::getPost),
-                    friendRequest = notification.friendRequestId?.let(socialRepository::getFriendRequest)
-                )
+        viewModelScope.launch {
+            val currentUserId = userRepository.getCurrentUserOrDefault().id
+            val notifications = notificationRepository.getNotifications(currentUserId)
+            
+            val items = mutableListOf<NotificationUiItem>()
+            for (notification in notifications) {
+                val post = notification.postId?.let { outfitPostRepository.getPost(it) }
+                val request = notification.friendRequestId?.let { socialRepository.getFriendRequest(it) }
+                items.add(NotificationUiItem(notification, post, request))
             }
-        )
+            
+            _uiState.update { it.copy(notifications = items) }
+        }
     }
 
     fun onAcceptFriendRequest(requestId: String) {
-        socialRepository.respondToFriendRequest(requestId, accepted = true)
-        refresh()
+        viewModelScope.launch {
+            socialRepository.respondToFriendRequest(requestId, accepted = true)
+            refresh()
+        }
     }
 
     fun onRejectFriendRequest(requestId: String) {
-        socialRepository.respondToFriendRequest(requestId, accepted = false)
-        refresh()
+        viewModelScope.launch {
+            socialRepository.respondToFriendRequest(requestId, accepted = false)
+            refresh()
+        }
     }
 
     private fun markAllAsRead() {
-        val currentUserId = userRepository.getCurrentUserOrDefault().id
-        notificationRepository.markAllAsRead(currentUserId)
-        refresh()
+        viewModelScope.launch {
+            val currentUserId = userRepository.getCurrentUserOrDefault().id
+            notificationRepository.markAllAsRead(currentUserId)
+        }
     }
 }

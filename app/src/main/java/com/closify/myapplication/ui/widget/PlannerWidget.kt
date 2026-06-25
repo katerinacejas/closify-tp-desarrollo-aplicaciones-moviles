@@ -33,7 +33,6 @@ import com.closify.myapplication.MainActivity
 import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.ui.screens.planner.components.toSpanishTitle
 import java.time.LocalDate
 
 class PlannerWidget : GlanceAppWidget() {
@@ -42,7 +41,15 @@ class PlannerWidget : GlanceAppWidget() {
         val repo = OutfitRepository.instance
         val userId = UserRepository.instance.getCurrentUserOrDefault().id
         val today = LocalDate.now()
-        val todayStr = today.toSpanishTitle()
+
+        // Formateo manual para el Widget (no puede usar @Composable toSpanishTitle)
+        val monthResId = when (today.monthValue) {
+            1 -> R.string.month_1; 2 -> R.string.month_2; 3 -> R.string.month_3; 4 -> R.string.month_4
+            5 -> R.string.month_5; 6 -> R.string.month_6; 7 -> R.string.month_7; 8 -> R.string.month_8
+            9 -> R.string.month_9; 10 -> R.string.month_10; 11 -> R.string.month_11
+            else -> R.string.month_12
+        }
+        val todayStr = context.getString(R.string.planner_date_format, today.dayOfMonth, context.getString(monthResId), today.year)
         
         // Buscamos el outfit planeado para hoy
         val plannedPost = repo.getPlannedPostByDate(userId, todayStr)

@@ -62,8 +62,19 @@ class UserRepository private constructor(context: Context) {
 
     fun getCurrentUserOrDefault(): User = _currentUser.value ?: MockClosifyData.currentUser
 
-    fun getUserById(userId: String): User? =
-        MockClosifyData.authUserById(userId) ?: MockClosifyData.userById(userId)
+    suspend fun getUserById(userId: String): User? {
+        val entity = userDao.getById(userId)
+        if (entity != null) return entity.toDomain()
+        
+        return try {
+            val doc = firestore.collection("users").document(userId).get().await()
+            val remoteEntity = doc.toUserEntity() ?: return null
+            userDao.upsert(remoteEntity)
+            remoteEntity.toDomain()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     // Restaura la sesión al abrir la app si ya había un usuario logueado
     suspend fun restoreSession() {
@@ -99,7 +110,7 @@ class UserRepository private constructor(context: Context) {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: throw Exception("No se pudo crear el usuario.")
             val createdAt = LocalDate.now().format(
-                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "AR"))
+                DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-AR"))
             )
             val user = User(
                 id = uid,
