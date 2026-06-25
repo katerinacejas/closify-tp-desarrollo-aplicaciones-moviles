@@ -1,0 +1,24 @@
+app/src/main/java/com/closify/myapplication/data/local/dao/OutfitPostDao.kt
+  h_e38f44ce52ca59 59-61
+app/src/main/java/com/closify/myapplication/data/repository/OutfitPostRepository.kt
+  h_e38f44ce52ca59 185-191
+app/src/main/java/com/closify/myapplication/data/repository/GarmentRepository.kt
+  h_e38f44ce52ca59 64-70
+app/src/main/java/com/closify/myapplication/data/repository/OutfitRepository.kt
+  h_e38f44ce52ca59 63-69
+app/src/main/java/com/closify/myapplication/data/local/dao/GarmentDao.kt
+  h_e38f44ce52ca59 29-34
+app/src/main/java/com/closify/myapplication/data/local/dao/OutfitDao.kt
+  h_e38f44ce52ca59 29-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "f8ee4c8bada60bc90867dfb91ea9bd97b571beec",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
