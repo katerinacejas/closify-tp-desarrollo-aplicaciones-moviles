@@ -165,24 +165,22 @@ class OutfitPostRepository private constructor(
     }
 
     private suspend fun assemblePost(entity: com.closify.myapplication.data.local.entity.OutfitPostEntity): OutfitPost? {
-        val author = userDao.getById(entity.authorId)?.toDomain()?.toSummary()
-            ?: fetchUserFromFirestore(entity.authorId)
-            ?: return null
+        val author = userRepository.getUserSummary(entity.authorId) ?: return null
         val outfit = outfitRepository.getFavoriteOutfits(entity.authorId).find { it.id == entity.outfitId }
             ?: outfitRepository.currentOutfits.find { it.id == entity.outfitId }
             ?: fetchOutfitFromFirestore(entity.authorId, entity.outfitId)
             ?: return null
-            
+
         val likes = postDao.getLikesForPost(entity.id).mapNotNull { likeEntity ->
-            val likeUser = userDao.getById(likeEntity.userId)?.toDomain()?.toSummary()
+            val likeUser = userRepository.getUserSummary(likeEntity.userId)
             if (likeUser != null) likeEntity.toDomain(likeUser) else null
         }
-        
+
         val comments = postDao.getCommentsForPost(entity.id).mapNotNull { commentEntity ->
-            val commentUser = userDao.getById(commentEntity.userId)?.toDomain()?.toSummary()
+            val commentUser = userRepository.getUserSummary(commentEntity.userId)
             if (commentUser != null) commentEntity.toDomain(commentUser) else null
         }
-        
+
         return entity.toDomain(author, outfit, likes, comments)
     }
 
@@ -211,15 +209,6 @@ class OutfitPostRepository private constructor(
     }
 
     fun resetSessionSync() { syncedThisSession = false }
-
-    private suspend fun fetchUserFromFirestore(userId: String): com.closify.myapplication.domain.model.UserSummary? {
-        return try {
-            val doc = firestore.collection("users").document(userId).get().await()
-            val entity = doc.toUserEntity() ?: return null
-            userDao.upsert(entity)
-            entity.toDomain().toSummary()
-        } catch (e: Exception) { null }
-    }
 
     private suspend fun fetchOutfitFromFirestore(authorId: String, outfitId: String): com.closify.myapplication.domain.model.Outfit? {
         return try {

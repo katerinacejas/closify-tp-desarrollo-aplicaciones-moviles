@@ -64,18 +64,20 @@ class UserRepository private constructor(context: Context) {
         ?: error("getCurrentUserOrDefault() llamado sin usuario logueado.")
 
     suspend fun getUserById(userId: String): User? {
+        _currentUser.value?.let { if (it.id == userId) return it }
         val entity = userDao.getById(userId)
         if (entity != null) return entity.toDomain()
-        
         return try {
             val doc = firestore.collection("users").document(userId).get().await()
+            if (!doc.exists()) return null
             val remoteEntity = doc.toUserEntity() ?: return null
             userDao.upsert(remoteEntity)
             remoteEntity.toDomain()
-        } catch (e: Exception) {
-            null
-        }
+        } catch (e: Exception) { null }
     }
+
+    suspend fun getUserSummary(userId: String): com.closify.myapplication.domain.model.UserSummary? =
+        getUserById(userId)?.toSummary()
 
     // Restaura la sesión al abrir la app si ya había un usuario logueado
     suspend fun restoreSession() {

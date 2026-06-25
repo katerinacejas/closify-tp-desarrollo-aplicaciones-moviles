@@ -47,11 +47,13 @@ class NotificationRepository private constructor(context: Context) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var syncedThisSession = false
 
+    private val userRepository: UserRepository by lazy { UserRepository.instance }
+
     suspend fun getNotifications(userId: String): List<Notification> {
         val entities = notificationDao.getAllByUserId(userId)
         return entities.mapNotNull { entity ->
-            val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary()
-            val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary()
+            val sender = userRepository.getUserSummary(entity.senderId)
+            val receiver = userRepository.getUserSummary(entity.receiverId)
             if (sender != null && receiver != null) entity.toDomain(sender, receiver) else null
         }
     }
