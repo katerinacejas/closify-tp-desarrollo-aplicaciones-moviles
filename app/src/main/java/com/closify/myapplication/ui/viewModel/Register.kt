@@ -2,6 +2,9 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,7 +68,8 @@ sealed interface RegisterEvent {
 }
 
 class RegisterViewModel(
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -133,6 +137,7 @@ class RegisterViewModel(
             }
 
             if (isValid) {
+                analyticsTracker.track(AnalyticsEvents.registerStepCompleted(step = 1))
                 _uiState.update { it.copy(currentStep = RegisterStep.STEP_2) }
             }
         }
@@ -173,6 +178,7 @@ class RegisterViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
+            analyticsTracker.track(AnalyticsEvents.registerSubmitted())
             userRepository.register(
                 email = state.email,
                 password = state.password,
@@ -182,9 +188,12 @@ class RegisterViewModel(
                 bio = state.bio.trim()
             )
                 .onSuccess {
+                    analyticsTracker.setUserId(userRepository.currentUserId.takeIf { it.isNotBlank() })
+                    analyticsTracker.track(AnalyticsEvents.registerSucceeded())
                     _uiState.update { it.copy(isLoading = false, registerSuccess = true) }
                 }
                 .onFailure { error ->
+                    analyticsTracker.track(AnalyticsEvents.registerFailed(error.message))
                     _uiState.update {
                         it.copy(isLoading = false, generalError = error.message)
                     }

@@ -4,6 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import com.closify.myapplication.R
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 
 data class OnboardingPage(
     @param:DrawableRes val imageRes: Int,
@@ -11,7 +14,9 @@ data class OnboardingPage(
     @param:StringRes val descriptionRes: Int
 )
 
-class OnboardingViewModel : ViewModel() {
+class OnboardingViewModel(
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
+) : ViewModel() {
 
     val pages = listOf(
         OnboardingPage(
@@ -43,6 +48,7 @@ class OnboardingViewModel : ViewModel() {
     }
 
     private fun onFinish() {
+        analyticsTracker.track(AnalyticsEvents.onboardingCompleted())
         // TODO: guardar en DataStore que el onboarding ya fue visto
         // TODO: navegar a home
     }

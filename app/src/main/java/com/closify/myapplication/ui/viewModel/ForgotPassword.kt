@@ -3,6 +3,9 @@ package com.closify.myapplication.ui.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +29,8 @@ sealed interface ForgotPasswordEvent {
 }
 
 class ForgotPasswordViewModel(
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ForgotPasswordUiState())
@@ -55,9 +59,11 @@ class ForgotPasswordViewModel(
             _uiState.update { it.copy(isLoading = true) }
             userRepository.requestPasswordRecovery(email)
                 .onSuccess {
+                    analyticsTracker.track(AnalyticsEvents.passwordRecoveryRequested())
                     _uiState.update { it.copy(isLoading = false, recoverySent = true) }
                 }
                 .onFailure { error ->
+                    analyticsTracker.track(AnalyticsEvents.passwordRecoveryFailed(error.message))
                     _uiState.update {
                         it.copy(isLoading = false, generalError = error.message)
                     }
