@@ -107,10 +107,22 @@ class ClassifyGarmentViewModel(
     private fun uriToFile(uriString: String): File? {
         return try {
             val uri = Uri.parse(uriString)
-            val path = uri.path ?: return null
-            val file = File(path)
-            if (file.exists()) file else null
-        } catch (e: Exception) { null }
+            if (uri.scheme == "file") {
+                val file = File(uri.path ?: return null)
+                return if (file.exists()) file else null
+            }
+            
+            // Para content:// URIs (Galeria/Camara), copiamos a un archivo temporal
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+            val tempFile = File(context.cacheDir, "temp_upload_${System.currentTimeMillis()}.png")
+            tempFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+            tempFile
+        } catch (e: Exception) {
+            android.util.Log.e("ClassifyGarment", "Error converting URI to file", e)
+            null
+        }
     }
 
     private fun toggleWeather(weather: WeatherCondition) {
