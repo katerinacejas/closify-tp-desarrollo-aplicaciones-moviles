@@ -137,14 +137,7 @@ internal fun PlannerDateSummaryCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             val forecast = uiState.selectedForecast
-            if (forecast == null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.planner_no_weather_info),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
+            if (forecast != null) {
                 Spacer(modifier = Modifier.height(2.dp))
                 WeatherInfoRow(forecast = forecast)
             }

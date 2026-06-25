@@ -38,10 +38,12 @@ fun HomeContent(
     selectedWeather: WeatherCondition?,
     selectedOccasion: Occasion?,
     isAutoWeather: Boolean,
+    isAutoWeatherAvailable: Boolean,
     isLoadingWeather: Boolean,
     isGenerateEnabled: Boolean,
     dialog: HomeDialog? = null,
     onEvent: (HomeEvent) -> Unit,
+    onAutomaticWeatherRequested: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (dialog) {
@@ -54,6 +56,12 @@ fun HomeContent(
         HomeDialog.NO_COMBINATIONS -> ClosifyConfirmationDialog(
             title = stringResource(R.string.dialog_no_combinations_title),
             subtitle = stringResource(R.string.dialog_no_combinations_subtitle),
+            buttonText = stringResource(R.string.btn_continue),
+            onDismiss = { onEvent(HomeEvent.DismissDialog) }
+        )
+        HomeDialog.WEATHER_UNAVAILABLE -> ClosifyConfirmationDialog(
+            title = stringResource(R.string.dialog_weather_unavailable_title),
+            subtitle = stringResource(R.string.dialog_weather_unavailable_subtitle),
             buttonText = stringResource(R.string.btn_continue),
             onDismiss = { onEvent(HomeEvent.DismissDialog) }
         )
@@ -100,9 +108,11 @@ fun HomeContent(
         WeatherSection(
             selectedWeather = selectedWeather,
             isAutoWeather = isAutoWeather,
+            isAutoWeatherAvailable = isAutoWeatherAvailable,
             isLoadingWeather = isLoadingWeather,
             onWeatherSelected = { onEvent(HomeEvent.SelectWeather(it)) },
-            onToggleAuto = { onEvent(HomeEvent.ToggleAutoWeather(it)) }
+            onAutomaticWeatherRequested = onAutomaticWeatherRequested,
+            onManualWeatherSelected = { onEvent(HomeEvent.SelectManualWeatherMode) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -133,9 +143,11 @@ private fun HomeContentPreview() {
             selectedWeather = WeatherCondition.MILD,
             selectedOccasion = Occasion.CASUAL,
             isAutoWeather = false,
+            isAutoWeatherAvailable = true,
             isLoadingWeather = false,
             isGenerateEnabled = true,
-            onEvent = {}
+            onEvent = {},
+            onAutomaticWeatherRequested = {}
         )
     }
 }

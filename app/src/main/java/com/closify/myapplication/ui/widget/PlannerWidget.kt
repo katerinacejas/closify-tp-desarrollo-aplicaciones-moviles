@@ -33,7 +33,6 @@ import com.closify.myapplication.MainActivity
 import com.closify.myapplication.R
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
-import com.closify.myapplication.ui.screens.planner.components.toSpanishTitle
 import java.time.LocalDate
 
 class PlannerWidget : GlanceAppWidget() {
@@ -221,4 +220,23 @@ class PlannerWidget : GlanceAppWidget() {
 
 class PlannerWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = PlannerWidget()
+}
+
+private fun LocalDate.toSpanishTitle(): String {
+    val month = when (monthValue) {
+        1 -> "enero"
+        2 -> "febrero"
+        3 -> "marzo"
+        4 -> "abril"
+        5 -> "mayo"
+        6 -> "junio"
+        7 -> "julio"
+        8 -> "agosto"
+        9 -> "septiembre"
+        10 -> "octubre"
+        11 -> "noviembre"
+        else -> "diciembre"
+    }
+
+    return "$dayOfMonth de $month de $year"
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.PlannerForecastDay
@@ -84,13 +85,20 @@ class PlannerViewModel(
         selectedDate = today,
         visibleMonth = java.time.YearMonth.from(today),
         dateInput = today.format(PlannerDateFormatter),
-        forecastDays = weatherRepository.getPlannerForecast(today),
         plannedPosts = outfitRepository.getPlannedPosts(userRepository.getCurrentUserOrDefault().id)
     ))
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 
     init {
         loadGarments()
+    }
+
+    fun onForecastLocationAvailable(location: DeviceLocation) {
+        loadForecast(location)
+    }
+
+    fun onForecastUnavailable() {
+        _uiState.update { it.copy(forecastDays = emptyList()) }
     }
 
     fun onDateInputChange(value: String) {
@@ -264,6 +272,13 @@ class PlannerViewModel(
                     selectedFullBodyGarmentId = defaultSelectedId(garmentGroups.fullBody)
                 )
             }
+        }
+    }
+
+    private fun loadForecast(location: DeviceLocation) {
+        viewModelScope.launch {
+            val forecastDays = weatherRepository.getPlannerForecast(location, today).getOrDefault(emptyList())
+            _uiState.update { it.copy(forecastDays = forecastDays) }
         }
     }
 

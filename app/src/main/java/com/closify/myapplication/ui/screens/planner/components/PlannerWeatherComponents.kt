@@ -7,9 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.rounded.Cloud
-import androidx.compose.material.icons.rounded.WaterDrop
-import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.closify.myapplication.R
@@ -39,7 +39,7 @@ internal fun WeatherInfoRow(
 
         val weatherLabelResId = when (forecast.weather) {
             WeatherCondition.HOT -> R.string.weather_hot_long
-            WeatherCondition.COLD -> R.string.weather_rainy
+            WeatherCondition.COLD -> R.string.weather_cold
             WeatherCondition.WINDY -> R.string.weather_windy
             WeatherCondition.MILD -> R.string.weather_mild
             else -> R.string.weather_any
@@ -62,19 +62,21 @@ internal fun WeatherIcon(
         WeatherCondition.MILD -> MildWeatherIcon(modifier = modifier)
         WeatherCondition.ANY  -> Unit
         else -> {
-            val icon: ImageVector
-            val tint: Color
-            when (weather) {
-                WeatherCondition.HOT   -> { icon = Icons.Rounded.WbSunny;  tint = Color(0xFFFFD600) }
-                WeatherCondition.COLD  -> { icon = Icons.Rounded.WaterDrop; tint = Color(0xFF1E88E5) }
-                WeatherCondition.WINDY -> { icon = Icons.Rounded.Cloud;     tint = Color(0xFF1E88E5) }
-                else                   -> { icon = Icons.Rounded.Cloud;     tint = MaterialTheme.colorScheme.outlineVariant }
-            }
             Icon(
-                imageVector = icon,
+                imageVector = when (weather) {
+                    WeatherCondition.HOT -> Icons.Filled.WbSunny
+                    WeatherCondition.COLD -> Icons.Filled.AcUnit
+                    WeatherCondition.WINDY -> Icons.Filled.Air
+                    else -> Icons.Rounded.Cloud
+                },
                 contentDescription = null,
-                tint = tint,
-                modifier = modifier.size(18.dp)
+                tint = when (weather) {
+                    WeatherCondition.HOT -> Color(0xFFFFD600)
+                    WeatherCondition.COLD -> Color(0xFF90CAF9)
+                    WeatherCondition.WINDY -> Color(0xFF64B5F6)
+                    else -> MaterialTheme.colorScheme.outlineVariant
+                },
+                modifier = modifier.size(20.dp)
             )
         }
     }
@@ -87,7 +89,7 @@ internal fun MildWeatherIcon(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = Icons.Rounded.WbSunny,
+            imageVector = Icons.Filled.WbSunny,
             contentDescription = null,
             tint = Color(0xFFFFD600),
             modifier = Modifier.align(Alignment.TopStart).size(15.dp)

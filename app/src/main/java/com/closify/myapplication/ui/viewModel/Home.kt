@@ -6,10 +6,12 @@ import com.closify.myapplication.data.repository.GarmentRepository
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.data.repository.UserRepository
 import com.closify.myapplication.data.repository.WeatherRepository
+import com.closify.myapplication.domain.model.DeviceLocation
 import com.closify.myapplication.domain.model.Occasion
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.WeatherCondition
 import com.closify.myapplication.domain.usecase.GenerateOutfitsUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,14 +20,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class HomeDialog { NO_GARMENTS, NO_COMBINATIONS }
+enum class HomeDialog { NO_GARMENTS, NO_COMBINATIONS, WEATHER_UNAVAILABLE }
 
 data class HomeUiState(
     val username: String = "",
     val selectedWeather: WeatherCondition? = null,
     val selectedOccasion: Occasion? = null,
-    val isAutoWeather: Boolean = false,
-    val isLoadingWeather: Boolean = false,
+    val isAutoWeather: Boolean = true,
+    val isAutoWeatherAvailable: Boolean = true,
+    val isLoadingWeather: Boolean = true,
     val isGenerateEnabled: Boolean = false,
     val dialog: HomeDialog? = null
 )
@@ -33,7 +36,9 @@ data class HomeUiState(
 sealed interface HomeEvent {
     data class SelectWeather(val weather: WeatherCondition) : HomeEvent
     data class SelectOccasion(val occasion: Occasion) : HomeEvent
-    data class ToggleAutoWeather(val isAuto: Boolean) : HomeEvent
+    data class LoadAutomaticWeather(val location: DeviceLocation) : HomeEvent
+    data object SelectManualWeatherMode : HomeEvent
+    data object AutomaticWeatherUnavailable : HomeEvent
     data object GenerateOutfits : HomeEvent
     data object DismissDialog : HomeEvent
 }
@@ -50,6 +55,8 @@ class HomeViewModel(
     private val userRepository: UserRepository = UserRepository.instance
 ) : ViewModel() {
 
+    private var automaticWeatherJob: Job? = null
+
     private val _uiState = MutableStateFlow(
         HomeUiState(username = userRepository.currentUsername)
     )
@@ -62,7 +69,9 @@ class HomeViewModel(
         when (event) {
             is HomeEvent.SelectWeather      -> selectWeather(event.weather)
             is HomeEvent.SelectOccasion     -> selectOccasion(event.occasion)
-            is HomeEvent.ToggleAutoWeather  -> toggleAutoWeather(event.isAuto)
+            is HomeEvent.LoadAutomaticWeather -> loadAutomaticWeather(event.location)
+            is HomeEvent.SelectManualWeatherMode -> selectManualWeatherMode()
+            is HomeEvent.AutomaticWeatherUnavailable -> handleAutomaticWeatherUnavailable()
             is HomeEvent.GenerateOutfits -> generateOutfits()
             is HomeEvent.DismissDialog   -> _uiState.update { it.copy(dialog = null) }
         }
@@ -72,6 +81,7 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 selectedWeather = weather,
+                isAutoWeather = false,
                 isGenerateEnabled = it.selectedOccasion != null
             )
         }
@@ -86,23 +96,60 @@ class HomeViewModel(
         }
     }
 
-    private fun toggleAutoWeather(isAuto: Boolean) {
-        _uiState.update { it.copy(isAutoWeather = isAuto) }
-
-        if (isAuto) {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoadingWeather = true) }
-                val weather = weatherRepository.getCurrentWeather()
-                _uiState.update {
-                    it.copy(
-                        selectedWeather = weather,
-                        isLoadingWeather = false,
-                        isGenerateEnabled = it.selectedOccasion != null
-                    )
-                }
+    private fun loadAutomaticWeather(location: DeviceLocation) {
+        automaticWeatherJob?.cancel()
+        automaticWeatherJob = viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    selectedWeather = null,
+                    isAutoWeather = true,
+                    isAutoWeatherAvailable = true,
+                    isLoadingWeather = true,
+                    isGenerateEnabled = false
+                )
             }
-        } else {
-            _uiState.update { it.copy(selectedWeather = null, isGenerateEnabled = false) }
+
+            weatherRepository.getCurrentWeather(location)
+                .onSuccess { weather ->
+                    _uiState.update {
+                        it.copy(
+                            selectedWeather = weather,
+                            isAutoWeather = true,
+                            isAutoWeatherAvailable = true,
+                            isLoadingWeather = false,
+                            isGenerateEnabled = it.selectedOccasion != null
+                        )
+                    }
+                }
+                .onFailure {
+                    handleAutomaticWeatherUnavailable()
+                }
+        }
+    }
+
+    private fun selectManualWeatherMode() {
+        automaticWeatherJob?.cancel()
+        _uiState.update {
+            it.copy(
+                selectedWeather = null,
+                isAutoWeather = false,
+                isLoadingWeather = false,
+                isGenerateEnabled = false
+            )
+        }
+    }
+
+    private fun handleAutomaticWeatherUnavailable() {
+        automaticWeatherJob?.cancel()
+        _uiState.update {
+            it.copy(
+                selectedWeather = null,
+                isAutoWeather = false,
+                isAutoWeatherAvailable = false,
+                isLoadingWeather = false,
+                isGenerateEnabled = false,
+                dialog = HomeDialog.WEATHER_UNAVAILABLE
+            )
         }
     }
 

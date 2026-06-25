@@ -223,15 +223,7 @@ private fun PlannerOutfitSelectionContent(
                 modifier = Modifier.fillMaxWidth()
             )
             val forecast = uiState.selectedForecast
-            if (forecast == null) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.planner_no_forecast),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-            } else {
+            if (forecast != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 WeatherInfoRow(forecast = forecast)
             }
