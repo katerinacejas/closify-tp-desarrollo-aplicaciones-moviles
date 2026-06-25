@@ -1,0 +1,26 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/ClassifyGarment.kt
+  s_ef187569660cfa::t_480f4866aca5b4 3-4,7,13,19-20,32-33,48,56-59,72-112
+app/src/main/java/com/closify/myapplication/ui/screens/addgarment/ClassifyGarmentScreen.kt
+  s_ef187569660cfa::t_febfd252410797 3-8,10,13,16,18-20,34-37,41,83-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7283dcdc37f82f3e04ad3afe7b22ea68daa76779",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
