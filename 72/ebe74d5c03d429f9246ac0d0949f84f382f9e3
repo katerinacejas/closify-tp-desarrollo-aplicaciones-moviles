@@ -1,0 +1,16 @@
+app/src/main/java/com/closify/myapplication/ui/viewModel/Main.kt
+  h_e38f44ce52ca59 5-8,20-24,26,33-34,36-37,44,62-63,67,71-75
+app/src/main/java/com/closify/myapplication/ui/viewModel/Planner.kt
+  h_e38f44ce52ca59 5-8,27,84-86,178-180,288-289,297-304,311-321,341-349,352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "72ebe74d5c03d429f9246ac0d0949f84f382f9e3",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
