@@ -1,0 +1,90 @@
+app/src/main/java/com/closify/myapplication/data/repository/SocialRepository.kt
+  s_ef187569660cfa::t_204cba59a9fa91 275-276
+  s_ef187569660cfa::t_3436335dcc7754 98
+  s_ef187569660cfa::t_7e53b12a5f4354 266-269
+  s_ef187569660cfa::t_ba14896c5e6e6f 56
+  s_ef187569660cfa::t_e085cb44351334 75
+  s_ef187569660cfa::t_1c7c7619031986 100
+  s_ef187569660cfa::t_01ff8fed402f01 10
+  s_ef187569660cfa::t_81216c78c07c29 242-252,256,258-265,270-273
+app/src/main/java/com/closify/myapplication/ui/screens/friends/FriendsContent.kt
+  s_ef187569660cfa::t_5d8045f29afb8b 150
+  s_ef187569660cfa::t_a6ca07a8947177 128-141
+  s_ef187569660cfa::t_8846d227f812d3 29
+  s_ef187569660cfa::t_9fca6d6212a705 142-143,149,151-152
+  s_ef187569660cfa::t_235b3b5d8cf0db 144-148
+app/src/main/java/com/closify/myapplication/ui/viewModel/Notifications.kt
+  s_ef187569660cfa::t_dfffe018fe6568 39-46,50-59
+app/src/main/java/com/closify/myapplication/data/repository/NotificationRepository.kt
+  s_ef187569660cfa::t_22cc9c16cd651f 87
+  s_ef187569660cfa::t_435f608185fd7a 80,85
+  s_ef187569660cfa::t_cf1863e2d216a9 177-178
+  s_ef187569660cfa::t_e6c81bf14aeac4 19
+  s_ef187569660cfa::t_cb56997b0b0713 51
+  s_ef187569660cfa::t_6398292c6806a8 54-57,60
+  s_ef187569660cfa::t_abceebafe9c849 22-24
+  s_ef187569660cfa::t_076389a1ab1f65 163-165
+app/src/main/java/com/closify/myapplication/ClosifyApplication.kt
+  s_ef187569660cfa::t_5dfd4bf6bb9b89 19-20
+app/src/main/java/com/closify/myapplication/ui/viewModel/Main.kt
+  s_ef187569660cfa::t_0e486421d79c79 36-38
+  s_ef187569660cfa::t_a20a2111918ea4 5-7
+app/src/main/java/com/closify/myapplication/data/local/dao/UserDao.kt
+  s_ef187569660cfa::t_b730bfc0a66994 20-22
+app/src/main/java/com/closify/myapplication/ui/screens/friends/FriendsScreen.kt
+  s_ef187569660cfa::t_55a6c4b46df50b 8,19-23
+app/src/main/java/com/closify/myapplication/data/local/AppDatabase.kt
+  s_ef187569660cfa::t_3018e69453a5bf 36
+app/src/main/AndroidManifest.xml
+  s_ef187569660cfa::t_e71d94a24cf2b2 6
+app/src/main/java/com/closify/myapplication/ui/viewModel/Friends.kt
+  s_ef187569660cfa::t_f598791c985b8d 63,72-74,78,87-89
+  s_ef187569660cfa::t_9f5b8c426371ac 3-6,49,54,64-71,79-86,103-108,111-112,121,129-135,147,150,154,170,193-198,204,215-220
+  s_ef187569660cfa::t_04c0a5d4a07fe6 93-96,98,109-110
+  s_ef187569660cfa::t_d58cbb3515a716 7
+  s_ef187569660cfa::t_00f75a7a73ad4e 43
+  s_ef187569660cfa::t_44538ef61b31c2 222-230
+app/src/main/java/com/closify/myapplication/ui/viewModel/Home.kt
+  s_ef187569660cfa::t_d0bbb2c84d74b1 56
+  s_ef187569660cfa::t_f6e5046d8d8f77 17-19
+  s_ef187569660cfa::t_55d19190166ddd 62-67
+app/src/main/java/com/closify/myapplication/data/repository/UserRepository.kt
+  s_ef187569660cfa::t_0ab4e647f31d3a 86-87
+  s_ef187569660cfa::t_6ac6abb11f9b18 219,221
+app/src/main/java/com/closify/myapplication/data/local/entity/LikeEntity.kt
+  s_ef187569660cfa::t_1d8461153daaf2 5,9
+app/src/main/java/com/closify/myapplication/data/repository/OutfitPostRepository.kt
+  s_ef187569660cfa::t_26cad9f0dc7dc8 21-23
+  s_ef187569660cfa::t_e56af38a98b71a 107
+  s_ef187569660cfa::t_233402204ea3aa 32
+  s_ef187569660cfa::t_8e6582b37fe3cf 202
+  s_ef187569660cfa::t_1e5d24b10b6d25 205,208-210
+  s_ef187569660cfa::t_49bf9fdcf365ee 183
+  s_ef187569660cfa::t_a92533535a504d 206-207
+  s_ef187569660cfa::t_bc2e70e5740ce8 31
+  s_ef187569660cfa::t_9aa96dcdf65d45 127
+  s_ef187569660cfa::t_46a89f377b1710 200
+app/src/main/java/com/closify/myapplication/data/repository/OutfitRepository.kt
+  s_ef187569660cfa::t_c33a44dc2dd85a 26,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2ecc8c9d0ab4201365d869b1f75976c00ef36d54",
+  "prompts": {},
+  "humans": {
+    "h_e38f44ce52ca59": {
+      "author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  },
+  "sessions": {
+    "s_ef187569660cfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1886fbd-d9a8-459d-9d7b-1805830ee7b0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "agustina Marrapodi <agustina.amarrapodi@mercadolibre.com>"
+    }
+  }
+}
