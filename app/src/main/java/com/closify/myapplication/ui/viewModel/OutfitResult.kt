@@ -1,6 +1,9 @@
 package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.OutfitRepository
 import com.closify.myapplication.domain.model.Outfit
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,8 @@ sealed interface OutfitResultEvent {
 }
 
 class OutfitResultViewModel(
-    private val outfitRepository: OutfitRepository = OutfitRepository.instance
+    private val outfitRepository: OutfitRepository = OutfitRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -37,6 +41,7 @@ class OutfitResultViewModel(
     private fun toggleFavorite(outfitId: String) {
         val current = _uiState.value.favoriteIds
         val updated = if (outfitId in current) current - outfitId else current + outfitId
+        analyticsTracker.track(AnalyticsEvents.favoriteSelectionChanged(updated.size))
         _uiState.update { it.copy(favoriteIds = updated) }
     }
 

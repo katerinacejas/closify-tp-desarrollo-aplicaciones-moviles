@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.ui.screens.ForgotPasswordScreen
 import com.closify.myapplication.ui.screens.LoginScreen
 import com.closify.myapplication.ui.screens.OnboardingScreen
@@ -15,8 +17,11 @@ import com.closify.myapplication.ui.screens.register.RegisterScreen
 fun AuthNavGraph(
     onLoginSuccess: () -> Unit,
     startDestination: String = Screen.Onboarding.route,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker
 ) {
+    TrackScreenViews(navController = navController, analyticsTracker = analyticsTracker)
+
     NavHost(
         navController = navController,
         startDestination = startDestination

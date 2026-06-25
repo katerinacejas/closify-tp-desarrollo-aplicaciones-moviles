@@ -2,6 +2,10 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.OutfitRepository
 import kotlinx.coroutines.launch
 import com.closify.myapplication.domain.model.Outfit
@@ -23,7 +27,9 @@ sealed interface SaveFavoritesEvent {
 }
 
 class SaveFavoritesViewModel(
-    private val outfitRepository: OutfitRepository = OutfitRepository.instance
+    private val outfitRepository: OutfitRepository = OutfitRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -44,8 +50,21 @@ class SaveFavoritesViewModel(
     private fun save() {
         val state = _uiState.value
         viewModelScope.launch {
-            outfitRepository.saveFavorites(state.outfits, state.outfitNames)
-            _uiState.update { it.copy(showSavedDialog = true) }
+            runCatching {
+                outfitRepository.saveFavorites(state.outfits, state.outfitNames)
+            }.onSuccess {
+                analyticsTracker.track(AnalyticsEvents.favoriteOutfitsSaved(state.outfits.size))
+                _uiState.update { it.copy(showSavedDialog = true) }
+            }.onFailure { error ->
+                crashReporter.recordException(
+                    throwable = error,
+                    keys = mapOf(
+                        "feature" to "favorite_outfits",
+                        "operation" to "save",
+                        "outfit_count" to state.outfits.size
+                    )
+                )
+            }
         }
     }
 }

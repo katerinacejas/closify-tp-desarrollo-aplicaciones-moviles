@@ -2,6 +2,10 @@ package com.closify.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.closify.myapplication.core.telemetry.AnalyticsEvents
+import com.closify.myapplication.core.telemetry.AnalyticsTracker
+import com.closify.myapplication.core.telemetry.CrashReporter
+import com.closify.myapplication.core.telemetry.TelemetryProvider
 import com.closify.myapplication.data.repository.NotificationRepository
 import com.closify.myapplication.data.repository.OutfitPostRepository
 import com.closify.myapplication.data.repository.SocialRepository
@@ -29,7 +33,9 @@ class NotificationsViewModel(
     private val notificationRepository: NotificationRepository = NotificationRepository.instance,
     private val outfitPostRepository: OutfitPostRepository = OutfitPostRepository.instance,
     private val socialRepository: SocialRepository = SocialRepository.instance,
-    private val userRepository: UserRepository = UserRepository.instance
+    private val userRepository: UserRepository = UserRepository.instance,
+    private val analyticsTracker: AnalyticsTracker = TelemetryProvider.analyticsTracker,
+    private val crashReporter: CrashReporter = TelemetryProvider.crashReporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotificationsUiState())
@@ -75,6 +81,13 @@ class NotificationsViewModel(
     fun onAcceptFriendRequest(requestId: String) {
         viewModelScope.launch {
             socialRepository.respondToFriendRequest(requestId, accepted = true)
+                .onSuccess { analyticsTracker.track(AnalyticsEvents.friendRequestResponded(accepted = true)) }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf("feature" to "notifications", "operation" to "accept_friend_request")
+                    )
+                }
             refresh()
         }
     }
@@ -82,6 +95,13 @@ class NotificationsViewModel(
     fun onRejectFriendRequest(requestId: String) {
         viewModelScope.launch {
             socialRepository.respondToFriendRequest(requestId, accepted = false)
+                .onSuccess { analyticsTracker.track(AnalyticsEvents.friendRequestResponded(accepted = false)) }
+                .onFailure { error ->
+                    crashReporter.recordException(
+                        throwable = error,
+                        keys = mapOf("feature" to "notifications", "operation" to "reject_friend_request")
+                    )
+                }
             refresh()
         }
     }
