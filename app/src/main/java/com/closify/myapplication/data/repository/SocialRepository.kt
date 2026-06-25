@@ -16,8 +16,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
@@ -54,15 +52,6 @@ class SocialRepository private constructor(
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var syncedThisSession = false
-
-    fun observeFriends(userId: String): Flow<List<UserSummary>> {
-        return friendshipDao.observeByUserId(userId).map { entities ->
-            entities.mapNotNull { entity ->
-                val friendId = if (entity.userAId == userId) entity.userBId else entity.userAId
-                userDao.getById(friendId)?.toDomain()?.toSummary()
-            }
-        }
-    }
 
     suspend fun getFriends(userId: String): List<UserSummary> {
         return friendshipDao.getAllByUserId(userId).mapNotNull { entity ->
@@ -201,16 +190,6 @@ class SocialRepository private constructor(
         docToDelete?.reference?.delete()?.await()
     }
 
-    fun observePendingReceivedRequests(userId: String): Flow<List<FriendRequest>> {
-        return requestDao.observePendingIncoming(userId).map { entities ->
-            entities.mapNotNull { entity ->
-                val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary()
-                val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary()
-                if (sender != null && receiver != null) entity.toDomain(sender, receiver) else null
-            }
-        }
-    }
-    
     suspend fun getPendingOutgoingFriendRequest(senderId: String, receiverId: String): FriendRequest? {
         val entities = requestDao.getAllByUserId(senderId)
         val entity = entities.find { it.senderId == senderId && it.receiverId == receiverId && it.status == FriendRequestStatus.PENDING.name }
@@ -236,20 +215,6 @@ class SocialRepository private constructor(
         val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary() ?: return null
         val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary() ?: return null
         return entity.toDomain(sender, receiver)
-    }
-
-    suspend fun getAllUserSummaries(excludeUserId: String): List<UserSummary> {
-        return try {
-            firestore.collection("users")
-                .get()
-                .await()
-                .documents
-                .mapNotNull { it.toUserEntity()?.toDomain()?.toSummary() }
-                .filter { it.id != excludeUserId }
-        } catch (e: Exception) {
-            android.util.Log.w("SocialRepository", "getAllUserSummaries failed: ${e.message}")
-            emptyList()
-        }
     }
 
     suspend fun searchUserSummariesByName(query: String, currentUserId: String): List<UserSummary> {

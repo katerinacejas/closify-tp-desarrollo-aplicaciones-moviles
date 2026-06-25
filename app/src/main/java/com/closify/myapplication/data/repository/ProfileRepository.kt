@@ -50,8 +50,6 @@ class ProfileRepository private constructor(
         return userRepository.getUserById(userId)?.profile
     }
 
-    suspend fun getUserProfile(userId: String): UserProfile? = getProfile(userId)
-
     suspend fun getWardrobeGarments(userId: String = userRepository.currentUserId): List<Garment> =
         garmentRepository.getAllByUserId(userId)
 

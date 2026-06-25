@@ -57,7 +57,7 @@ class PublicProfileViewModel(
         val userId = profileUserId ?: return
         viewModelScope.launch {
             val currentUser = userRepository.getCurrentUserOrDefault().toSummary()
-            val profile = profileRepository.getUserProfile(userId) ?: return@launch
+            val profile = profileRepository.getProfile(userId) ?: return@launch
             val posts = outfitPostRepository.getPostsByUser(userId)
             val friends = socialRepository.getFriends(userId)
             val stats = profileRepository.getPublicProfileStats(userId)

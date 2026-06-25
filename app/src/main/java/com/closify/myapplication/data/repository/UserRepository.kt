@@ -60,7 +60,8 @@ class UserRepository private constructor(context: Context) {
 
     fun getCurrentUser(): User? = _currentUser.value
 
-    fun getCurrentUserOrDefault(): User = _currentUser.value ?: MockClosifyData.currentUser
+    fun getCurrentUserOrDefault(): User = _currentUser.value
+        ?: error("getCurrentUserOrDefault() llamado sin usuario logueado.")
 
     suspend fun getUserById(userId: String): User? {
         val entity = userDao.getById(userId)

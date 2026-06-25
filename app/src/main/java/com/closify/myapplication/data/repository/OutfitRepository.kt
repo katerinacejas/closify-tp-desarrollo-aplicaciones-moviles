@@ -10,7 +10,6 @@ import com.closify.myapplication.domain.model.Garment
 import com.closify.myapplication.domain.model.Outfit
 import com.closify.myapplication.domain.model.OutfitPost
 import com.closify.myapplication.domain.model.OutfitPostType
-import com.closify.myapplication.domain.model.SuggestedOutfit
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -138,9 +137,6 @@ class OutfitRepository private constructor(
         }
     }
 
-    fun getSuggestedOutfits(): List<SuggestedOutfit> =
-        MockClosifyData.suggestedOutfits
-
     suspend fun getFavoritePosts(userId: String = UserRepository.instance.currentUserId): List<OutfitPost> =
         outfitPostRepository.getPostsByUser(userId).filter { it.type == OutfitPostType.FAVORITE }
 
@@ -154,11 +150,9 @@ class OutfitRepository private constructor(
         plannedDate: String,
         createdAt: String
     ): OutfitPost? {
-        val author = UserRepository.instance.getCurrentUser()?.toSummary()
-            ?: MockClosifyData.userById(userId)?.toSummary()
-            ?: return null
+        val author = UserRepository.instance.getCurrentUser()?.toSummary() ?: return null
         val post = OutfitPost(
-            id = "planned_post_${MockClosifyData.outfitPosts.size + 1}",
+            id = UUID.randomUUID().toString(),
             author = author,
             outfit = outfit.copy(ownerUserId = userId),
             title = title?.take(100)?.ifBlank { null },

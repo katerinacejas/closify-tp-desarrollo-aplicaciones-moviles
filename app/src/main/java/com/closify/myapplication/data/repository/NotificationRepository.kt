@@ -14,9 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
@@ -49,19 +46,6 @@ class NotificationRepository private constructor(context: Context) {
     private val firestore = FirebaseFirestore.getInstance()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var syncedThisSession = false
-
-    fun observeNotifications(userId: String): Flow<List<Notification>> =
-        notificationDao.observeByUserId(userId).transform { entities ->
-            val notifications = entities.mapNotNull { entity ->
-                val sender = userDao.getById(entity.senderId)?.toDomain()?.toSummary()
-                val receiver = userDao.getById(entity.receiverId)?.toDomain()?.toSummary()
-                if (sender != null && receiver != null) entity.toDomain(sender, receiver) else null
-            }
-            emit(notifications)
-        }
-
-    fun observeUnreadCount(userId: String): Flow<Int> =
-        notificationDao.observeUnreadCount(userId)
 
     suspend fun getNotifications(userId: String): List<Notification> {
         val entities = notificationDao.getAllByUserId(userId)
