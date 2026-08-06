@@ -24,6 +24,7 @@ data class RegisterUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val acceptedTerms: Boolean = false,
 
     // Step 2
     val name: String = "",
@@ -54,6 +55,7 @@ sealed interface RegisterEvent {
     data class EmailChanged(val value: String) : RegisterEvent
     data class PasswordChanged(val value: String) : RegisterEvent
     data class ConfirmPasswordChanged(val value: String) : RegisterEvent
+    data class TermsToggled(val value: Boolean) : RegisterEvent
     data object NextStep : RegisterEvent
 
     // Step 2
@@ -84,6 +86,7 @@ class RegisterViewModel(
             is RegisterEvent.EmailChanged           -> _uiState.update { it.copy(email = event.value, emailError = null) }
             is RegisterEvent.PasswordChanged        -> _uiState.update { it.copy(password = event.value, passwordError = null) }
             is RegisterEvent.ConfirmPasswordChanged -> _uiState.update { it.copy(confirmPassword = event.value, confirmPasswordError = null) }
+            is RegisterEvent.TermsToggled           -> _uiState.update { it.copy(acceptedTerms = event.value) }
             is RegisterEvent.NextStep               -> validateStep1()
             is RegisterEvent.NameChanged            -> _uiState.update { it.copy(name = event.value, nameError = null) }
             is RegisterEvent.BirthDayChanged        -> _uiState.update { it.copy(birthDay = event.value, birthdateError = null) }
@@ -130,6 +133,11 @@ class RegisterViewModel(
             if (state.password != state.confirmPassword) {
                 confirmPasswordError = "Las contraseñas no coinciden."
                 isValid = false
+            }
+
+            if (!state.acceptedTerms) {
+                isValid = false
+                _uiState.update { it.copy(generalError = "Debés aceptar los términos y condiciones para continuar.") }
             }
 
             _uiState.update {
